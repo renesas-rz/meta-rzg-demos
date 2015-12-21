@@ -1,0 +1,113 @@
+From fdf1b192eef20ff3ff6c0910e540db19e1758306 Mon Sep 17 00:00:00 2001
+From: tamnm2 <tamnm2@fsoft.com.vn>
+Date: Fri, 16 Oct 2015 15:42:54 +0700
+Subject: [PATCH] fix memory leak H264streaming Signed-off-by: tamnm2
+ <tamnm2@fsoft.com.vn>
+
+---
+ .../qgstreamerH264Streamingsession.cpp             |   68 ++++++++++++++++++++
+ 1 files changed, 68 insertions(+)
+
+diff --git a/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp b/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp
+index cd12864..f1a1a81 100755
+--- a/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp
++++ b/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp
+@@ -316,6 +316,71 @@ QGstreamerH264StreamingSession::~QGstreamerH264StreamingSession()
+         gst_element_set_state(rtsp_bin, GST_STATE_NULL);
+ 		gst_object_unref(GST_OBJECT(rtsp_bin));
+ 	}
++    //Check for element and caps to free
++    if(m_videoOutputBin)
++        gst_object_unref(m_videoOutputBin);
++    if(m_videoIdentity)
++        gst_object_unref(m_videoIdentity);
++    if(m_colorSpace)
++        gst_object_unref(m_colorSpace);
++    if(m_videoSink)
++        gst_object_unref(m_videoSink);
++    if(m_pendingVideoSink)
++        gst_object_unref(m_pendingVideoSink);
++    if(m_nullVideoSink)
++        gst_object_unref(m_nullVideoSink);
++    if(m_audioSink)
++        gst_object_unref(m_audioSink);
++    if(m_volumeElement)
++        gst_object_unref(m_volumeElement);
++
++    if(m_videoOutput)
++        gst_object_unref(m_videoOutput);
++    if(udp_src)
++        gst_object_unref(udp_src);
++    if(udp_sink)
++        gst_object_unref(udp_sink);
++    if(pay)
++        gst_object_unref(pay);
++    if(depay)
++        gst_object_unref(depay);
++    if(parser)
++        gst_object_unref(parser);
++    if(encoder)
++        gst_object_unref(encoder);
++    if(decoder)
++        gst_object_unref(decoder);
++    if(filter)
++        gst_object_unref(filter);
++    if(capfilter_vspm)
++        gst_object_unref(capfilter_vspm);
++    if(videoIdentity_depay)
++        gst_object_unref(videoIdentity_depay);
++    if(videoIdentity_parse)
++        gst_object_unref(videoIdentity_parse);
++    if(videosink)
++        gst_object_unref(videosink);
++    if(tee)
++        gst_object_unref(tee);
++    if(filter1)
++        gst_object_unref(filter1);
++    if(capfilter_vspm1)
++        gst_object_unref(capfilter_vspm1);
++    if(parser1)
++        gst_object_unref(parser1);
++
++    if(filtercaps_vspm)
++        gst_caps_unref(filtercaps_vspm);
++    if(filtercaps_vspm1)
++        gst_caps_unref(filtercaps_vspm1);
++    if(filtercaps_depay)
++        gst_caps_unref(filtercaps_depay);
++    if(filtercaps_parse)
++        gst_caps_unref(filtercaps_parse);
++    if(streaming_src_cap)
++        gst_caps_unref(streaming_src_cap);
++    if(filtercaps_dec)
++        gst_caps_unref(filtercaps_dec);
+ }
+ 
+ void QGstreamerH264StreamingSession::setHdmiWidth(int hdmiwidth)
+@@ -416,6 +481,7 @@ void QGstreamerH264StreamingSession::setVspmWidth(int vspmwidth)
+                                 "format", G_TYPE_STRING, vspm_format,
+                                 NULL);
+     g_object_set (G_OBJECT (capfilter_vspm), "caps", filtercaps_vspm, NULL);
++    gst_caps_unref(filtercaps_vspm);  //Free filtercaps_vspm after use
+ }
+ 
+ void QGstreamerH264StreamingSession::setVspmWidth1(int vspmwidth1)
+@@ -430,6 +496,7 @@ QGstreamerH264StreamingSession::setVspmWidth(int vspmwidth)
+                                 NULL);
+     g_object_set (G_OBJECT (capfilter_vspm1), "caps", filtercaps_vspm1, NULL);
+     g_object_set (G_OBJECT(filter1), "outbuf-alloc", TRUE, NULL);
++    gst_caps_unref(filtercaps_vspm1);  //Free filtercaps_vspm1 after use
+ }
+ 
+ void QGstreamerH264StreamingSession::setVspmHeight(int vspmheight)
+@@ -1204,6 +1273,7 @@ void QGstreamerH264StreamingSession::teeSetting()
+ 	}
+ 
+ 	gst_object_unref (q1_pad);
++       gst_object_unref (tee_q1_pad);  //Free tee_q1_pad after use
+ }
+ 
+ void QGstreamerH264StreamingSession::updateDuration()
+-- 
+1.7.9.5
+

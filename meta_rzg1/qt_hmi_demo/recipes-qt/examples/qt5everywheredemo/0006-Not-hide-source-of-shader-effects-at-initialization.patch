@@ -1,0 +1,13 @@
+diff --git a/qml/QtDemo/demos/shaders/Content.qml b/qml/QtDemo/demos/shaders/Content.qml
+index 151f7da..93255c2 100755
+--- a/qml/QtDemo/demos/shaders/Content.qml
++++ b/qml/QtDemo/demos/shaders/Content.qml
+@@ -52,7 +52,7 @@ Rectangle {
+     ShaderEffectSource {
+         id: theSource
+         smooth: true
+-        hideSource: true
++        hideSource: false
+     }
+ 
+     LogoContainer {

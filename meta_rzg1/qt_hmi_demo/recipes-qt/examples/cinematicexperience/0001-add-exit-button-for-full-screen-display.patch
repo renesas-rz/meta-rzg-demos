@@ -1,0 +1,45 @@
+diff --git a/content/MainView.qml b/content/MainView.qml
+index 3b38782..f70497c 100644
+--- a/content/MainView.qml
++++ b/content/MainView.qml
+@@ -227,4 +227,21 @@ Item {
+             visible: root.blurAmount
+         }
+     }
++
++    // Add exit button for fullscreen display
++    Image {
++        id: exit_image
++        anchors.right: parent.right
++        anchors.rightMargin: 8
++        anchors.bottom: parent.bottom
++        anchors.bottomMargin: 8
++        source: "images/exit.png"
++        opacity: 0.25
++        MouseArea {
++            anchors.fill : parent
++            onClicked: {
++                Qt.quit()
++            }
++        }
++    }
+ }
+diff --git a/main.cpp b/main.cpp
+index 81c1c85..da04b1a 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -1,5 +1,6 @@
+ #include <QGuiApplication>
+ #include <QQuickView>
++#include <QtQml/QQmlEngine>
+ 
+ int main(int argc, char* argv[])
+ {
+@@ -7,6 +8,7 @@ int main(int argc, char* argv[])
+     QQuickView view;
+     view.setResizeMode(QQuickView::SizeRootObjectToView);
+     view.setSource(QUrl::fromLocalFile(QCoreApplication::applicationDirPath() + QLatin1String("/Qt5_CinematicExperience.qml")));
++    QObject::connect(view.engine(), SIGNAL(quit()), &view, SLOT(close()));
+ 
+     const QString lowerArgument = QString::fromLatin1(argv[1]).toLower();
+     if (lowerArgument == QLatin1String("--fullscreen")) {

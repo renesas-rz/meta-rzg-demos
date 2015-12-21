@@ -1,0 +1,21 @@
+diff --git a/omx/gstomxvideoenc.c b/omx/gstomxvideoenc.c
+index c378608..b643c5a 100644
+--- a/omx/gstomxvideoenc.c
++++ b/omx/gstomxvideoenc.c
+@@ -266,7 +266,7 @@ gst_omx_video_enc_sink_query (GstPad * pad, GstObject * parent, GstQuery * query
+       break;
+     }
+     default:
+-      res = gst_pad_query_default (pad, parent, query);
++      res = gst_video_encoder_sink_query (pad, parent, query);
+       break;
+   }
+   return res;
+@@ -1437,6 +1437,7 @@ gst_omx_video_enc_set_format (GstVideoEncoder * encoder,
+         if (gst_omx_port_allocate_buffers (self->enc_in_port) != OMX_ErrorNone)
+           return FALSE;
+       }
++	  self->p_buffers = p_buffers;
+     } else {
+       if (gst_omx_port_allocate_buffers (self->enc_in_port) != OMX_ErrorNone)
+         return FALSE;

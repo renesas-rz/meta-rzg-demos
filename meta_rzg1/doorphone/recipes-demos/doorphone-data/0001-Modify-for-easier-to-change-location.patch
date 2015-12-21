@@ -1,0 +1,61 @@
+From f64ef98498c7d6a8662b1f4528cd9fce99902a63 Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Sat, 28 Nov 2015 18:42:48 +0700
+Subject: [PATCH] Modify for easier to change location
+
+After this change, just change VIDEOLOCATION and SCRIPTLOCATION
+environment variable when need to change location.
+Note that this is for this script only, must change other place as well
+
+Signed-off-by: HungTran <hung.tran.jy@rvc.renesas.com>
+---
+ OutDoor/run_outdoor_opencv.sh | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/OutDoor/run_outdoor_opencv.sh b/OutDoor/run_outdoor_opencv.sh
+index ada0d69..74de9d5 100755
+--- a/OutDoor/run_outdoor_opencv.sh
++++ b/OutDoor/run_outdoor_opencv.sh
+@@ -1,6 +1,7 @@
+ #!/bin/sh
+ 
+-
++VIDEOLOCATION=/home/root/videos/
++SCRIPTLOCATION=/home/root/doorphone/    # Only effect in this file, remember to change other files as well
+ gst-launch-1.0 alsasrc device=hw:0,0 ! audioconvert ! avenc_aac compliance=-2 ! rtpmp4apay ! udpsink host=192.168.10.100 port=2000 sync=false &> /dev/null &
+ gst-launch-1.0 udpsrc port=2001 caps="application/x-rtp,config=(string)40002420" ! rtpjitterbuffer ! queue ! rtpmp4adepay ! avdec_aac ! audioconvert !  alsasink &> /dev/null &
+ 
+@@ -8,23 +9,23 @@ gst-launch-1.0 udpsrc port=2001 caps="application/x-rtp,config=(string)40002420"
+ gst-launch-1.0 -e v4l2src ! video/x-raw,format=UYVY,width=720,height=480 ! tee name=t t. ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=640,height=480 ! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay pt=96 config-interval=3 mtu=9000 ! udpsink host=192.168.10.255 port=1234 t. ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=736,height=480 ! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay pt=96 config-interval=3 ! udpsink host=192.168.10.101 port=5555 &> /dev/null &
+ 
+ # Send 3 video stream to Base phone
+-while true; do  gst-launch-1.0 filesrc location=/home/root/doorphone/vga1.h264 ! video/x-h264,framerate=30/1 ! h264parse ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=192.168.10.255 port=1235 &> /dev/null; done &
+-while true; do  gst-launch-1.0 filesrc location=/home/root/doorphone/vga2.h264 ! video/x-h264,framerate=30/1 ! h264parse ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=192.168.10.255 port=1236 &> /dev/null; done &
+-while true; do  gst-launch-1.0 filesrc location=/home/root/doorphone/vga3.h264 ! video/x-h264,framerate=30/1 ! h264parse ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=192.168.10.255 port=1237 &> /dev/null; done &
++while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga1.h264 ! video/x-h264,framerate=30/1 ! h264parse ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=192.168.10.255 port=1235 &> /dev/null; done &
++while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga2.h264 ! video/x-h264,framerate=30/1 ! h264parse ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=192.168.10.255 port=1236 &> /dev/null; done &
++while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga3.h264 ! video/x-h264,framerate=30/1 ! h264parse ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=192.168.10.255 port=1237 &> /dev/null; done &
+ 
+ # Remove old image
+-rm /home/root/doorphone/image* &> /dev/null
++rm $SCRIPTLOCATION/image* &> /dev/null
+ 
+ # Face detect and capture image
+-/home/root/doorphone/guess-mess udpsrc port=5555 caps="application/x-rtp" ! rtph264depay ! \
++$SCRIPTLOCATION/guess-mess udpsrc port=5555 caps="application/x-rtp" ! rtph264depay ! \
+   h264parse ! tee tee0. ! omxh264dec no-copy=true ! queue ! videorate ! \
+   video/x-raw,framerate=1/1 ! jpegenc ! multifilesink post-messages=true \
+-  location=/home/root/doorphone/image_capture.jpeg max-files=1 tee0. ! omxh264dec ! videorate ! \
++  location=$SCRIPTLOCATION/image_capture.jpeg max-files=1 tee0. ! omxh264dec ! videorate ! \
+   video/x-raw,framerate=1/1 ! vspmfilter ! \
+   video/x-raw,format=RGB,width=256,height=200 ! facedetect updates=2 \
+   profile=/usr/share/OpenCV/haarcascades/haarcascade_frontalface_default.xml \
+   min-size-width=50 min-size-height=80 ! waylandsink qos=false &
+ 
+ # GPIO button
+-/home/root/doorphone/GPIO_button &
++$SCRIPTLOCATION/GPIO_button &
+ 
+-- 
+1.9.1
+

@@ -1,0 +1,50 @@
+diff --git a/qml/QtDemo/demos/touchgallery/content/ButtonPage.qml b/qml/QtDemo/demos/touchgallery/content/ButtonPage.qml
+index 10e4d0d..679a093 100644
+--- a/qml/QtDemo/demos/touchgallery/content/ButtonPage.qml
++++ b/qml/QtDemo/demos/touchgallery/content/ButtonPage.qml
+@@ -108,7 +108,7 @@ Item {
+                         anchors.centerIn: parent
+                         color: "white"
+                         font.pixelSize: 23
+-                        renderType: Text.NativeRendering
++                        renderType: Text.QtRendering
+                     }
+                 }
+             }
+diff --git a/qml/QtDemo/demos/touchgallery/content/TextInputPage.qml b/qml/QtDemo/demos/touchgallery/content/TextInputPage.qml
+index 2f841ce..cc7754a 100644
+--- a/qml/QtDemo/demos/touchgallery/content/TextInputPage.qml
++++ b/qml/QtDemo/demos/touchgallery/content/TextInputPage.qml
+@@ -85,6 +85,7 @@ Item {
+         TextFieldStyle {
+             textColor: "white"
+             font.pixelSize: 28
++	    renderType: Text.QtRendering
+             background: Item {
+                 implicitHeight: 50
+                 implicitWidth: 300
+diff --git a/qml/QtDemo/engine.js b/qml/QtDemo/engine.js
+index 2618807..7219df5 100644
+--- a/qml/QtDemo/engine.js
++++ b/qml/QtDemo/engine.js
+@@ -69,13 +69,13 @@ var groupPositions = [
+         ]
+ 
+ var imageSources = ["phone1.png","phone2.png", "phone3.png","tablet1.png", "car_device.png", "medical_device.png", "laptop1.png", "laptop2.png", "tv.png"]
+-var widths = [300, 360, 366, 758, 625, 600, 918, 923, 800]
+-var heights = [605, 706, 720, 564, 386, 488, 600, 600, 638]
+-var scales = [0.8, 0.8, 0.6, 0.9, 1.0, 1.0, 0.9, 1.0, 1.0]
+-var demoWidths = [269, 322, 322, 642, 480, 482, 688, 691, 726]
+-var demoHeights = [404, 482, 482, 402, 320, 322, 431, 432, 456]
+-var maskHorizontalOffsets = [1, 1, 1, 1, -52, 1, 1, 1, 1]
+-var maskVerticalOffsets = [20, 32, 15, 24, 15, 45, 59, 57, 56]
++var widths = [300, 360, 366, 758, 1649, 1649, 918, 923, 800]
++var heights = [605, 706, 720, 564, 1080, 1341, 600, 600, 638]
++var scales = [0.8, 0.8, 0.6, 0.9, 0.4, 0.4, 0.9, 1.0, 1.0]
++var demoWidths = [269, 322, 322, 642, 1343, 1325, 688, 691, 726]
++var demoHeights = [404, 482, 482, 402, 925, 940, 431, 432, 456]
++var maskHorizontalOffsets = [1, 1, 1, 1, -122, 1, 1, 1, 1]
++var maskVerticalOffsets = [20, 32, 15, 24, 15, 130, 59, 57, 56]
+ var navigationList = [1,0,2,3,4,6,5,7,8,12,11,9,10]
+ var groupNavigationList = [0,1,2,3,4,5]
+ var currentDemoIndex = -1

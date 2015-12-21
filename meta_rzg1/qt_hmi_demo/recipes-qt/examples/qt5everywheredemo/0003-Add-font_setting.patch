@@ -1,0 +1,21 @@
+diff --git a/main.cpp b/main.cpp
+index e3572ea..8764951 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -1,11 +1,15 @@
+ #include <QGuiApplication>
+ #include <QQmlApplicationEngine>
+ #include <QQmlContext>
++#include <QFont>
+ 
+ int main(int argc, char *argv[])
+ {
+     QGuiApplication app(argc, argv);
+-
++    QFont font;
++	/*set default font*/
++    font.setFamily("DejaVu Sans");
++    app.setFont(font);
+     QQmlApplicationEngine engine;
+     engine.load(QUrl(QStringLiteral("qrc:///qml/QtDemo/main.qml")));
+ 

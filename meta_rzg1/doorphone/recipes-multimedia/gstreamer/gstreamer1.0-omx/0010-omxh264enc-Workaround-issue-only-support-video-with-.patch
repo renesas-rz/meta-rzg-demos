@@ -1,0 +1,36 @@
+From 9951aca697c88e4baee8bfa73a6f3dc475f89b96 Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Thu, 23 Jul 2015 20:25:39 +0700
+Subject: [PATCH] omxh264enc: Workaround issue only support video with
+ 128-multiple width.
+
+The OMX MC manual says it only supports 128-aligned stride.
+But in practice it still works with 32-aligned stride.
+
+This patch change the aligment in omxh264enc from 128 to 32 to
+support more resolution.
+Note that this change is just a workaround as it is wrong with spec.
+Should confirm with OMX MC team about the reason of 128-alignment
+and can it work with 32-aligment.
+---
+ omx/gstomxvideoenc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/omx/gstomxvideoenc.c b/omx/gstomxvideoenc.c
+index f1eee9c..1ea92be 100644
+--- a/omx/gstomxvideoenc.c
++++ b/omx/gstomxvideoenc.c
+@@ -1345,7 +1345,9 @@ gst_omx_video_enc_set_format (GstVideoEncoder * encoder,
+         break;
+       }
+       case OMX_COLOR_FormatYUV420SemiPlanar:
+-        port_def.format.video.nStride = ((info->width + 127) & ~ 127);   /* Align 128 */
++      /* Workaround: MC manual requires 128 align, but in practice
++       * it still work with 32 align */
++        port_def.format.video.nStride = ((info->width + 31) & ~ 31);   /* Align 32 */
+       break;
+       default:
+         port_def.format.video.nStride = GST_ROUND_UP_4 (info->width);    /* Safe (?) default */
+-- 
+1.9.1
+

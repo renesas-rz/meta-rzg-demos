@@ -1,0 +1,14 @@
+diff --git a/qml/QtDemo/main.qml b/qml/QtDemo/main.qml
+index f0e32eb..22daa6f 100644
+--- a/qml/QtDemo/main.qml
++++ b/qml/QtDemo/main.qml
+@@ -45,7 +45,8 @@ import "style.js" as Style
+ 
+ Window {
+     visible: true
+-
++    width: 1920
++    height: 1080
+     onWidthChanged: app.calculateScales();
+     onHeightChanged: app.calculateScales();
+ 

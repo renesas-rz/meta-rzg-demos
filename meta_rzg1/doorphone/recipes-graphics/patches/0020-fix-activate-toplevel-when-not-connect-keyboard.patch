@@ -1,0 +1,32 @@
+From 2aabe45db720d7eabb43f6f09f6ba33e5f2da089 Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Mon, 14 Dec 2015 18:10:02 +0700
+Subject: [PATCH] fix activate toplevel when not connect keyboard
+
+Checking for keyboard before activate is not need.
+It causes problem if user does not connect the keyboard
+(activate not work, causes wrong layer order int that case)
+
+This patch remove the check and fix the problem
+
+Signed-off-by: HungTran <hung.tran.jy@rvc.renesas.com>
+---
+ desktop-shell/shell.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index bfdd189..35cf232 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -2281,8 +2281,6 @@ set_toplevel(struct shell_surface *shsurf)
+ 	struct weston_seat *seat;
+ 
+ 	wl_list_for_each(seat, &shsurf->shell->compositor->seat_list, link) {
+-		if (!seat->keyboard)
+-			continue;
+ 		activate(shsurf->shell, shsurf->surface, seat, true);
+   }
+ 	/* The layer_link is updated in set_surface_type(),
+-- 
+1.9.1
+

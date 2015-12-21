@@ -1,0 +1,22 @@
+diff --git a/VideoSlide.qml b/VideoSlide.qml
+index 95479ef..41f05e6 100644
+--- a/VideoSlide.qml
++++ b/VideoSlide.qml
+@@ -54,7 +54,7 @@ Slide {
+         id: video
+ 
+         anchors.fill: parent
+-        source: "bunny.mov"
++        source: "renesas.mov"
+         autoLoad: true;
+ 
+         layer.enabled: true;
+@@ -94,7 +94,7 @@ Slide {
+         visible: false
+     }
+ 
+-    centeredText: video.hasVideo ? "" : "'bunny.mov' is not found or cannot be played: " + video.errorString
++    centeredText: video.hasVideo ? "" : "'renesas.mov' is not found or cannot be played: " + video.errorString
+ 
+      onVisibleChanged: {
+          if (slide.visible)

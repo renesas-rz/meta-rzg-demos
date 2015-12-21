@@ -1,0 +1,12 @@
+diff --git a/qml/QtDemo/Slide.qml b/qml/QtDemo/Slide.qml
+index 99ef4a9..e4a45dd 100644
+--- a/qml/QtDemo/Slide.qml
++++ b/qml/QtDemo/Slide.qml
+@@ -192,6 +192,7 @@ Item {
+                     releaseSplashScreen()
+                 }
+             }
++            incubator.forceCompletion();
+         } else {
+             print ("Object", incubator.object, "is ready immediately!");
+             slide.loaded = true

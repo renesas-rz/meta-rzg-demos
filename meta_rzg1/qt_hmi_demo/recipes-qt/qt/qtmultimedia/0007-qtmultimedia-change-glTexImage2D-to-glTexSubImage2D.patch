@@ -1,0 +1,96 @@
+From 4617aea94de8f83ae033deb6dd7b575dc7f02259 Mon Sep 17 00:00:00 2001
+From: Binh Nguyen <binh.nguyen.uw@rvc.renesas.com>
+Date: Fri, 6 Nov 2015 15:27:15 +0700
+Subject: [PATCH 1/2] qtmultimedia: change glTexImage2D to glTexSubImage2D
+
+improve video displaying performance by replace glTexImage2D with glTwxSubImage2D
+
+Signed-off-by: Binh Nguyen <binh.nguyen.uw@rvc.renesas.com>
+---
+ src/qtmultimediaquicktools/qsgvideonode_yuv.cpp | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
+ mode change 100644 => 100755 src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
+
+diff --git a/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp b/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
+old mode 100644
+new mode 100755
+index af1e98c..07d5119
+--- a/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
++++ b/src/qtmultimediaquicktools/qsgvideonode_yuv.cpp
+@@ -40,6 +40,8 @@
+ 
+ QT_BEGIN_NAMESPACE
+ 
++int re_texture;
++
+ QList<QVideoFrame::PixelFormat> QSGVideoNodeFactory_YUV::supportedPixelFormats(
+                                         QAbstractVideoBuffer::HandleType handleType) const
+ {
+@@ -55,6 +57,7 @@ QList<QVideoFrame::PixelFormat> QSGVideoNodeFactory_YUV::supportedPixelFormats(
+ 
+ QSGVideoNode *QSGVideoNodeFactory_YUV::createNode(const QVideoSurfaceFormat &format)
+ {
++    re_texture = 1;
+     if (supportedPixelFormats(format.handleType()).contains(format.pixelFormat()))
+         return new QSGVideoNode_YUV(format);
+ 
+@@ -193,7 +196,7 @@ public:
+     }
+ 
+     void bind();
+-    void bindTexture(int id, int w, int h, const uchar *bits, GLenum format);
++    void bindTexture(int id, int w, int h, const uchar *bits, GLenum format, int re_texture);
+ 
+     QVideoSurfaceFormat m_format;
+     QSize m_textureSize;
+@@ -295,9 +298,9 @@ void QSGVideoMaterial_YUV::bind()
+                 m_planeWidth[0] = m_planeWidth[1] = qreal(fw) / m_frame.bytesPerLine(y);
+ 
+                 functions->glActiveTexture(GL_TEXTURE1);
+-                bindTexture(m_textureIds[1], m_frame.bytesPerLine(uv) / 2, fh / 2, m_frame.bits(uv), GL_LUMINANCE_ALPHA);
++                bindTexture(m_textureIds[1], m_frame.bytesPerLine(uv) / 2, fh / 2, m_frame.bits(uv), GL_LUMINANCE_ALPHA, re_texture);
+                 functions->glActiveTexture(GL_TEXTURE0); // Finish with 0 as default texture unit
+-                bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), GL_LUMINANCE);
++                bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), GL_LUMINANCE, re_texture);
+ 
+             } else { // YUV420P || YV12
+                 const int y = 0;
+@@ -308,13 +311,14 @@ void QSGVideoMaterial_YUV::bind()
+                 m_planeWidth[1] = m_planeWidth[2] = qreal(fw) / (2 * m_frame.bytesPerLine(u));
+ 
+                 functions->glActiveTexture(GL_TEXTURE1);
+-                bindTexture(m_textureIds[1], m_frame.bytesPerLine(u), fh / 2, m_frame.bits(u), GL_LUMINANCE);
++                bindTexture(m_textureIds[1], m_frame.bytesPerLine(u), fh / 2, m_frame.bits(u), GL_LUMINANCE, re_texture);
+                 functions->glActiveTexture(GL_TEXTURE2);
+-                bindTexture(m_textureIds[2], m_frame.bytesPerLine(v), fh / 2, m_frame.bits(v), GL_LUMINANCE);
++                bindTexture(m_textureIds[2], m_frame.bytesPerLine(v), fh / 2, m_frame.bits(v), GL_LUMINANCE, re_texture);
+                 functions->glActiveTexture(GL_TEXTURE0); // Finish with 0 as default texture unit
+-                bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), GL_LUMINANCE);
++                bindTexture(m_textureIds[0], m_frame.bytesPerLine(y), fh, m_frame.bits(y), GL_LUMINANCE, re_texture);
+             }
+ 
++            re_texture = 0;
+             functions->glPixelStorei(GL_UNPACK_ALIGNMENT, previousAlignment);
+             m_frame.unmap();
+         }
+@@ -329,12 +333,15 @@ void QSGVideoMaterial_YUV::bind()
+     }
+ }
+ 
+-void QSGVideoMaterial_YUV::bindTexture(int id, int w, int h, const uchar *bits, GLenum format)
++void QSGVideoMaterial_YUV::bindTexture(int id, int w, int h, const uchar *bits, GLenum format, int re_texture)
+ {
+     QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
+ 
+     functions->glBindTexture(GL_TEXTURE_2D, id);
+-    functions->glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, bits);
++    if (re_texture)
++      functions->glTexImage2D(GL_TEXTURE_2D, 0, format, w, h, 0, format, GL_UNSIGNED_BYTE, bits);
++    else
++      functions->glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, format, GL_UNSIGNED_BYTE, bits);
+     functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+     functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+     functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+-- 
+1.9.1
+

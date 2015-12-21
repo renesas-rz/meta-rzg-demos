@@ -1,0 +1,36 @@
+From 119874841f0bb1aab63785b1bd451ae18659c6f7 Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Thu, 12 Nov 2015 17:50:16 +0700
+Subject: [PATCH] MP4Playback: Change to use waylandwrlsink
+
+MP4Playback service also need waylandwrlsink for position
+setting
+
+Signed-off-by: HungTran <hung.tran.jy@rvc.renesas.com>
+---
+ src/plugins/gstreamer/MP4Playback/qgstreamerMP4Playbacksession.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/plugins/gstreamer/MP4Playback/qgstreamerMP4Playbacksession.cpp b/src/plugins/gstreamer/MP4Playback/qgstreamerMP4Playbacksession.cpp
+index 57f85b7..5fac07c 100644
+--- a/src/plugins/gstreamer/MP4Playback/qgstreamerMP4Playbacksession.cpp
++++ b/src/plugins/gstreamer/MP4Playback/qgstreamerMP4Playbacksession.cpp
+@@ -149,7 +149,7 @@ void QGstreamerMP4PlaybackSession::play()
+         m_demux = gst_element_factory_make("qtdemux", "Demuxer");
+         m_dec = gst_element_factory_make("omxh264dec", "Decoder");
+         m_queue = gst_element_factory_make("queue", "Queue");
+-        m_display = gst_element_factory_make("waylandsink", "Display");
++        m_display = gst_element_factory_make("waylandwrlsink", "Display");
+         
+         gst_bin_add_many (GST_BIN (m_pipeline), m_filesrc, m_demux, m_dec, m_queue, m_display, NULL);
+         gst_element_link (m_filesrc, m_demux);
+@@ -220,4 +220,4 @@ void QGstreamerMP4PlaybackSession::componentComplete()
+ }
+ 
+ 
+-QT_END_NAMESPACE
+\ No newline at end of file
++QT_END_NAMESPACE
+-- 
+1.9.1
+

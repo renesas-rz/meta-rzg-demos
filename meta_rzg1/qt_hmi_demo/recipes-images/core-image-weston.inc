@@ -1,0 +1,81 @@
+
+EXTRA_IMAGE_FEATURES = "debug-tweaks tools-debug tools-profile"
+
+IMAGE_INSTALL_append = " \
+    mm-init \
+    qtwayland \
+    qtwayland-plugins \
+    qt5ledscreen \
+    qt5nmapcarousedemo \
+    qt5nmapper \
+    qt5-opengles2-test \
+    qtsmarthome \
+    quitbattery \
+    qtbase-fonts \
+    qtbase-plugins \
+    qtbase-tools \
+    qtbase-examples \
+    qtdeclarative \
+    qtdeclarative-plugins \
+    qtdeclarative-tools \
+    qtdeclarative-examples \
+    qtdeclarative-qmlplugins \
+    qtimageformats-plugins \
+    qtsvg \
+    qtsvg-plugins \
+    qtsensors \
+    qtscript \
+    qt3d \
+    qt3d-examples \
+    qt3d-qmlplugins \
+    qtwebkit \
+    qtwebkit-examples-examples \
+    qtwebkit-qmlplugins \
+    qtgraphicaleffects-qmlplugins \
+    qtconnectivity \
+    qtconnectivity-examples \
+    qtconnectivity-qmlplugins \
+    qtlocation-plugins \
+    qtlocation-qmlplugins \
+    cinematicexperience \
+    qtmultimedia \
+    qtmultimedia-examples \
+    qtmultimedia-plugins \
+    qtmultimedia-qmlplugins \
+    qt5everywheredemo \
+    qt5-launch-demo \
+    qt5-qml-presentation-system \
+    icu \
+    libicudata \
+    libicuuc \
+    libicui18n  \
+    strace \
+    connman \
+    connman-client connman-tests \
+    launcher-taskbar \
+    qtquickcontrols-qmlplugins \
+    \
+    gstreamer1.0-plugins-base-apps \
+    gstreamer1.0-plugins-good-multifile \
+    gstreamer1.0-plugins-good-rtp \
+    gstreamer1.0-plugins-good-udp \
+    faac \
+    gstreamer1.0-plugins-bad-faac \
+    pulseaudio-server \
+    pulseaudio-module-echo-cancel \
+    gstreamer1.0-plugins-good-pulse \
+    gstreamer1.0-plugins-good-rtpmanager \
+    gstreamer1.0-plugins-base-app \
+    libgstapp-1.0 \
+    gstreamer1.0-plugins-bad-waylandfssink \
+    gstreamer1.0-plugins-bad-waylandmiraclesink \
+    gstreamer1.0-plugins-bad-waylandwrlsink \
+    gstreamer1.0-plugins-good-jpeg \
+    gstreamer1.0-plugins-base-volume \
+    gstreamer1.0-plugins-base-audiorate \
+    gstreamer1.0-plugins-base-videorate \
+    gstreamer1.0-plugins-base-encodebin \
+    gstreamer1.0-plugins-bad-camerabin2 \
+    gstreamer1.0-plugins-good-icydemux \
+    libgstphotography-1.0 \
+"
