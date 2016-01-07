@@ -1,0 +1,32 @@
+From c3b76d749d7085f9f9e66a5f5383edcfb0f6cb70 Mon Sep 17 00:00:00 2001
+From: Andrey Dolnikov <andrey.dolnikov@cogentembedded.com>
+Date: Wed, 29 Apr 2015 16:29:04 +0300
+Subject: [PATCH] vsp-renderer fix
+
+---
+ src/vsp-renderer.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/src/vsp-renderer.c b/src/vsp-renderer.c
+index ac4f741..b8767f0 100644
+--- a/src/vsp-renderer.c
++++ b/src/vsp-renderer.c
+@@ -828,9 +828,12 @@ vsp_comp_flush(struct vsp_device *vsp)
+ 	DBG("flush vsp composition.\n");
+ 
+ 	// enable links and queue buffer
+-	for (i = 0; i < vsp->input_count; i++)
+-		vsp_comp_setup_inputs(vsp, &vsp->input_pads[i], vsp->use_scaler[i],
+-				      vsp->input_surface_states[i], 1);
++	for (i = 0; i < vsp->input_count; i++) {
++		if (vsp_comp_setup_inputs(vsp, &vsp->input_pads[i], vsp->use_scaler[i], vsp->input_surface_states[i], 1) < 0) {
++			weston_log("Setup used input failed!\n");
++			goto error;
++		}
++	}
+ 
+ 	// disable unused inputs
+ 	for (i = vsp->input_count; i < vsp->input_max; i++)
+-- 
+1.9.1
+
