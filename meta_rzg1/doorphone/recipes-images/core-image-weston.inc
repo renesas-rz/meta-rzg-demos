@@ -54,6 +54,7 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-bad-camerabin2 \
     gstreamer1.0-plugins-good-icydemux \
     libgstphotography-1.0 \
+    wireless-firmware \
 "
 
 
@@ -86,6 +87,8 @@ setup_outdoor () {
     sed -i 's/iface eth0 inet dhcp/iface eth0 inet static\
     address 192.168.10.101\
     netmask 255.255.255.0/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
+    # Use nl80211 driver instead of wext, which is older and not support Wifi AC
+    sed -i 's/wpa-driver wext/wpa-driver nl80211/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
 }
 
 # Create Outdoor image manually
@@ -126,6 +129,8 @@ setup_basephone () {
     sed -i 's/iface eth0 inet dhcp/iface eth0 inet static\
     address 192.168.10.100\
     netmask 255.255.255.0/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
+    # Use nl80211 driver instead of wext, which is older and not support Wifi AC
+    sed -i 's/wpa-driver wext/wpa-driver nl80211/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
 
     # Enable WLAN0
     echo 'auto wlan0' >> ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces

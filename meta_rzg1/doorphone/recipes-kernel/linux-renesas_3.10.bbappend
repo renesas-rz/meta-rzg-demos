@@ -5,6 +5,7 @@ PATCHTOOL_rzg1 = "git"
 SRC_URI_append = " \
     file://0001-add-wifi-bcmdhd.patch \
     file://0002-audio-fix-non-audio-at-boot-up-randomly.patch \
+    file://0003-Build-driver-support-USBWifi-band-5GHz.patch \
 "
 
 do_configure_append() {
@@ -81,6 +82,7 @@ do_configure_append() {
     kernel_configure_variable RTL8192CE=y
     kernel_configure_variable RTL8188EE=y
     kernel_configure_variable RTL8192CU=y
+    kernel_configure_variable RTL8812AU_8821AU=y
 
     yes '' | oe_runmake oldconfig
 }

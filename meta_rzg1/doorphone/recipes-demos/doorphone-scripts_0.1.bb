@@ -36,7 +36,7 @@ do_install () {
     cp -RP ${S}/profile                  ${D}/home/root/.profile
 
     # Basephone
-    cp -RP ${S}/firmware                 ${D}/${base_libdir}/
+#    cp -RP ${S}/firmware                 ${D}/${base_libdir}/
     cp -RP ${S}/BasePhone/mailrc         ${D}/home/root/.mailrc
     cp -RP ${S}/BasePhone/msmtprc        ${D}/home/root/.msmtprc
     cp -RP ${S}/BasePhone/ssl            ${D}/${sysconfdir}/
