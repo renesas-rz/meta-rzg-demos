@@ -5,7 +5,8 @@ DEPENDS = "qtdeclarative qtquickcontrols axistatlib qtmultimedia"
 RDEPENDS_${PN} = "qtquickcontrols-qmlplugins  axistatlib qtmultimedia"
 
 SRC_URI = " \
- file://simpleplayer.tar.gz \
+  file://simpleplayer.tar.gz \
+  file://0001-Workaround-error-sometimes-touch-button-has-no-effec.patch \
 "
 S = "${WORKDIR}/simpleplayer"
 
