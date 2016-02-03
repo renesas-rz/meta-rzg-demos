@@ -37,14 +37,6 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-good-multifile \
     gstreamer1.0-plugins-good-rtp \
     gstreamer1.0-plugins-good-udp \
-    faac \
-    gstreamer1.0-plugins-bad-faac \
-    pulseaudio-server \
-    pulseaudio-module-echo-cancel \
-    gstreamer1.0-plugins-good-pulse \
-    gstreamer1.0-plugins-good-rtpmanager \
-    gstreamer1.0-rtsp-server \
-    gstreamer1.0-plugins-base-app \
     libgstapp-1.0 \
     gstreamer1.0-plugins-good-jpeg \
     gstreamer1.0-plugins-base-volume \
@@ -54,7 +46,6 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-bad-camerabin2 \
     gstreamer1.0-plugins-good-icydemux \
     libgstphotography-1.0 \
-    wireless-firmware \
 "
 
 
@@ -63,14 +54,25 @@ IMAGE_INSTALL_append = " \
 ### ADD modules for Doorphone###
 IMAGE_INSTALL_append = " \
      gstreamer1.0-rtsp-server \
-     axistatlib simple-player-qml \
      qtmultimedia qtmultimedia-plugins \
      qtmultimedia-qmlplugins \
      gstreamer1.0-plugins-base-vspmfilter \
      gstreamer1.0-libav \
      gstreamer1.0-plugins-bad-opencv \
+     faac \
+     gstreamer1.0-plugins-bad-faac \
+     pulseaudio-server \
+     pulseaudio-module-echo-cancel \
+     gstreamer1.0-plugins-good-pulse \
+     gstreamer1.0-plugins-good-rtpmanager \
+     gstreamer1.0-plugins-base-app \
      doorphone-scripts \
      doorphone-videos \
+     mailx \
+     msmtp \
+     axistatlib \
+     simple-player-qml \
+     wireless-firmware \
 "
 
 ### MODIFY for Doorphone before creating image###
