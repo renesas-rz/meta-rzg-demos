@@ -1,0 +1,116 @@
+From 7730d44031cc431f06dbce70d9d8dc68a453fb3d Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Thu, 4 Feb 2016 22:20:17 +0700
+Subject: [PATCH 6/6] Flexible-Display-Support-icon-hidden
+
+Make ratio icons hidden during apps scaling (~3s), so that
+user can know that these button is click able during this time
+
+Signed-off-by: khoahvd <khoahvd@fsoft.com.vn>
+---
+ qml/simpleplayer/main.qml | 28 ++++++++++++++++++++++++++--
+ 1 file changed, 26 insertions(+), 2 deletions(-)
+
+diff --git a/qml/simpleplayer/main.qml b/qml/simpleplayer/main.qml
+index 5f6b476..d2c6e83 100755
+--- a/qml/simpleplayer/main.qml
++++ b/qml/simpleplayer/main.qml
+@@ -838,6 +838,7 @@ Rectangle {
+                      id: icon_4_3
+                      source: "pics/4_3_icon.png"
+                      anchors.fill: parent
++                     opacity: 1
+                  }
+ 
+                  MouseArea {
+@@ -855,6 +856,10 @@ Rectangle {
+                          scale_UI(screenratio)
+                          icon_4_3.source = "pics/4_3_icon_active.png"
+ 
++                        icon_4_3.opacity = 0.5
++                        icon_5_4.opacity = 0.5
++                        icon_16_10.opacity = 0.5
++                        icon_full_screen.opacity = 0.5
+                      }
+                      onPressed: {
+                          icon_4_3.scale = 0.9
+@@ -878,6 +883,7 @@ Rectangle {
+                      id: icon_5_4
+                      source: "pics/5_4_icon.png"
+                      anchors.fill: parent
++                     opacity: 1
+                  }
+ 
+                  MouseArea {
+@@ -894,6 +900,10 @@ Rectangle {
+                          screenratio = 5/4
+                          scale_UI(screenratio)
+                          icon_5_4.source = "pics/5_4_icon_active.png"
++                         icon_4_3.opacity = 0.5
++                         icon_5_4.opacity = 0.5
++                         icon_16_10.opacity = 0.5
++                         icon_full_screen.opacity = 0.5
+                      }
+                      onPressed: {
+                          icon_5_4.scale = 0.9
+@@ -917,6 +927,7 @@ Rectangle {
+                      id: icon_16_10
+                      source: "pics/16_10_icon.png"
+                      anchors.fill: parent
++                     opacity: 1
+                  }
+ 
+                  MouseArea {
+@@ -933,6 +944,10 @@ Rectangle {
+                          screenratio = 16/10
+                          scale_UI(screenratio)
+                          icon_16_10.source = "pics/16_10_icon_active.png"
++                         icon_4_3.opacity = 0.5
++                         icon_5_4.opacity = 0.5
++                         icon_16_10.opacity = 0.5
++                         icon_full_screen.opacity = 0.5
+                      }
+                      onPressed: {
+                          icon_16_10.scale = 0.9
+@@ -957,6 +972,7 @@ Rectangle {
+                      id: icon_full_screen
+                      source: "pics/full_screen_icon_active.png"
+                      anchors.fill: parent
++                     opacity: 1
+                  }
+ 
+                  MouseArea {
+@@ -973,7 +989,10 @@ Rectangle {
+                          screenratio = 1
+                          scale_UI(screenratio)
+                          icon_full_screen.source = "pics/full_screen_icon_active.png"
+-
++                         icon_4_3.opacity = 0.5
++                         icon_5_4.opacity = 0.5
++                         icon_16_10.opacity = 0.5
++                         icon_full_screen.opacity = 0.5
+                      }
+                      onPressed: {
+                          icon_full_screen.scale = 0.9
+@@ -1013,12 +1032,17 @@ Rectangle {
+              /* btn timmer */
+              Timer{
+                  id: btn_timer
+-                 interval: 5000
++                 interval: 3000
+                  onTriggered: {
+                      btn_4_3.enabled = true;
+                      btn_5_4.enabled = true;
+                      btn_16_10.enabled = true;
+                      btn_full_screen.enabled = true;
++                     icon_4_3.opacity = 1
++                     icon_5_4.opacity = 1
++                     icon_16_10.opacity = 1
++                     icon_full_screen.opacity = 1
++
+                      if(screenratio == 4/3){
+                          btn_4_3.enabled = false;
+                      }
+-- 
+1.9.1
+

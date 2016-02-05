@@ -1,0 +1,54 @@
+From 7465f0365bdfbf8cc0ac077110d2365732c19843 Mon Sep 17 00:00:00 2001
+From: khoahvd <khoahvd@fsoft.com.vn>
+Date: Mon, 28 Dec 2015 15:08:05 +0700
+Subject: [PATCH 3/6] Flexible_Display_Support_remake_CPU_MEM_commponents
+
+Signed-off-by: khoahvd <khoahvd@fsoft.com.vn>
+---
+ qml/simpleplayer/CPUMonitorComponent.qml | 11 +++++++++++
+ qml/simpleplayer/MEMMonitorComponent.qml | 15 +++++++++++++++
+ 2 files changed, 26 insertions(+)
+ create mode 100644 qml/simpleplayer/CPUMonitorComponent.qml
+ create mode 100644 qml/simpleplayer/MEMMonitorComponent.qml
+
+diff --git a/qml/simpleplayer/CPUMonitorComponent.qml b/qml/simpleplayer/CPUMonitorComponent.qml
+new file mode 100644
+index 0000000..571ab13
+--- /dev/null
++++ b/qml/simpleplayer/CPUMonitorComponent.qml
+@@ -0,0 +1,11 @@
++import QtQuick 2.0
++
++    CpuMonitor{
++        id: cpu
++        height: (root.height)/(720/120)
++        width: (root.width)/(1280/444)
++        x: (root.width)/(1280/19)
++        y: (root.height)/(720/572)
++        //Adjust the gap between each CPU core display
++        m_offset: 2
++    }
+diff --git a/qml/simpleplayer/MEMMonitorComponent.qml b/qml/simpleplayer/MEMMonitorComponent.qml
+new file mode 100644
+index 0000000..e19d040
+--- /dev/null
++++ b/qml/simpleplayer/MEMMonitorComponent.qml
+@@ -0,0 +1,15 @@
++import QtQuick 2.0
++
++    MemMonitor {
++        id: mem
++        height: (root.height)/(720/120)
++        width: (root.width)/(1280/256)
++        x: (root.width)/(1280/476)
++        y: (root.height)/(720/572)
++        //Adjust the gap between each display
++        m_offset: 5
++        //Adjust the height of memory usage bar
++        barHeight: (root.height)/(720/110)
++        //Adjust the width of the memory history
++        graphWidthOffset: 1
++    }
+-- 
+1.9.1
+

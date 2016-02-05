@@ -1,0 +1,683 @@
+From af8dc10210755abbfa114c51b27d129e7abf0041 Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Thu, 4 Feb 2016 22:56:10 +0700
+Subject: [PATCH 8/8] Flexible_Display_Support_H264StreamingSession_cpp
+
+Signed-off-by: khoahvd <khoahvd@fsoft.com.vn>
+---
+ .../qgstreamerH264Streamingsession.cpp             | 363 ++++++++++++---------
+ 1 file changed, 206 insertions(+), 157 deletions(-)
+
+diff --git a/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp b/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp
+index 80552ea..52b8eac 100755
+--- a/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp
++++ b/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp
+@@ -222,7 +222,6 @@ QGstreamerH264StreamingSession::QGstreamerH264StreamingSession(QObject *parent)
+      m_state(QH264Streaming::StoppedState),
+      m_videostate(QH264Streaming::StoppedState),
+      m_busHelper(0),
+-     m_playbin(0),
+      m_bus(0),
+      m_playbackRate(1.0),
+      m_seekable(false),
+@@ -242,32 +241,25 @@ QGstreamerH264StreamingSession::QGstreamerH264StreamingSession(QObject *parent)
+      m_udp_host("192.168.0.30"),
+      m_vspm(false),
+      m_vspm_dmabuf_use(false),
+-     m_vspm_width(-1),
+      m_vspm_width1(-1),
+-     m_vspm_height(-1),
+      m_vspm_height1(-1),
+      m_vspm_format("NV12"),
+      m_wls_max_lateness(0),
+-     m_wls_qos(true),
+-     m_wls_position_x(-1),
+-     m_wls_position_y(-1),
+-     m_wls_out_width(-1),
+-     m_wls_out_height(-1),
+      notFirstRun(false),
+      isFirstRemove(false),
+-     isTeePadAdd(false)
++     isTeePadAdd(false),
++     isFirstChange(true),
++     userData({0,0,0,0,0,0,true,-1,-1,-1,-1,false,-1,-1,0})
+ {
+     count = 0 ;
+ 
+-    m_playbin = gst_pipeline_new ("H264Streaming");
+-    parser = gst_element_factory_make ("h264parse","h264-parse");
++    userData.m_playbin = gst_pipeline_new ("H264Streaming");
++    userData.parser = gst_element_factory_make ("h264parse","h264-parse");
+     parser1 = gst_element_factory_make ("h264parse","h264-parse1");
+-    filter = gst_element_factory_make ("vspmfilter","vspm-filter");
+     filter1 = gst_element_factory_make ("vspmfilter","vspm-filter1");
+     encoder = gst_element_factory_make ("omxh264enc","omx-encoder");
+-    decoder = gst_element_factory_make ("omxh264dec","omx-decoder");
+-    videosink = gst_element_factory_make ("waylandsink","video-output");
+-    capfilter_vspm = gst_element_factory_make("capsfilter", "caps-filter");
++    userData.decoder = gst_element_factory_make ("omxh264dec","omx-decoder");
++    userData.videosink = gst_element_factory_make ("waylandsink","video-output");
+     capfilter_vspm1 = gst_element_factory_make("capsfilter", "caps-filter1");
+     videoIdentity_parse = gst_element_factory_make("capsfilter", NULL);
+     videoIdentity_depay = gst_element_factory_make("capsfilter", "caps-filter2");
+@@ -276,6 +268,7 @@ QGstreamerH264StreamingSession::QGstreamerH264StreamingSession(QObject *parent)
+     udp_src = gst_element_factory_make("udpsrc", "udp-src");
+     udp_sink = gst_element_factory_make("udpsink", "udp-sink");
+     tee = gst_element_factory_make ("tee", "video-tee");
++    decoder1 = gst_element_factory_make ("omxh264dec","decoder1");
+ 
+     g_object_set (G_OBJECT (pay), "pt", 96, NULL);
+     g_object_set (G_OBJECT (pay), "config-interval", 3, NULL);
+@@ -294,20 +287,20 @@ QGstreamerH264StreamingSession::QGstreamerH264StreamingSession(QObject *parent)
+     g_object_set (G_OBJECT (udp_sink), "port", 5000, NULL);
+     g_object_set (G_OBJECT (udp_sink), "async", FALSE, NULL);
+ 
+-    m_bus = gst_element_get_bus(m_playbin);
++    m_bus = gst_element_get_bus(userData.m_playbin);
+     m_busHelper = new QGstreamerBusHelper(m_bus, this);
+     m_busHelper->installMessageFilter(this);
+ }
+ 
+ QGstreamerH264StreamingSession::~QGstreamerH264StreamingSession()
+ {
+-    if (m_playbin) {
+-		gst_element_send_event (m_playbin, gst_event_new_eos ());
++    if (userData.m_playbin) {
++                gst_element_send_event (userData.m_playbin, gst_event_new_eos ());
+         stop();
+ 
+             delete m_busHelper;
+             gst_object_unref(GST_OBJECT(m_bus));
+-            gst_object_unref(GST_OBJECT(m_playbin));
++            gst_object_unref(GST_OBJECT(userData.m_playbin));
+     }
+ 
+ 	if (rtsp_bin) {
+@@ -316,71 +309,6 @@ QGstreamerH264StreamingSession::~QGstreamerH264StreamingSession()
+         gst_element_set_state(rtsp_bin, GST_STATE_NULL);
+ 		gst_object_unref(GST_OBJECT(rtsp_bin));
+ 	}
+-    //Check for element and caps to free
+-    if(m_videoOutputBin)
+-        gst_object_unref(m_videoOutputBin);
+-    if(m_videoIdentity)
+-        gst_object_unref(m_videoIdentity);
+-    if(m_colorSpace)
+-        gst_object_unref(m_colorSpace);
+-    if(m_videoSink)
+-        gst_object_unref(m_videoSink);
+-    if(m_pendingVideoSink)
+-        gst_object_unref(m_pendingVideoSink);
+-    if(m_nullVideoSink)
+-        gst_object_unref(m_nullVideoSink);
+-    if(m_audioSink)
+-        gst_object_unref(m_audioSink);
+-    if(m_volumeElement)
+-        gst_object_unref(m_volumeElement);
+-
+-    if(m_videoOutput)
+-        gst_object_unref(m_videoOutput);
+-    if(udp_src)
+-        gst_object_unref(udp_src);
+-    if(udp_sink)
+-        gst_object_unref(udp_sink);
+-    if(pay)
+-        gst_object_unref(pay);
+-    if(depay)
+-        gst_object_unref(depay);
+-    if(parser)
+-        gst_object_unref(parser);
+-    if(encoder)
+-        gst_object_unref(encoder);
+-    if(decoder)
+-        gst_object_unref(decoder);
+-    if(filter)
+-        gst_object_unref(filter);
+-    if(capfilter_vspm)
+-        gst_object_unref(capfilter_vspm);
+-    if(videoIdentity_depay)
+-        gst_object_unref(videoIdentity_depay);
+-    if(videoIdentity_parse)
+-        gst_object_unref(videoIdentity_parse);
+-    if(videosink)
+-        gst_object_unref(videosink);
+-    if(tee)
+-        gst_object_unref(tee);
+-    if(filter1)
+-        gst_object_unref(filter1);
+-    if(capfilter_vspm1)
+-        gst_object_unref(capfilter_vspm1);
+-    if(parser1)
+-        gst_object_unref(parser1);
+-
+-    if(filtercaps_vspm)
+-        gst_caps_unref(filtercaps_vspm);
+-    if(filtercaps_vspm1)
+-        gst_caps_unref(filtercaps_vspm1);
+-    if(filtercaps_depay)
+-        gst_caps_unref(filtercaps_depay);
+-    if(filtercaps_parse)
+-        gst_caps_unref(filtercaps_parse);
+-    if(streaming_src_cap)
+-        gst_caps_unref(streaming_src_cap);
+-    if(filtercaps_dec)
+-        gst_caps_unref(filtercaps_dec);
+ }
+ 
+ void QGstreamerH264StreamingSession::setHdmiWidth(int hdmiwidth)
+@@ -424,7 +352,7 @@ void QGstreamerH264StreamingSession::setUdpPort(QString udpport)
+     char *udpsrc_port = p.data();
+     streaming_src_cap = gst_caps_new_simple ("application/x-rtp", NULL);
+ 
+-	state = gst_element_get_state(m_playbin, &currentState, &pending, GST_CLOCK_TIME_NONE);	
++	state = gst_element_get_state(userData.m_playbin, &currentState, &pending, GST_CLOCK_TIME_NONE);	
+ 	if (currentState == GST_STATE_PLAYING) {
+ 		gst_element_set_state (udp_src, GST_STATE_PAUSED);
+ 		gst_element_set_state (udp_src, GST_STATE_NULL);
+@@ -436,6 +364,7 @@ void QGstreamerH264StreamingSession::setUdpPort(QString udpport)
+ 		g_object_set (G_OBJECT (udp_src), "port",atoi(udpsrc_port), NULL);
+ 		g_object_set (G_OBJECT (udp_src), "caps", streaming_src_cap, NULL);
+ 	}
++
+ }
+ 
+ void QGstreamerH264StreamingSession::setUdpHost(QString udphost)
+@@ -451,9 +380,9 @@ void QGstreamerH264StreamingSession::setUdpHost(QString udphost)
+ 
+ void QGstreamerH264StreamingSession::setTransmit(bool transmit)
+ {
+-    m_transmit = transmit;
+-    if (m_transmit)
+-        g_object_set (G_OBJECT (decoder), "no-copy", TRUE ,NULL);
++    userData.m_transmit = transmit;
++    if (userData.m_transmit)
++        g_object_set (G_OBJECT (decoder1), "no-copy", true, NULL);
+ }
+ 
+ void QGstreamerH264StreamingSession::setVspm(bool vspm)
+@@ -464,24 +393,11 @@ void QGstreamerH264StreamingSession::setVspm(bool vspm)
+ void QGstreamerH264StreamingSession::setVspmDmabuf(bool vspmdmabuf)
+ {
+     m_vspm_dmabuf_use = vspmdmabuf;
+-    if(m_vspm_dmabuf_use)
+-        g_object_set (G_OBJECT (filter), "dmabuf-use", TRUE, NULL);
+-    else
+-        g_object_set (G_OBJECT (filter), "dmabuf-use", FALSE, NULL);
+ }
+ 
+ void QGstreamerH264StreamingSession::setVspmWidth(int vspmwidth)
+ {
+-    m_vspm_width = vspmwidth;
+-    QByteArray f = m_vspm_format.toLocal8Bit();
+-    char *vspm_format = f.data();
+-    filtercaps_vspm = gst_caps_new_simple ("video/x-raw",
+-                                "width", G_TYPE_INT, m_vspm_width,
+-                                "height", G_TYPE_INT, m_vspm_height,
+-                                "format", G_TYPE_STRING, vspm_format,
+-                                NULL);
+-    g_object_set (G_OBJECT (capfilter_vspm), "caps", filtercaps_vspm, NULL);
+-    gst_caps_unref(filtercaps_vspm);  //Free filtercaps_vspm after use
++    userData.m_vspm_width = vspmwidth;
+ }
+ 
+ void QGstreamerH264StreamingSession::setVspmWidth1(int vspmwidth1)
+@@ -501,7 +417,7 @@ void QGstreamerH264StreamingSession::setVspmWidth1(int vspmwidth1)
+ 
+ void QGstreamerH264StreamingSession::setVspmHeight(int vspmheight)
+ {
+-    m_vspm_height = vspmheight;
++    userData.m_vspm_height = vspmheight;
+ }
+ 
+ void QGstreamerH264StreamingSession::setVspmHeight1(int vspmheight1)
+@@ -517,37 +433,161 @@ void QGstreamerH264StreamingSession::setVspmFormat(QString vspmformat)
+ void QGstreamerH264StreamingSession::setWlsMaxLateness(qint64 wlsmaxlateness)
+ {
+     m_wls_max_lateness = wlsmaxlateness;
+-    g_object_set (G_OBJECT (videosink), "max-lateness", m_wls_max_lateness, NULL);
++    g_object_set (G_OBJECT (userData.videosink), "max-lateness", m_wls_max_lateness, NULL);
+ }
+ 
+ void QGstreamerH264StreamingSession::setWlsQos(bool wlsqos)
+ {
+-    m_wls_qos = wlsqos;
+-    g_object_set (G_OBJECT (videosink), "qos", m_wls_qos, NULL);
++    //g_print("QGstreamerH264StreamingSession::setWlsQos (%d) \n", userData.counter);
++    userData.m_wls_qos = wlsqos;
++    g_object_set (G_OBJECT (userData.videosink), "qos", userData.m_wls_qos, NULL);
++
++    /* Wait for application finish setting up all 5 properties */
++    userData.counter = userData.counter + 1;
++    if(userData.counter == 5){
++        userData.counter = 0;
++        if(!isFirstChange)
++            gst_pad_add_probe (userData.blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, &userData, NULL);
++        else
++            isFirstChange = false;
++    }
++
+ }
+ 
+ void QGstreamerH264StreamingSession::setWlsPositionX(int wlspositionx)
+ {
+-    m_wls_position_x = wlspositionx;
+-    g_object_set (G_OBJECT (videosink), "position_x", m_wls_position_x, NULL);
++    //g_print("QGstreamerH264StreamingSession::setwlspositionX (%d) - (%d)\n", wlspositionx, userData.counter);
++    userData.m_wls_position_x = wlspositionx;
++    g_object_set (G_OBJECT (userData.videosink), "position_x", userData.m_wls_position_x, NULL);
++
++    /* Wait for application finish setting up all 5 properties */
++    userData.counter = userData.counter + 1;
++    if(userData.counter == 5){
++        userData.counter = 0;
++        if(!isFirstChange)
++            gst_pad_add_probe (userData.blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, &userData, NULL);
++        else
++            isFirstChange = false;
++    }
+ }
+ 
+ void QGstreamerH264StreamingSession::setWlsPositionY(int wlspositiony)
+ {
+-    m_wls_position_y = wlspositiony;
+-    g_object_set (G_OBJECT (videosink), "position_y", m_wls_position_y, NULL);
++    //g_print("QGstreamerH264StreamingSession::setWlspositionY (%d) - (%d)\n", wlspositiony, userData.counter);
++    userData.m_wls_position_y = wlspositiony;
++    g_object_set (G_OBJECT (userData.videosink), "position_y", userData.m_wls_position_y, NULL);
++
++    /* Wait for application finish setting up all 5 properties */
++    userData.counter = userData.counter + 1;
++    if(userData.counter == 5){
++        userData.counter = 0;
++        if(!isFirstChange)
++            gst_pad_add_probe (userData.blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, &userData, NULL);
++        else
++            isFirstChange = false;
++    }
+ }
+ 
+ void QGstreamerH264StreamingSession::setWlsOutWidth(int wlsoutwidth)
+ {
+-    m_wls_out_width = wlsoutwidth;
+-    g_object_set (G_OBJECT (videosink), "out_width", m_wls_out_width, NULL);
++    //g_print("QGstreamerH264StreamingSession::setWlsOutWidth (%d) - (%d)\n", wlsoutwidth, userData.counter);
++    userData.m_wls_out_width = wlsoutwidth;
++    g_object_set (G_OBJECT (userData.videosink), "out_width", userData.m_wls_out_width, NULL);
++
++    /* Wait for application finish setting up all 5 properties */
++    userData.counter = userData.counter + 1;
++    if(userData.counter == 5){
++        userData.counter = 0;
++        if(!isFirstChange)
++            gst_pad_add_probe (userData.blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, &userData, NULL);
++        else
++            isFirstChange = false;
++    }
+ }
+ 
+ void QGstreamerH264StreamingSession::setWlsOutHeight(int wlsoutheight)
+ {
+-    m_wls_out_height = wlsoutheight;
+-    g_object_set (G_OBJECT (videosink), "out_height", m_wls_out_height, NULL);
++    //g_print("QGstreamerH264StreamingSession::setWlsOutHeight (%d) - (%d)\n", wlsoutheight, userData.counter);
++    userData.m_wls_out_height = wlsoutheight;
++    g_object_set (G_OBJECT (userData.videosink), "out_height", userData.m_wls_out_height, NULL);
++
++    /* Wait for application finish setting up all 5 properties */
++    userData.counter = userData.counter + 1;
++    if(userData.counter == 5){
++        userData.counter = 0;
++        if(!isFirstChange)
++            gst_pad_add_probe (userData.blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, &userData, NULL);
++        else
++            isFirstChange = false;
++    }
++}
++
++GstPadProbeReturn QGstreamerH264StreamingSession::event_probe_cb (GstPad * pad, GstPadProbeInfo * info, gpointer user_data)
++{
++    //g_print("Change dynamic property of pipeline - event_probe_cb\n");
++    user_data_t *p_user = (user_data_t *)user_data;
++    if (GST_EVENT_TYPE (GST_PAD_PROBE_INFO_DATA (info)) != GST_EVENT_EOS)
++      return GST_PAD_PROBE_OK;
++    gst_pad_remove_probe (pad, GST_PAD_PROBE_INFO_ID (info));
++
++        gst_element_set_state (p_user->decoder, GST_STATE_NULL);
++        gst_element_set_state (p_user->videosink, GST_STATE_NULL);
++
++        gst_bin_remove (GST_BIN (p_user->m_playbin), p_user->decoder);
++        gst_bin_remove (GST_BIN (p_user->m_playbin), p_user->videosink);
++        p_user->decoder = NULL;
++        p_user->videosink = NULL;
++
++        sleep(1);
++
++        p_user->decoder = gst_element_factory_make ("omxh264dec","decoder");
++        p_user->videosink = gst_element_factory_make ("waylandsink","waylandsink1");
++        g_object_set (G_OBJECT (p_user->videosink), "out_width", p_user->m_wls_out_width, NULL);
++        g_object_set (G_OBJECT (p_user->videosink), "out_height", p_user->m_wls_out_height, NULL);
++        g_object_set (G_OBJECT (p_user->videosink), "position_x", p_user->m_wls_position_x, NULL);
++        g_object_set (G_OBJECT (p_user->videosink), "position_y", p_user->m_wls_position_y, NULL);
++        g_object_set (G_OBJECT (p_user->videosink), "qos", p_user->m_wls_qos, NULL);
++
++        gst_bin_add_many (GST_BIN (p_user->m_playbin), p_user->decoder, p_user->videosink, NULL);
++
++        if(p_user->m_transmit)
++        {
++            GstPad *sinkpad;
++            gst_element_link_many (p_user->decoder, p_user->videosink, NULL);
++
++            sinkpad = gst_element_get_static_pad (p_user->decoder, "sink");
++            if (gst_pad_link (p_user->blockpad, sinkpad) != GST_PAD_LINK_OK) {
++                   g_print ("Tee2 for brand1 could not be linked.\n");
++                   return GST_PAD_PROBE_DROP;
++             }
++             gst_object_unref (sinkpad);
++        }else{
++            gst_element_link_many (p_user->parser, p_user->decoder, p_user->videosink, NULL);
++        }
++
++        gst_element_sync_state_with_parent (p_user->decoder);
++        gst_element_sync_state_with_parent (p_user->videosink);
++
++    return GST_PAD_PROBE_DROP;
++}
++
++GstPadProbeReturn QGstreamerH264StreamingSession::pad_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer user_data)
++{
++      //g_print("Change dynamic property of pipeline - pad_probe_cb\n");
++      user_data_t *p_user = (user_data_t *)user_data;
++      GstPad *sinkpad, *srcpad;
++      gst_pad_remove_probe (pad, GST_PAD_PROBE_INFO_ID (info));
++        /* install new probe for EOS */
++      srcpad = gst_element_get_static_pad (p_user->decoder, "src");
++      gst_pad_add_probe (srcpad, GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM, QGstreamerH264StreamingSession::event_probe_cb, user_data, NULL);
++
++      sinkpad = gst_element_get_static_pad (p_user->decoder, "sink");
++      gst_pad_send_event (sinkpad, gst_event_new_eos ());
++
++      gst_object_unref (srcpad);
++      gst_object_unref (sinkpad);
++
++      return GST_PAD_PROBE_OK;
+ }
+ 
+ void QGstreamerH264StreamingSession::componentComplete()
+@@ -560,13 +600,13 @@ void QGstreamerH264StreamingSession::componentComplete()
+     FPS_env = qgetenv("QT_SHOW_FPS");
+     if (FPS_env.isEmpty() == false && id == atoi (FPS_env))
+     {
+-    	GstPad *probePad = gst_element_get_static_pad (videosink, "sink");
++        GstPad *probePad = gst_element_get_static_pad (userData.videosink, "sink");
+     	if (probePad) {
+     		gst_pad_add_probe (probePad, GST_PAD_PROBE_TYPE_BUFFER, (GstPadProbeCallback) cb_have_data_sink, NULL, NULL);
+     		// gst_object_unref (videosink);
+     	}
+     	else {
+-    		qDebug() <<"Can NOT get videosink sink pad";
++                qDebug() <<"Can NOT get userData.videosink sink pad";
+     		exit (EXIT_FAILURE);
+     	}
+     	if (FPS_env != "0")
+@@ -583,11 +623,14 @@ void QGstreamerH264StreamingSession::componentComplete()
+     g_get_current_time (&start_time);
+     #endif	//MODIFY_QT_FPS
+ 
+-    if( !m_transmit)//Receiver
++    if( !userData.m_transmit)//Receiver
+     {
+-            g_object_set (G_OBJECT (videosink), "async", FALSE, NULL);
+-            gst_bin_add_many (GST_BIN (m_playbin), udp_src, depay, videoIdentity_depay, parser, decoder, videosink, NULL);
+-            gst_element_link_many(udp_src, depay, videoIdentity_depay, parser, decoder, videosink, NULL);
++            // flexible display support
++            userData.blockpad = gst_element_get_static_pad (userData.parser, "src");
++
++            g_object_set (G_OBJECT (userData.videosink), "async", FALSE, NULL);
++            gst_bin_add_many (GST_BIN (userData.m_playbin), udp_src, depay, videoIdentity_depay, userData.parser, userData.decoder, userData.videosink, NULL);
++            gst_element_link_many(udp_src, depay, videoIdentity_depay, userData.parser, userData.decoder, userData.videosink, NULL);
+ 
+     }
+     else {
+@@ -611,14 +654,13 @@ void QGstreamerH264StreamingSession::componentComplete()
+ 			*/
+ 
+ 			g_object_set (G_OBJECT (filter1), "outbuf-alloc", true, NULL);
+-			g_object_set (G_OBJECT (videosink), "async", FALSE, NULL);
++                        g_object_set (G_OBJECT (userData.videosink), "async", FALSE, NULL);
+ 			
+-			gst_bin_add_many (GST_BIN (m_playbin), udp_src, depay,
+-				videoIdentity_depay, parser, decoder, tee, filter,
+-				capfilter_vspm , videosink, NULL);
++                        gst_bin_add_many (GST_BIN (userData.m_playbin), udp_src, depay,
++                                videoIdentity_depay, userData.parser, tee, userData.decoder, userData.videosink, NULL);
+ 
+-			if ( !gst_element_link_many(udp_src, depay, videoIdentity_depay, parser, decoder, tee, NULL) ||
+-			     !gst_element_link_many(filter, capfilter_vspm , videosink, NULL)) {
++                        if ( !gst_element_link_many(udp_src, depay, videoIdentity_depay, userData.parser, tee, NULL) ||
++                             !gst_element_link_many(userData.decoder, userData.videosink, NULL)) {
+ 				g_critical ("Fail to link elements");
+ 				return ;
+ 			}
+@@ -707,10 +749,10 @@ qint64 QGstreamerH264StreamingSession::position() const
+     gint64      position = 0;
+ 
+ #if GST_CHECK_VERSION(1,0,0)
+- if ( m_playbin && gst_element_query_position(m_playbin, format, &position))
++ if ( userData.m_playbin && gst_element_query_position(userData.m_playbin, format, &position))
+  m_lastPosition = position / 1000000;
+ #else
+-    if ( m_playbin && gst_element_query_position(m_playbin, &format, &position))
++    if ( userData.m_playbin && gst_element_query_position(userData.m_playbin, &format, &position))
+         m_lastPosition = position / 1000000;
+ #endif
+     return m_lastPosition;
+@@ -727,18 +769,18 @@ bool QGstreamerH264StreamingSession::play()
+ 
+ #ifdef DEBUG_PLAYBIN
+ #endif
+-    if (m_playbin) {
+-        if (gst_element_set_state(m_playbin, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
++    if (userData.m_playbin) {
++        if (gst_element_set_state(userData.m_playbin, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
+                 qWarning() << "GStreamer; Unable to play -" << m_request.url().toString();
+                 m_state = QH264Streaming::StoppedState;
+                 emit stateChanged(m_state);
+         } else {
+-			while(gst_element_get_state(m_playbin, NULL, NULL, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_ASYNC) {
++                        while(gst_element_get_state(userData.m_playbin, NULL, NULL, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_ASYNC) {
+ 			    g_print ("QGstreamerH264StreamingSession::play -> wait async \n "); 
+ 			    sleep(1);
+ 			}
+ 
+-			if (m_transmit == false) notFirstRun = true;
++                        if (userData.m_transmit == false) notFirstRun = true;
+ 			return true;
+ 		}
+     }
+@@ -751,13 +793,13 @@ bool QGstreamerH264StreamingSession::pause()
+ 
+ #ifdef DEBUG_PLAYBIN
+ #endif
+-    if (m_playbin) {
+-        if (gst_element_set_state(m_playbin, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE) {
++    if (userData.m_playbin) {
++        if (gst_element_set_state(userData.m_playbin, GST_STATE_PAUSED) == GST_STATE_CHANGE_FAILURE) {
+                 qWarning() << "GStreamer; Unable to pause -" << m_request.url().toString();
+                 m_state = QH264Streaming::StoppedState;
+                 emit stateChanged(m_state);
+         } else {
+-			while(gst_element_get_state(m_playbin, NULL, NULL, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_ASYNC) {
++                        while(gst_element_get_state(userData.m_playbin, NULL, NULL, GST_CLOCK_TIME_NONE) == GST_STATE_CHANGE_ASYNC) {
+ 			    g_print ("QGstreamerH264StreamingSession::pause ->wait async \n "); 
+ 			    sleep(1);
+ 			}
+@@ -775,9 +817,9 @@ void QGstreamerH264StreamingSession::stop()
+ #ifdef DEBUG_PLAYBIN
+ #endif
+ 
+-    if (m_playbin) {
++    if (userData.m_playbin) {
+ 
+-        gst_element_set_state(m_playbin, GST_STATE_NULL);
++        gst_element_set_state(userData.m_playbin, GST_STATE_NULL);
+ 
+         m_lastPosition = 0;
+         QH264Streaming::State oldState = m_state;
+@@ -793,6 +835,8 @@ void QGstreamerH264StreamingSession::rtspConnected()
+ {
+ 	if (!isTeePadAdd) {
+ 		if (notFirstRun) {
++                        decoder1 = gst_element_factory_make ("omxh264dec","decoder1");
++                        g_object_set (G_OBJECT (decoder1), "no-copy", true, NULL);
+ 			filter1 = gst_element_factory_make ("vspmfilter","vspm-filter1");
+ 			g_object_set (G_OBJECT (filter1), "outbuf-alloc", true, NULL);
+ 			
+@@ -813,14 +857,15 @@ void QGstreamerH264StreamingSession::rtspConnected()
+ 			g_object_set (G_OBJECT (udp_sink), "port", 5000, NULL);
+ 			g_object_set (G_OBJECT (udp_sink), "host", "127.0.0.1", NULL);
+ 			
+-			gst_bin_add_many (GST_BIN (m_playbin), filter1, encoder, parser1,
++                        gst_bin_add_many (GST_BIN (userData.m_playbin), decoder1, filter1, encoder, parser1,
+ 								videoIdentity_parse, pay, udp_sink, NULL);
+-		} else gst_bin_add_many (GST_BIN (m_playbin), filter1, capfilter_vspm1, encoder, parser1,
++                } else gst_bin_add_many (GST_BIN (userData.m_playbin), decoder1, filter1, capfilter_vspm1, encoder, parser1,
+ 									videoIdentity_parse, pay, udp_sink, NULL);
+ 
+-		gst_element_link_many (filter1, capfilter_vspm1, encoder, parser1,
++                gst_element_link_many (decoder1, filter1, capfilter_vspm1, encoder, parser1,
+ 								videoIdentity_parse, pay, udp_sink, NULL);
+ 		
++                gst_element_sync_state_with_parent (decoder1);
+ 		gst_element_sync_state_with_parent (filter1);
+ 		gst_element_sync_state_with_parent (capfilter_vspm1);
+ 		gst_element_sync_state_with_parent (encoder);
+@@ -835,7 +880,7 @@ void QGstreamerH264StreamingSession::rtspConnected()
+ 			return ;
+ 		}
+ 		tee_q2_pad = gst_element_request_pad (tee, tee_src_pad_template, NULL, NULL);
+-		q2_pad = gst_element_get_static_pad (filter1, "sink");
++                q2_pad = gst_element_get_static_pad (decoder1, "sink");
+ 		if (gst_pad_link (tee_q2_pad, q2_pad) != GST_PAD_LINK_OK) {
+ 			g_critical ("Tee2 for brand2 could not be linked.\n");
+ 			gst_object_unref (q2_pad);
+@@ -855,16 +900,17 @@ void QGstreamerH264StreamingSession::rtspDisConnected()
+ 			g_critical ("Unable to get pad template");
+ 			return ;
+ 		}
+-		q2_pad = gst_element_get_static_pad (filter1, "sink");
++                q2_pad = gst_element_get_static_pad (decoder1, "sink");
+ 		gst_pad_unlink (tee_q2_pad, q2_pad);
+ 		
+ 		gst_element_release_request_pad (tee, tee_q2_pad);
+ 		gst_object_unref (q2_pad);
+ 		gst_object_unref (tee_q2_pad);
+ 		
+-		gst_element_unlink_many (filter1, capfilter_vspm1, encoder, parser1,
++                gst_element_unlink_many (decoder1, filter1, capfilter_vspm1, encoder, parser1,
+ 									videoIdentity_parse, pay, udp_sink, NULL);
+ 		
++                gst_element_set_state (decoder1, GST_STATE_NULL);
+ 		gst_element_set_state (filter1, GST_STATE_NULL);
+ 		gst_element_set_state (encoder, GST_STATE_NULL);
+ 		gst_element_set_state (parser1, GST_STATE_NULL);
+@@ -872,9 +918,10 @@ void QGstreamerH264StreamingSession::rtspDisConnected()
+ 		gst_element_set_state (pay, GST_STATE_NULL);
+ 		gst_element_set_state (udp_sink, GST_STATE_NULL);
+ 		
+-		gst_bin_remove_many (GST_BIN (m_playbin), filter1, encoder, parser1,
++                gst_bin_remove_many (GST_BIN (userData.m_playbin), decoder1, filter1, encoder, parser1,
+ 										videoIdentity_parse, pay, udp_sink, NULL);
+ 		
++                decoder1 = NULL;
+ 		filter1 = NULL;
+ 		encoder = NULL;
+ 		parser1 = NULL;
+@@ -904,10 +951,10 @@ bool QGstreamerH264StreamingSession::seek(qint64 ms)
+ #endif
+     //seek locks when the video output sink is changing and pad is blocked
+     // if (m_playbin && !m_pendingVideoSink && m_state != QMediaPlayer::StoppedState && m_seekable) {
+-    if (m_playbin && m_state != QH264Streaming::StoppedState && m_seekable) {
++    if (userData.m_playbin && m_state != QH264Streaming::StoppedState && m_seekable) {
+         ms = qMax(ms,qint64(0));
+         gint64  position = ms * 1000000;
+-        bool isSeeking = gst_element_seek(m_playbin,
++        bool isSeeking = gst_element_seek(userData.m_playbin,
+                                           m_playbackRate,
+                                           GST_FORMAT_TIME,
+                                           GstSeekFlags(GST_SEEK_FLAG_FLUSH),
+@@ -942,7 +989,7 @@ bool QGstreamerH264StreamingSession::processBusMessage(const QGstreamerMessage &
+     if (gm) {
+ 
+         bool handlePlaybin2 = false;
+-        if (GST_MESSAGE_SRC(gm) == GST_OBJECT_CAST(m_playbin)) {
++        if (GST_MESSAGE_SRC(gm) == GST_OBJECT_CAST(userData.m_playbin)) {
+             switch (GST_MESSAGE_TYPE(gm))  {
+             case GST_MESSAGE_STATE_CHANGED:
+                 {
+@@ -977,7 +1024,7 @@ bool QGstreamerH264StreamingSession::processBusMessage(const QGstreamerMessage &
+                         break;
+                     }
+                     case GST_STATE_PLAYING:
+-                        if (m_transmit && !isFirstRemove) {
++                        if (userData.m_transmit && !isFirstRemove) {
+ 							printf ("Please wait til already for external device connection...\n");
+ 							timer.start(3000, this);
+ 						}
+@@ -1084,7 +1131,7 @@ bool QGstreamerH264StreamingSession::processBusMessage(const QGstreamerMessage &
+ 
+                 GstFormat   format = GST_FORMAT_TIME;
+                 gint64      position = 0;
+-                if (gst_element_query_position(m_playbin, &format, &position)) {
++                if (gst_element_query_position(userData.m_playbin, &format, &position)) {
+                     position /= 1000000;
+                     m_lastPosition = position;
+                     emit positionChanged(position);
+@@ -1261,17 +1308,19 @@ void QGstreamerH264StreamingSession::teeSetting()
+ 	}
+ 
+ 	/* Obtaining request pads for the tee2 elements*/
+-	tee_q1_pad = gst_element_request_pad (tee, tee_src_pad_template, NULL, NULL);
+-	q1_pad = gst_element_get_static_pad (filter, "sink");
+ 
+ 	/* Link tee2 to the REVIEW */
+-	if (gst_pad_link (tee_q1_pad, q1_pad) != GST_PAD_LINK_OK ){
++        userData.blockpad = gst_element_request_pad (tee, tee_src_pad_template, NULL, NULL);
++        q1_pad = gst_element_get_static_pad (userData.decoder, "sink");
++
++
++
++	/* Link tee2 to the REVIEW */
++        if (gst_pad_link (userData.blockpad, q1_pad) != GST_PAD_LINK_OK ){
+ 		g_critical ("Tee2 for brand1 could not be linked.\n");
+ 		return ;
+ 	}
+-
+ 	gst_object_unref (q1_pad);
+-       gst_object_unref (tee_q1_pad);  //Free tee_q1_pad after use
+ }
+ 
+ void QGstreamerH264StreamingSession::updateDuration()
+@@ -1282,9 +1331,9 @@ void QGstreamerH264StreamingSession::updateDuration()
+     int duration = -1;
+ 
+ #if GST_CHECK_VERSION(1,0,0)
+- if (m_playbin && gst_element_query_duration(m_playbin, format, &gstDuration))
++ if (userData.m_playbin && gst_element_query_duration(userData.m_playbin, format, &gstDuration))
+ #else
+-    if (m_playbin && gst_element_query_duration(m_playbin, &format, &gstDuration))
++    if (userData.m_playbin && gst_element_query_duration(userData.m_playbin, &format, &gstDuration))
+ #endif
+         duration = gstDuration / 1000000;
+ 
+@@ -1297,7 +1346,7 @@ void QGstreamerH264StreamingSession::updateDuration()
+     if (m_duration > 0) {
+         m_durationQueries = 0;
+         GstQuery *query = gst_query_new_seeking(GST_FORMAT_TIME);
+-        if (gst_element_query(m_playbin, query))
++        if (gst_element_query(userData.m_playbin, query))
+             gst_query_parse_seeking(query, 0, &seekable, 0, 0);
+         gst_query_unref(query);
+     }
+-- 
+1.9.1
+

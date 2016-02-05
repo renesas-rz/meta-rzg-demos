@@ -1,0 +1,43 @@
+From 37a60e8ddfd59d035898c8ae07c9a6a241a72488 Mon Sep 17 00:00:00 2001
+From: khoahvd <khoahvd@fsoft.com.vn>
+Date: Mon, 28 Dec 2015 15:00:32 +0700
+Subject: [PATCH 2/6] Flexible_Display_Support_get_physical_display
+
+Signed-off-by: khoahvd <khoahvd@fsoft.com.vn>
+---
+ main.cpp | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/main.cpp b/main.cpp
+index 32f5523..f70950d 100755
+--- a/main.cpp
++++ b/main.cpp
+@@ -39,6 +39,7 @@
+ #include <QtGui/QGuiApplication>
+ #include <QtQuick/QQuickItem>
+ #include <QtQuick/QQuickView>
++#include <QtGui/QScreen>
+ 
+ #include <QtCore/QTimer>
+ #include <signal.h>
+@@ -63,7 +64,17 @@ int main(int argc, char *argv[])
+     QGuiApplication app(argc, argv);
+     p_app = &app;	/* For calling quit in signal handler */
+ 
++    //Show information of screen (all monitors)
++    QScreen *screen = QGuiApplication::screens().at(1);
++    qDebug() << "Information for screen:" << screen->name();
++    qDebug() << "  Available geometry:" << screen->availableGeometry().x() << screen->availableGeometry().y() << screen->availableGeometry().width() << "x" << screen->availableGeometry().height();
++    qDebug() << "  Available size:" << screen->availableSize().width() << "x" << screen->availableSize().height();
++
++
+     QQuickView viewer;
++    viewer.rootContext()->setContextProperty("screenHeight", screen->availableSize().height() );
++    viewer.rootContext()->setContextProperty("screenWidth", screen->availableSize().width());
++
+     viewer.setSource(QUrl("qrc:///qml/simpleplayer/main.qml"));
+     viewer.rootContext()->setContextProperty("Get_MEM", new Get_MEM);
+     QObject::connect(viewer.engine(), SIGNAL(quit()), &viewer, SLOT(close()));
+-- 
+1.9.1
+

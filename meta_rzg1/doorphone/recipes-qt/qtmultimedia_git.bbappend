@@ -6,6 +6,9 @@ SRC_URI_append = " \
 	 file://0003-H264streaming-fix-memory-leak.patch \
 	 file://0004-audiostreaming-fix-memory-leak.patch \
 	 file://0005-H264Streaming-Fix-unstable-connect-for-External-devi.patch \
+	 file://0006-Flexible_Display_Support_H264StreamingSession_h.patch \
+	 file://0007-Correct_function_call_for_SetVspmfiler1.patch \
+	 file://0008-Flexible_Display_Support_H264StreamingSession_cpp.patch \
 "
 
 DEPENDS += " gstreamer1.0-rtsp-server axistatlib qtquickcontrols "
