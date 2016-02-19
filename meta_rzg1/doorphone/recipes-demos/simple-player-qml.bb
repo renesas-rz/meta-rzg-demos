@@ -15,6 +15,7 @@ SRC_URI = " \
   file://0006-Flexible-Display-Support-icon-hidden.patch \
   file://0007-Adjust-indent-and-trailing-space-for-main.qml.patch \
   file://0008-Update-for-Flexible-resolution.patch \
+  file://0009-Update-new-path-for-simple-player.patch \
 "
 S = "${WORKDIR}/simpleplayer"
 
