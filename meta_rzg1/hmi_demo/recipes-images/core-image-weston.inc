@@ -33,4 +33,5 @@ IMAGE_INSTALL_append = " \
     glmark2 \
     configuration \
     demos \
+    linux-firmware \
 "
