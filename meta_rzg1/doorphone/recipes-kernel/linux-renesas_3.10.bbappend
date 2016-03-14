@@ -6,6 +6,7 @@ SRC_URI_append = " \
     file://0001-add-wifi-bcmdhd.patch \
     file://0002-audio-fix-non-audio-at-boot-up-randomly.patch \
     file://0003-Build-driver-support-USBWifi-band-5GHz.patch \
+    file://0004-Add-GPIO-button-for-RZG1M-Starter-Kit.patch \
 "
 
 do_configure_append() {
