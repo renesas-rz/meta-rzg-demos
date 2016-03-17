@@ -13,6 +13,7 @@ SRC_URI_append += " \
     file://0009-vspmfilter-Rewrite-caps-with-available-format-only.patch \
     file://0010-vspmfilter-Update-setting-in-out-params.patch \
     file://0011-gstvspmfilter-add-bufferpool.patch \
+    file://0012-gstvspmfilter-re-add-memory_alignment.patch \
 "
 
 DEPENDS_append += " mmngr-kernel-module mmngr-user-module mmngrbuf-kernel-module mmngrbuf-user-module vspm-user-module vspm-kernel-module"
