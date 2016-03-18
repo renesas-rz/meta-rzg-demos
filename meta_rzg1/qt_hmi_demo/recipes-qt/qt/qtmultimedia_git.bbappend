@@ -12,5 +12,6 @@ SRC_URI_append += " \
     file://0009-qtmultimedia-Fix-error-code-in-qmlvideo.patch \
     file://0010-qtmultimedia-rerun-glTexImage2D-when-glTexSubImage2D-fail.patch \
     file://0011-qtmultimedia-add-EGLImage-render-for-video-playback.patch \
+    file://0012-qtmultimedia-qmlvideo-add-fullscreen-display-support.patch \
 "
 PACKAGECONFIG += " gstreamer"
