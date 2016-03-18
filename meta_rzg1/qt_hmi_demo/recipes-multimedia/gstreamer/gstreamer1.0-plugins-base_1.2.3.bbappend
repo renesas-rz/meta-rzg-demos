@@ -16,6 +16,7 @@ SRC_URI_append += " \
     file://0012-gstvspmfilter-re-add-memory_alignment.patch \
     file://0013-gstvspmfilter-change-to-output-alloc-as-default.patch \
     file://0014-gstplaybin-change-vspmfilter-as-default-converter.patch \
+    file://0015-gstplaybin-remove-queue.patch \
 "
 
 DEPENDS_append += " mmngr-kernel-module mmngr-user-module mmngrbuf-kernel-module mmngrbuf-user-module vspm-user-module vspm-kernel-module"
