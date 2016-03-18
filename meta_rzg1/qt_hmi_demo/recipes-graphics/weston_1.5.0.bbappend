@@ -19,6 +19,7 @@ SRC_URI_append = " \
     file://0008-window.c-do-not-resize-if-not-needed.patch \
     file://0017-Fixed-memory-corruption-when-focus-listener-is-moved.patch \
     file://0019-v4l2-renderer-clear-dmabuf-fd-when-a-kms-buffer-is-d.patch \
+    file://0020-set-position-to-fix-problem-app-under-weston-bar.patch \
 "
 
 FILES_${PN}-dev += "${libdir}/libweston-toytoolkit*"
