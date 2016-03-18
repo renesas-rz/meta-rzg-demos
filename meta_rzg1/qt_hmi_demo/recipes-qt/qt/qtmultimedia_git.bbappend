@@ -11,5 +11,6 @@ SRC_URI_append += " \
     file://0008-qtmultimedia-Fix-wrong-display-color-for-Full-HD-vid.patch \
     file://0009-qtmultimedia-Fix-error-code-in-qmlvideo.patch \
     file://0010-qtmultimedia-rerun-glTexImage2D-when-glTexSubImage2D-fail.patch \
+    file://0011-qtmultimedia-add-EGLImage-render-for-video-playback.patch \
 "
 PACKAGECONFIG += " gstreamer"
