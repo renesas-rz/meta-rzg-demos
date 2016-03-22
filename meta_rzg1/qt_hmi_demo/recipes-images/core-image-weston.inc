@@ -77,6 +77,7 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-base-encodebin \
     gstreamer1.0-plugins-bad-camerabin2 \
     gstreamer1.0-plugins-good-icydemux \
+    gstreamer1.0-plugins-base-vspmfilter \
     libgstphotography-1.0 \
     loading-qt-app \
     qtpreload \
