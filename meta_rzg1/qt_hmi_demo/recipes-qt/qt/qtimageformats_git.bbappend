@@ -1,3 +1,0 @@
-
-PACKAGECONFIG += "libwebp"
-PACKAGECONFIG[libwebp] = ",,"

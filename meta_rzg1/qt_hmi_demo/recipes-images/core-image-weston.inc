@@ -67,9 +67,6 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-good-rtpmanager \
     gstreamer1.0-plugins-base-app \
     libgstapp-1.0 \
-    gstreamer1.0-plugins-bad-waylandfssink \
-    gstreamer1.0-plugins-bad-waylandmiraclesink \
-    gstreamer1.0-plugins-bad-waylandwrlsink \
     gstreamer1.0-plugins-good-jpeg \
     gstreamer1.0-plugins-base-volume \
     gstreamer1.0-plugins-base-audiorate \
@@ -81,4 +78,5 @@ IMAGE_INSTALL_append = " \
     libgstphotography-1.0 \
     loading-qt-app \
     qtpreload \
+    wireless-firmware \
 "
