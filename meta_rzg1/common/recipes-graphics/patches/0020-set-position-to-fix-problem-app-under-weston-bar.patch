@@ -16,8 +16,8 @@ index 0de6d16..8cbb835 100644
  
  	x = target_output->x + dx;
  	y = target_output->y + dy;
-+	if(y < 32){
-+		y = y + 32;
++	if(y < panel_height){
++		y = y + panel_height;
 +	}
  
  	weston_view_set_position(view, x, y);
@@ -27,8 +27,8 @@ index 0de6d16..8cbb835 100644
  			surface_subsurfaces_boundingbox(shsurf->surface,
  							&surf_x, &surf_y, NULL, NULL);
 +			/* Fix problem relate to weston bar */
-+			if ((shsurf->output->y + panel_height - surf_y) < 32)
-+				shsurf->output->y += 32;
++			if ((shsurf->output->y + panel_height - surf_y) < panel_height)
++				shsurf->output->y += panel_height;
 +
  			weston_view_set_position(shsurf->view,
  						 shsurf->output->x - surf_x,
