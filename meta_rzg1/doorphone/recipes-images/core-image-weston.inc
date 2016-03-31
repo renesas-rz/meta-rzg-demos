@@ -1,5 +1,4 @@
 # Currently skrzg1m is not supported yet
-COMPATIBLE_MACHINE = "skrzg1e|skrzg1m"
 
 EXTRA_IMAGE_FEATURES = "debug-tweaks tools-debug tools-profile"
 
