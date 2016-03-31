@@ -135,7 +135,7 @@ setup_basephone () {
     sed -i 's/wpa-driver wext/wpa-driver nl80211/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
 
     # Enable WLAN0
-    echo 'auto wlan0' >> ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
+    #echo 'auto wlan0' >> ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
 }
 
 # Create image for Basephone (only change name, image will be created later)

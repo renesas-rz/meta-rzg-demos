@@ -13,7 +13,7 @@ SRC_URI_append = " \
 
 DEPENDS += " gstreamer1.0-rtsp-server axistatlib qtquickcontrols "
 RDEPENDS_${PN} += " gstreamer1.0-rtsp-server axistatlib qtquickcontrols-qmlplugins "
-PACKAGECONFIG += " gstreamer"
+#PACKAGECONFIG += " gstreamer"
 
 #TODO: Below workaround is need because Qt will not regenerate files
 # with uppercase name. Change them to lowercase and remove workaround
