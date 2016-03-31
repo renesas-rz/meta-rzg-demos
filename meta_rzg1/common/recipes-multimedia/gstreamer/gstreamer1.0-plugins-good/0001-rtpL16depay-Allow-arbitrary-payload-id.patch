@@ -1,0 +1,27 @@
+From bfaff6a5f13faaf85836a025606bcfd6367c37c7 Mon Sep 17 00:00:00 2001
+From: Petr Nechaev <petr.nechaev@cogentembedded.com>
+Date: Thu, 11 Jun 2015 23:59:59 -0400
+Subject: [PATCH] rtpL16depay: Allow arbitrary payload-id
+
+---
+ gst/rtp/gstrtpL16depay.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/gst/rtp/gstrtpL16depay.c b/gst/rtp/gstrtpL16depay.c
+index 7e96d9d..ea8bb1b 100644
+--- a/gst/rtp/gstrtpL16depay.c
++++ b/gst/rtp/gstrtpL16depay.c
+@@ -72,8 +72,8 @@ static GstStaticPadTemplate gst_rtp_L16_depay_sink_template =
+         "encoding-name = (string) \"L16\";"
+         "application/x-rtp, "
+         "media = (string) \"audio\", "
+-        "payload = (int) { " GST_RTP_PAYLOAD_L16_STEREO_STRING ", "
+-        GST_RTP_PAYLOAD_L16_MONO_STRING " }," "clock-rate = (int) [ 1, MAX ]"
++        "payload = (int) [1, 255]," 
++	"clock-rate = (int) [ 1, MAX ]"
+         /* "channels = (int) [1, MAX]" */
+         /* "emphasis = (string) ANY" */
+         /* "channel-order = (string) ANY" */
+-- 
+1.9.3
+

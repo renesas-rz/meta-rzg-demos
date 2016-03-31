@@ -1,0 +1,13 @@
+diff --git a/src/plugins/gstreamer/mediaplayer/qgstreamerplayersession.cpp b/src/plugins/gstreamer/mediaplayer/qgstreamerplayersession.cpp
+index 165d093..11e14ff 100644
+--- a/src/plugins/gstreamer/mediaplayer/qgstreamerplayersession.cpp
++++ b/src/plugins/gstreamer/mediaplayer/qgstreamerplayersession.cpp
+@@ -164,6 +164,8 @@ QGstreamerPlayerSession::QGstreamerPlayerSession(QObject *parent)
+         }
+ #endif
+         g_object_set(G_OBJECT(m_playbin), "flags", flags, NULL);
++        g_object_set(G_OBJECT(m_playbin), "decode-nocopy", true, NULL);
++        g_object_set(G_OBJECT(m_playbin), "decode-dmabuf", false, NULL);
+ 
+         GstElement *audioSink = gst_element_factory_make("autoaudiosink", "audiosink");
+         if (audioSink) {
