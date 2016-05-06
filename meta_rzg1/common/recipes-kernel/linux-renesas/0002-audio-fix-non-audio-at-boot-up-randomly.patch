@@ -151,15 +151,14 @@ index 865d36b..23e5c84
  static int ak4642_dai_set_sysclk(struct snd_soc_dai *codec_dai,
  	int clk_id, unsigned int freq, int dir)
  {
-@@ -428,31 +467,12 @@ static int ak4642_set_bias_level(struct snd_soc_codec *codec,
+@@ -428,30 +467,12 @@ static int ak4642_set_bias_level(struct snd_soc_codec *codec,
  				 enum snd_soc_bias_level level)
  {
  	switch (level) {
 -	case SND_SOC_BIAS_ON:
 -	case SND_SOC_BIAS_PREPARE:
--		break;
 -	case SND_SOC_BIAS_STANDBY:
--		if (codec->dapm.bias_level == SND_SOC_BIAS_OFF) {
+-		if (snd_soc_test_bits(codec, PW_MGMT1, PMVCM, PMVCM) > 0) {
 -			snd_soc_update_bits(codec, PW_MGMT1, PMVCM, PMVCM);
 -
 -			/* start stereo input */
@@ -186,7 +185,7 @@ index 865d36b..23e5c84
  	}
  	codec->dapm.bias_level = level;
  
-@@ -460,6 +480,8 @@ static int ak4642_set_bias_level(struct snd_soc_codec *codec,
+@@ -459,6 +479,8 @@ static int ak4642_set_bias_level(struct snd_soc_codec *codec,
  }
  
  static const struct snd_soc_dai_ops ak4642_dai_ops = {
