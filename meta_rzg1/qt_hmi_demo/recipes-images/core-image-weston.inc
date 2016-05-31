@@ -28,9 +28,10 @@ IMAGE_INSTALL_append = " \
     qt3d \
     qt3d-examples \
     qt3d-qmlplugins \
-    qtwebkit \
-    qtwebkit-examples-examples \
-    qtwebkit-qmlplugins \
+    qtwebengine \
+    qtwebengine-examples \
+    qtwebengine-qmlplugins \
+    ca-certificates \
     qtgraphicaleffects-qmlplugins \
     qtconnectivity \
     qtconnectivity-examples \

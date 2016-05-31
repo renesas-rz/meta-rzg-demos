@@ -1,0 +1,45 @@
+From b94aa943f507a43f59cbc4a755d5ec7a71a50bad Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Wed, 16 Mar 2016 10:14:40 -0700
+Subject: [PATCH] Disable DirectFB automatic detection and mark it deprecated
+
+[ChangeLog][Important Behavior Changes] Support for DirectFB is no
+longer enabled by default, due to lack of development in upstream. To
+re-enable the platform plugin, pass the -directfb option to configure. If
+there is no interest in this platform, the support will be deprecated in
+Qt 5.7 and will be removed in Qt 5.8.
+
+See: http://lists.qt-project.org/pipermail/development/2016-March/025273.html
+Change-Id: Icaa7fb2a490246bda156ffff143c62515a5f575b
+Reviewed-by: Lars Knoll <lars.knoll@theqtcompany.com>
+---
+ configure | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/configure b/configure
+index fb4cbef..9492cb5 100755
+--- a/configure
++++ b/configure
+@@ -682,7 +682,7 @@ CFG_EGLFS_EGLDEVICE=no
+ CFG_EGLFS_MALI=no
+ CFG_EGLFS_VIV=no
+ CFG_EGLFS_VIV_WL=no
+-CFG_DIRECTFB=auto
++CFG_DIRECTFB=no
+ CFG_GBM=auto
+ CFG_LINUXFB=auto
+ CFG_KMS=auto
+@@ -2688,8 +2688,8 @@ Additional options:
+     -no-gbm ............ Do not compile backends for GBM.
+  *  -gbm ............... Compile backends for GBM.
+ 
+-    -no-directfb ....... Do not compile DirectFB support.
+- *  -directfb .......... Compile DirectFB support.
++ *  -no-directfb ....... Do not compile DirectFB support.
++    -directfb .......... Compile DirectFB support.
+ 
+     -no-linuxfb ........ Do not compile Linux Framebuffer support.
+  *  -linuxfb ........... Compile Linux Framebuffer support.
+-- 
+1.9.1
+
