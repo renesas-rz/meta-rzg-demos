@@ -10,6 +10,7 @@ SRCREV = "c43ddf9d354761c51266ecbdc6cb90a3aac1903d"
 SRC_URI = "git://code.qt.io/{non-gerrit}/qt-labs/qt5-launch-demo.git \
            file://0001-change_video_file.patch \
            file://renesas.mov \
+           file://0002-qt5-launch-demo-update-QtWebKit-to-QtWebEngine.patch \
 "
 
 S = "${WORKDIR}/git"
