@@ -38,10 +38,18 @@ do_install_append_skrzg1m(){
     install -m 755 ${SRC}/skrzg1m_info/start.html ${D}/home/root/
 }
 
+do_install_append_iwg20m(){
+    install -d ${D}/home/root/renesas_iWave_info_files
+    install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info_files/* ${D}/home/root/renesas_iWave_info_files
+    install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info.html ${D}/home/root/
+	install -m 755 ${SRC}/iwg20m_scripts/* ${D}/home/root/launcher-taskbar/
+}
+
 FILES_${PN} = "/home/root/launcher-taskbar/* \
 	/etc/profile.d \
 	/etc/init.d \
 	/home/root/start_files/* \
+	/home/root/renesas_iWave_info_files/* \
 	/home/root \
 "
 FILES_${PN}-dbg += " \
