@@ -1,10 +1,10 @@
 SUMMARY = "Qt5 launch demo"
 DESCRIPTION = "Quick tour of Qt 5.0, primarily focusing on its graphical capabilities."
 HOMEPAGE = "http://code.qt.io/cgit/{non-gerrit}/qt-labs/"
-LICENSE = "LGPLv2.1"
+LICENSE = "BSD"
 
 # This package actually has no License file. Below is dummy info to build
-LIC_FILES_CHKSUM = "file://main_lofi.qml;md5=61743fae5e4e8d28e9ee8b95b3f6a5fc"
+LIC_FILES_CHKSUM = "file://main.qml;beginline=1;endline=39;md5=46fcfe21b4d58845077530223ab020af"
 
 SRCREV = "c43ddf9d354761c51266ecbdc6cb90a3aac1903d"
 SRC_URI = "git://code.qt.io/{non-gerrit}/qt-labs/qt5-launch-demo.git \
