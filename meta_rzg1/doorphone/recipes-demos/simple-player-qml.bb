@@ -17,6 +17,7 @@ SRC_URI = " \
   file://0008-Update-for-Flexible-resolution.patch \
   file://0009-Update-new-path-for-simple-player.patch \
   file://0010-DoorPhone-Support-auto-recognize-screen-on-RZG1EM-an.patch \
+  file://welcome-screen5.6.tar.xz \
 "
 S = "${WORKDIR}/simpleplayer"
 
