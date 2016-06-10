@@ -20,6 +20,11 @@ SRC_URI = " \
   file://welcome-screen5.6.tar.xz \
   file://0011-DoorPhone-Modify-graph-display-of-memory-measurement.patch \
 "
+
+SRC_URI_append_iwg20m = " \
+  file://0012-DoorPhone-iWave-Modify-GUI-for-touch-screen.patch \
+"
+
 S = "${WORKDIR}/simpleplayer"
 
 SRC = "${THISDIR}/simple-player-qml"
