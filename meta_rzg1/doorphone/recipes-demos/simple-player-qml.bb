@@ -18,6 +18,7 @@ SRC_URI = " \
   file://0009-Update-new-path-for-simple-player.patch \
   file://0010-DoorPhone-Support-auto-recognize-screen-on-RZG1EM-an.patch \
   file://welcome-screen5.6.tar.xz \
+  file://0011-DoorPhone-Modify-graph-display-of-memory-measurement.patch \
 "
 S = "${WORKDIR}/simpleplayer"
 
