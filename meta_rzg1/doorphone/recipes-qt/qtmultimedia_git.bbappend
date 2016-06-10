@@ -12,6 +12,9 @@ SRC_URI_append = " \
          file://0009-DoorPhone-Fix-qtmultimedia-issues-on-Qt5.6.patch \
          file://0010-DoorPhone-Modify-review-size-of-recorded-video.patch \
 "
+SRC_URI_append_iwg20m = " \
+	 file://0011-DoorPhone-iWave-Fix-audio-issue-on-basephone.patch \
+"
 
 DEPENDS += " gstreamer1.0-rtsp-server axistatlib qtquickcontrols "
 RDEPENDS_${PN} += " gstreamer1.0-rtsp-server axistatlib qtquickcontrols-qmlplugins "

@@ -4,7 +4,9 @@ FILESEXTRAPATHS = "${THISDIR}/doorphone-data:"
 SRC_URI = "file://Test_scripts.tar.xz \
            file://0001-Modify-for-easier-to-change-location.patch \
 "
-
+SRC_URI_append_iwg20m = " \
+	file://0002-DoorPhone-iWave-Fix-audio-issue-on-outdoor-script.patch \
+"
 
 S = "${WORKDIR}/Test_scripts"
 
