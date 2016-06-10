@@ -1,0 +1,74 @@
+From a9a204a386528bff1854b6848b4a4baf9c774c5d Mon Sep 17 00:00:00 2001
+From: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+Date: Fri, 10 Jun 2016 10:02:26 +0700
+Subject: [PATCH] DoorPhone-Modify review size of recorded video
+
+At current time, review size of recorded video is fix 960x540,
+it will display OK on screen 1280x720 but with other screens,
+it will display wrong
+
+This patch file modifies for review size adapt with the screen resolution
+by get screen information then set video size
+
+Signed-off-by: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+---
+ .../MP4Playback/qgstreamerMP4Playbacksession.cpp   | 24 +++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/src/plugins/gstreamer/MP4Playback/qgstreamerMP4Playbacksession.cpp b/src/plugins/gstreamer/MP4Playback/qgstreamerMP4Playbacksession.cpp
+index 57f85b7..aaf6e13 100644
+--- a/src/plugins/gstreamer/MP4Playback/qgstreamerMP4Playbacksession.cpp
++++ b/src/plugins/gstreamer/MP4Playback/qgstreamerMP4Playbacksession.cpp
+@@ -4,6 +4,16 @@
+ #include <stdio.h>
+ #include "qgstreamerMP4Playbacksession.h"
+ #include <private/qgstreamerbushelper_p.h>
++#include <QtGui/QScreen>
++#include <QtGui/QGuiApplication>
++
++//Declare variable for review recorded video
++
++double scale_w;
++double scale_h;
++int disp_w;
++int disp_h;
++QScreen *screen;
+ 
+ // #define DEBUG_MP4PLAYBACK
+ QT_BEGIN_NAMESPACE
+@@ -126,6 +136,14 @@ void QGstreamerMP4PlaybackSession::play()
+ #ifdef DEBUG_MP4PLAYBACK
+     qDebug() << Q_FUNC_INFO;
+ #endif
++//Read screen information and set scale ratio
++	screen = QGuiApplication::screens().at(1);
++	if(screen == NULL)
++		screen = QGuiApplication::screens().at(0);
++	scale_w = (screen->availableSize().width() / 1280.0);
++	scale_h = (screen->availableSize().height() / 720.0);
++	disp_w = scale_w * 960;
++	disp_h = scale_h * 540;
+     if((m_state == QMP4Playback::StoppedState) && (m_status == QMP4Playback::EndOfMedia)){
+ 
+         gst_element_set_state(m_pipeline, GST_STATE_PAUSED);
+@@ -159,8 +177,8 @@ void QGstreamerMP4PlaybackSession::play()
+         
+         g_object_set (G_OBJECT (m_filesrc), "location", m_source.toLatin1().constData(), NULL);
+         g_object_set (G_OBJECT (m_dec), "use-dmabuf", true, NULL);
+-        g_object_set (G_OBJECT (m_display), "out-width", 960, NULL);
+-        g_object_set (G_OBJECT (m_display), "out-height", 540, NULL);
++        g_object_set (G_OBJECT (m_display), "out-width", disp_w, NULL);
++        g_object_set (G_OBJECT (m_display), "out-height", disp_h, NULL);
+         g_object_set (G_OBJECT (m_display), "position-x", 0, NULL);
+         g_object_set (G_OBJECT (m_display), "position-y", 0, NULL);
+         g_object_set (G_OBJECT (m_display), "max-lateness", -1, NULL);
+@@ -220,4 +238,4 @@ void QGstreamerMP4PlaybackSession::componentComplete()
+ }
+ 
+ 
+-QT_END_NAMESPACE
+\ No newline at end of file
++QT_END_NAMESPACE
+-- 
+1.9.1
+

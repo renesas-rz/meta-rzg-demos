@@ -10,6 +10,7 @@ SRC_URI_append = " \
 	 file://0007-Correct_function_call_for_SetVspmfiler1.patch \
 	 file://0008-Flexible_Display_Support_H264StreamingSession_cpp.patch \
          file://0009-DoorPhone-Fix-qtmultimedia-issues-on-Qt5.6.patch \
+         file://0010-DoorPhone-Modify-review-size-of-recorded-video.patch \
 "
 
 DEPENDS += " gstreamer1.0-rtsp-server axistatlib qtquickcontrols "
