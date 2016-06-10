@@ -1,0 +1,390 @@
+From ea3a1da77eb6d7ad9bc1d1413242e4215ba2d703 Mon Sep 17 00:00:00 2001
+From: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+Date: Thu, 9 Jun 2016 20:12:04 +0700
+Subject: [PATCH] DoorPhone-Fix issue HDMI display on iWave
+
+When Qt framework of DoorPhone updates from Qt5.5 to Qt5.6, there is an issue with
+DoorPhone on iWave board, DoorPhone can not run on HDMI screen of iWave board.
+Reason is Qt5.6 removed event thread due to no real reason to keep it (as description
+of Qt5.6)
+
+This patch file re-add event thread for a workaround to fix that issue
+
+Signed-off-by: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+---
+ src/client/client.pro              |   2 +
+ src/client/qwaylanddisplay.cpp     |  42 +++++++-------
+ src/client/qwaylanddisplay_p.h     |   3 +-
+ src/client/qwaylandeventthread.cpp | 112 +++++++++++++++++++++++++++++++++++++
+ src/client/qwaylandeventthread_p.h |  86 ++++++++++++++++++++++++++++
+ src/client/qwaylandintegration.cpp |   4 --
+ 6 files changed, 222 insertions(+), 27 deletions(-)
+ create mode 100644 src/client/qwaylandeventthread.cpp
+ create mode 100644 src/client/qwaylandeventthread_p.h
+
+diff --git a/src/client/client.pro b/src/client/client.pro
+index 59234b1..539ca58 100644
+--- a/src/client/client.pro
++++ b/src/client/client.pro
+@@ -70,6 +70,7 @@ SOURCES +=  qwaylandintegration.cpp \
+             qwaylandabstractdecoration.cpp \
+             qwaylanddecorationfactory.cpp \
+             qwaylanddecorationplugin.cpp \
++            qwaylandeventthread.cpp \
+             qwaylandwindowmanagerintegration.cpp \
+             qwaylandinputcontext.cpp \
+             qwaylanddatadevice.cpp \
+@@ -103,6 +104,7 @@ HEADERS +=  qwaylandintegration_p.h \
+             qwaylandabstractdecoration_p.h \
+             qwaylanddecorationfactory_p.h \
+             qwaylanddecorationplugin_p.h \
++            qwaylandeventthread_p.h \
+             qwaylandwindowmanagerintegration_p.h \
+             qwaylandinputcontext_p.h \
+             qwaylanddatadevice_p.h \
+diff --git a/src/client/qwaylanddisplay.cpp b/src/client/qwaylanddisplay.cpp
+index a6f52bc..42c6fe6 100644
+--- a/src/client/qwaylanddisplay.cpp
++++ b/src/client/qwaylanddisplay.cpp
+@@ -33,6 +33,7 @@
+ 
+ #include "qwaylanddisplay_p.h"
+ 
++#include "qwaylandeventthread_p.h"
+ #include "qwaylandintegration_p.h"
+ #include "qwaylandwindow_p.h"
+ #include "qwaylandscreen_p.h"
+@@ -143,15 +144,21 @@ QWaylandDisplay::QWaylandDisplay(QWaylandIntegration *waylandIntegration)
+     , mLastInputWindow(0)
+ {
+     qRegisterMetaType<uint32_t>("uint32_t");
++    
++    mEventThreadObject = new QWaylandEventThread(0);
++    mEventThread = new QThread(this);
++    mEventThread->setObjectName(QStringLiteral("QtWayland"));
++    mEventThreadObject->moveToThread(mEventThread);
++    mEventThread->start();
+ 
+-    mDisplay = wl_display_connect(NULL);
+-    if (mDisplay == NULL) {
+-        qErrnoWarning(errno, "Failed to create display");
+-        ::exit(1);
+-    }
++    mEventThreadObject->displayConnect();
++    mDisplay = mEventThreadObject->display(); //blocks until display is available
+ 
+     struct ::wl_registry *registry = wl_display_get_registry(mDisplay);
+     init(registry);
++    
++    connect(mEventThreadObject, SIGNAL(newEventsRead()), this, SLOT(flushRequests()));
++    connect(mEventThreadObject, &QWaylandEventThread::fatalError, this, &QWaylandDisplay::exitWithError);
+ 
+     mWindowManagerIntegration.reset(new QWaylandWindowManagerIntegration(this));
+ 
+@@ -168,28 +175,17 @@ QWaylandDisplay::~QWaylandDisplay(void)
+     }
+     mScreens.clear();
+     delete mDndSelectionHandler.take();
+-    wl_display_disconnect(mDisplay);
+-}
+-
+-void QWaylandDisplay::checkError() const
+-{
+-    int ecode = wl_display_get_error(mDisplay);
+-    if ((ecode == EPIPE || ecode == ECONNRESET)) {
+-        // special case this to provide a nicer error
+-        qWarning("The Wayland connection broke. Did the Wayland compositor die?");
+-    } else {
+-        qErrnoWarning(ecode, "The Wayland connection experienced a fatal error");
+-    }
++    mEventThread->quit();
++    mEventThread->wait();
++    delete mEventThreadObject;
+ }
+ 
+ void QWaylandDisplay::flushRequests()
+ {
+-    if (wl_display_prepare_read(mDisplay) == 0) {
+-        wl_display_read_events(mDisplay);
+-    }
++
+ 
+     if (wl_display_dispatch_pending(mDisplay) < 0) {
+-        checkError();
++        mEventThreadObject->checkError();
+         exitWithError();
+     }
+ 
+@@ -200,13 +196,15 @@ void QWaylandDisplay::flushRequests()
+ void QWaylandDisplay::blockingReadEvents()
+ {
+     if (wl_display_dispatch(mDisplay) < 0) {
+-        checkError();
++        mEventThreadObject->checkError();
+         exitWithError();
+     }
+ }
+ 
+ void QWaylandDisplay::exitWithError()
+ {
++    mEventThread->quit();
++    mEventThread->wait();
+     ::exit(1);
+ }
+ 
+diff --git a/src/client/qwaylanddisplay_p.h b/src/client/qwaylanddisplay_p.h
+index b53e057..0463e34 100644
+--- a/src/client/qwaylanddisplay_p.h
++++ b/src/client/qwaylanddisplay_p.h
+@@ -178,7 +178,6 @@ public slots:
+ private:
+     void waitForScreens();
+     void exitWithError();
+-    void checkError() const;
+ 
+     struct Listener {
+         RegistryListener listener;
+@@ -188,6 +187,8 @@ private:
+     struct wl_display *mDisplay;
+     QtWayland::wl_compositor mCompositor;
+     struct wl_shm *mShm;
++    QThread *mEventThread;
++    QWaylandEventThread *mEventThreadObject;
+     QScopedPointer<QtWayland::wl_shell> mShell;
+     QScopedPointer<QWaylandXdgShell> mShellXdg;
+     QList<QWaylandScreen *> mScreens;
+diff --git a/src/client/qwaylandeventthread.cpp b/src/client/qwaylandeventthread.cpp
+new file mode 100644
+index 0000000..e0a3edc
+--- /dev/null
++++ b/src/client/qwaylandeventthread.cpp
+@@ -0,0 +1,112 @@
++/****************************************************************************
++**
++** Copyright (C) 2015 The Qt Company Ltd.
++** Contact: http://www.qt.io/licensing/
++**
++** This file is part of the plugins of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL21$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and The Qt Company. For licensing terms
++** and conditions see http://www.qt.io/terms-conditions. For further
++** information use the contact form at http://www.qt.io/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 or version 3 as published by the Free
++** Software Foundation and appearing in the file LICENSE.LGPLv21 and
++** LICENSE.LGPLv3 included in the packaging of this file. Please review the
++** following information to ensure the GNU Lesser General Public License
++** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** As a special exception, The Qt Company gives you certain additional
++** rights. These rights are described in The Qt Company LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#include "qwaylandeventthread_p.h"
++#include <QtCore/QSocketNotifier>
++#include <QCoreApplication>
++
++#include <unistd.h>
++#include <fcntl.h>
++#include <stdio.h>
++#include <errno.h>
++
++QT_BEGIN_NAMESPACE
++
++namespace QtWaylandClient {
++
++QWaylandEventThread::QWaylandEventThread(QObject *parent)
++    : QObject(parent)
++    , m_display(0)
++    , m_fileDescriptor(-1)
++    , m_readNotifier(0)
++    , m_displayLock(new QMutex)
++{
++}
++
++QWaylandEventThread::~QWaylandEventThread()
++{
++    delete m_displayLock;
++    wl_display_disconnect(m_display);
++}
++
++void QWaylandEventThread::displayConnect()
++{
++    m_displayLock->lock();
++    QMetaObject::invokeMethod(this, "waylandDisplayConnect", Qt::QueuedConnection);
++}
++
++// ### be careful what you do, this function may also be called from other
++// threads to clean up & exit.
++void QWaylandEventThread::checkError() const
++{
++    int ecode = wl_display_get_error(m_display);
++    if ((ecode == EPIPE || ecode == ECONNRESET)) {
++        // special case this to provide a nicer error
++        qWarning("The Wayland connection broke. Did the Wayland compositor die?");
++    } else {
++        qErrnoWarning(ecode, "The Wayland connection experienced a fatal error");
++    }
++}
++
++void QWaylandEventThread::readWaylandEvents()
++{
++    if (wl_display_prepare_read(m_display) == 0) {
++        wl_display_read_events(m_display);
++    }
++    emit newEventsRead();
++}
++
++void QWaylandEventThread::waylandDisplayConnect()
++{
++    m_display = wl_display_connect(NULL);
++    if (m_display == NULL) {
++        qErrnoWarning(errno, "Failed to create display");
++        ::exit(1);
++    }
++    m_displayLock->unlock();
++
++    m_fileDescriptor = wl_display_get_fd(m_display);
++
++    m_readNotifier = new QSocketNotifier(m_fileDescriptor, QSocketNotifier::Read, this);
++    connect(m_readNotifier, SIGNAL(activated(int)), this, SLOT(readWaylandEvents()));
++}
++
++wl_display *QWaylandEventThread::display() const
++{
++    QMutexLocker displayLock(m_displayLock);
++    return m_display;
++}
++
++}
++
++QT_END_NAMESPACE
+diff --git a/src/client/qwaylandeventthread_p.h b/src/client/qwaylandeventthread_p.h
+new file mode 100644
+index 0000000..cd64b70
+--- /dev/null
++++ b/src/client/qwaylandeventthread_p.h
+@@ -0,0 +1,86 @@
++/****************************************************************************
++**
++** Copyright (C) 2015 The Qt Company Ltd.
++** Contact: http://www.qt.io/licensing/
++**
++** This file is part of the plugins of the Qt Toolkit.
++**
++** $QT_BEGIN_LICENSE:LGPL21$
++** Commercial License Usage
++** Licensees holding valid commercial Qt licenses may use this file in
++** accordance with the commercial license agreement provided with the
++** Software or, alternatively, in accordance with the terms contained in
++** a written agreement between you and The Qt Company. For licensing terms
++** and conditions see http://www.qt.io/terms-conditions. For further
++** information use the contact form at http://www.qt.io/contact-us.
++**
++** GNU Lesser General Public License Usage
++** Alternatively, this file may be used under the terms of the GNU Lesser
++** General Public License version 2.1 or version 3 as published by the Free
++** Software Foundation and appearing in the file LICENSE.LGPLv21 and
++** LICENSE.LGPLv3 included in the packaging of this file. Please review the
++** following information to ensure the GNU Lesser General Public License
++** requirements will be met: https://www.gnu.org/licenses/lgpl.html and
++** http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html.
++**
++** As a special exception, The Qt Company gives you certain additional
++** rights. These rights are described in The Qt Company LGPL Exception
++** version 1.1, included in the file LGPL_EXCEPTION.txt in this package.
++**
++** $QT_END_LICENSE$
++**
++****************************************************************************/
++
++#ifndef QWAYLANDEVENTTHREAD_H
++#define QWAYLANDEVENTTHREAD_H
++
++#include <QObject>
++#include <QMutex>
++#include <wayland-client.h>
++
++#include <QtWaylandClient/private/qwaylandclientexport_p.h>
++
++QT_BEGIN_NAMESPACE
++
++class QSocketNotifier;
++
++namespace QtWaylandClient {
++
++class Q_WAYLAND_CLIENT_EXPORT QWaylandEventThread : public QObject
++{
++    Q_OBJECT
++public:
++    explicit QWaylandEventThread(QObject *parent = 0);
++    ~QWaylandEventThread();
++
++    void displayConnect();
++
++    wl_display *display() const;
++
++    void checkError() const;
++
++private slots:
++    void readWaylandEvents();
++
++    void waylandDisplayConnect();
++
++signals:
++    void newEventsRead();
++    void fatalError();
++
++private:
++
++    struct wl_display *m_display;
++    int m_fileDescriptor;
++
++    QSocketNotifier *m_readNotifier;
++
++    QMutex *m_displayLock;
++
++};
++
++}
++
++QT_END_NAMESPACE
++
++#endif // QWAYLANDEVENTTHREAD_H
+diff --git a/src/client/qwaylandintegration.cpp b/src/client/qwaylandintegration.cpp
+index 39fff53..9c9558b 100644
+--- a/src/client/qwaylandintegration.cpp
++++ b/src/client/qwaylandintegration.cpp
+@@ -54,7 +54,6 @@
+ #include <qpa/qplatformcursor.h>
+ #include <QtGui/QSurfaceFormat>
+ #include <QtGui/QOpenGLContext>
+-#include <QSocketNotifier>
+ 
+ #include <qpa/qplatforminputcontextfactory_p.h>
+ #include <qpa/qplatformaccessibility.h>
+@@ -203,9 +202,6 @@ void QWaylandIntegration::initialize()
+     QObject::connect(dispatcher, SIGNAL(aboutToBlock()), mDisplay, SLOT(flushRequests()));
+     QObject::connect(dispatcher, SIGNAL(awake()), mDisplay, SLOT(flushRequests()));
+ 
+-    int fd = wl_display_get_fd(mDisplay->wl_display());
+-    QSocketNotifier *sn = new QSocketNotifier(fd, QSocketNotifier::Read, mDisplay);
+-    QObject::connect(sn, SIGNAL(activated(int)), mDisplay, SLOT(flushRequests()));
+ }
+ 
+ QPlatformFontDatabase *QWaylandIntegration::fontDatabase() const
+-- 
+1.9.1
+
