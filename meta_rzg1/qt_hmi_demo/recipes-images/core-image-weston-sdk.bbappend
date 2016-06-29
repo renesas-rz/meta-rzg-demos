@@ -50,3 +50,16 @@ create_sdk_files_prepend () {
 
 IMAGE_INSTALL_append = " qtmultimedia"
 TOOLCHAIN_HOST_TASK_append = " nativesdk-qtbase-tools nativesdk-packagegroup-qt5-toolchain-host"
+
+### For self-compile ###
+IMAGE_INSTALL_append = " packagegroup-qt5-toolchain-target "
+
+# Set up environment variables for self-compileing
+setup_qt_env () {
+    if [ ! -e ${IMAGE_ROOTFS}${sysconfdir}/profile.d/setup_qt_env ]
+    then
+        echo 'export PATH=$PATH:/usr/bin/qt5' > ${IMAGE_ROOTFS}${sysconfdir}/profile.d/setup_qt_env
+        echo 'export INCLUDEPATH=$INCLUDEPATH:/usr/include/qt5' >> ${IMAGE_ROOTFS}${sysconfdir}/profile.d/setup_qt_env
+    fi
+}
+ROOTFS_POSTPROCESS_COMMAND_append = "setup_qt_env"
