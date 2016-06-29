@@ -16,6 +16,11 @@ SRC_URI_append_iwg20m += " \
     file://0002-Add-pwm-support-on-device-tree-for-iWave-board.patch \
 "
 
+SRC_URI_append_skrzg1m += " \
+    file://0001-Add-pwm-pinfc-setting-for-r8a7743-skrzg1m.patch \
+    file://0002-Add-pwm-support-on-device-tree-for-skrzg1m-board.patch \
+"
+
 do_configure_append() {
     # Enable usb cam
     kernel_configure_variable MEDIA_USB_SUPPORT=y
@@ -95,12 +100,17 @@ do_configure_append() {
     yes '' | oe_runmake oldconfig
 }
 
+do_configure_append_skrzg1m() {
+    kernel_configure_variable PWM=y  
+ 
+    yes '' | oe_runmake oldconfig
+}
 
-do_configure_append_iwg20m() {
+do_configure_append() {
     kernel_configure_variable PWM_SYSFS=y  
     kernel_configure_variable PWM_RENESAS_PWM=y
 	kernel_configure_variable PWM_TIMER_SUPPORT=y  
  
     yes '' | oe_runmake oldconfig
 }
-	 
+
