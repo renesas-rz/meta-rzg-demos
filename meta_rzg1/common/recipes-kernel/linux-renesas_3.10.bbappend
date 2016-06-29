@@ -21,6 +21,10 @@ SRC_URI_append_skrzg1m += " \
     file://0002-Add-pwm-support-on-device-tree-for-skrzg1m-board.patch \
 "
 
+SRC_URI_append_skrzg1e += " \
+    file://0001-Add-pwm-pinfc-setting-for-r8a7745-skrzg1e.patch \
+    file://0002-Add-pwm-support-on-device-tree-for-skrzg1e-board.patch \
+"
 do_configure_append() {
     # Enable usb cam
     kernel_configure_variable MEDIA_USB_SUPPORT=y
@@ -101,6 +105,12 @@ do_configure_append() {
 }
 
 do_configure_append_skrzg1m() {
+    kernel_configure_variable PWM=y  
+ 
+    yes '' | oe_runmake oldconfig
+}
+
+do_configure_append_skrzg1e() {
     kernel_configure_variable PWM=y  
  
     yes '' | oe_runmake oldconfig
