@@ -15,6 +15,7 @@ SRC_URI_append_iwg20m += " \
     file://0001-Add-pwm-pin-function-controller-setting-for-r8a7743-.patch \
     file://0002-Add-pwm-support-on-device-tree-for-iWave-board.patch \
     file://0003-USB2.0-OTG-Enable-USB2.0-OTG-Like-Connector-on-iWave.patch \
+    file://0004-Fix-issue-ov7725-soc_cam.patch \
 "
 
 SRC_URI_append_skrzg1m += " \
