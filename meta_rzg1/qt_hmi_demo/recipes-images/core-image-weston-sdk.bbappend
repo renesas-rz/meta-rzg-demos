@@ -63,3 +63,9 @@ setup_qt_env () {
     fi
 }
 ROOTFS_POSTPROCESS_COMMAND_append = "setup_qt_env"
+
+# Include this make it similar to core-image-weston
+include core-image-weston.inc
+
+# Qt multimedia needs alsa-dev when self-compiling
+IMAGE_INSTALL_append = " alsa-dev "
