@@ -1,12 +1,19 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:${THISDIR}/${PN}/iWave:"
 
 PATCHTOOL_rzg1 = "git"
 
-SRC_URI_append = " \
+SRC_URI_append += " \
     file://0001-add-wifi-bcmdhd.patch \
     file://0002-audio-fix-non-audio-at-boot-up-randomly.patch \
     file://0003-Build-driver-support-USBWifi-band-5GHz.patch \
     file://0004-Add-GPIO-button-for-RZG1M-Starter-Kit.patch \
+    file://0005-Add-sysfs-for-pwm-from-kernel-v3.11.patch \
+    file://0006-Fix-issue-limit-setting-value-lower-2s-of-period.patch \
+"
+
+SRC_URI_append_iwg20m += " \
+    file://0001-Add-pwm-pin-function-controller-setting-for-r8a7743-.patch \
+    file://0002-Add-pwm-support-on-device-tree-for-iWave-board.patch \
 "
 
 do_configure_append() {
@@ -89,3 +96,11 @@ do_configure_append() {
 }
 
 
+do_configure_append_iwg20m() {
+    kernel_configure_variable PWM_SYSFS=y  
+    kernel_configure_variable PWM_RENESAS_PWM=y
+	kernel_configure_variable PWM_TIMER_SUPPORT=y  
+ 
+    yes '' | oe_runmake oldconfig
+}
+	 
