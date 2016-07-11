@@ -1,0 +1,104 @@
+From 4dc6079c865fe16f87f5b5047a0e8ab88308b085 Mon Sep 17 00:00:00 2001
+From: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+Date: Fri, 10 Jun 2016 11:51:18 +0700
+Subject: [PATCH] DoorPhone-iWave-Fix audio issue on basephone
+
+At current time, iWave board can not output audio because the audio pipeline
+use format S32LE for audio and iWave can not output audio with this format
+
+This patch file modifies audio pipeline of basephone
+This patch file fix this issue by using format S16LE that iWave board can
+use to output audio
+
+Signed-off-by: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+---
+ .../qgstreameraudiostreamingsession.cpp            | 27 ++++++++++++++++------
+ .../qgstreameraudiostreamingsession.h              |  4 ++--
+ 2 files changed, 22 insertions(+), 9 deletions(-)
+
+diff --git a/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.cpp b/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.cpp
+index 16cc810..fc8e30a 100755
+--- a/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.cpp
++++ b/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.cpp
+@@ -5,7 +5,7 @@
+ #include "qgstreameraudiostreamingsession.h"
+ #include <private/qgstreamerbushelper_p.h>
+ 
+-// #define DEBUG_AUDIOSTREAMING
++//#define DEBUG_AUDIOSTREAMING
+ QT_BEGIN_NAMESPACE
+ 
+ QGstreamerAudioStreamingSession::QGstreamerAudioStreamingSession(QObject *parent)
+@@ -293,10 +293,8 @@ void QGstreamerAudioStreamingSession::componentComplete()
+             m_rtpmp4adepay = gst_element_factory_make("rtpmp4adepay", "rtpmp4adepay");
+             m_aacdec = gst_element_factory_make("avdec_aac", "avdec_aac");
+             m_aconvert = gst_element_factory_make("audioconvert", "audioconvert");
++            m_convertcap = gst_element_factory_make("capsfilter", "aconvert-cap");
+             m_alsasink = gst_element_factory_make("alsasink", "Audio-Display");
+-            
+-            gst_bin_add_many (GST_BIN (m_pipeline), m_udpsrc, m_rtpjitterbuffer, m_queue, m_rtpmp4adepay, m_aacdec, m_aconvert, m_alsasink, NULL);
+-            gst_element_link_many (m_udpsrc, m_rtpjitterbuffer, m_queue, m_rtpmp4adepay, m_aacdec, m_aconvert, m_alsasink, NULL);
+ 
+             g_object_set (G_OBJECT (m_udpsrc), "port", m_usrcport, NULL);
+             m_capsfilter = gst_caps_new_simple ("application/x-rtp",
+@@ -304,6 +302,14 @@ void QGstreamerAudioStreamingSession::componentComplete()
+                                                 NULL);
+             g_object_set (G_OBJECT (m_udpsrc), "caps", m_capsfilter, NULL);
+             gst_caps_unref (m_capsfilter);
++
++            m_convertcapfilter = gst_caps_new_simple ("audio/x-raw", "format",G_TYPE_STRING, "S16LE",NULL);
++            g_object_set (G_OBJECT (m_convertcap), "caps", m_convertcapfilter, NULL);
++            gst_caps_unref (m_convertcapfilter);
++
++            gst_bin_add_many (GST_BIN (m_pipeline), m_udpsrc, m_rtpjitterbuffer, m_queue, m_rtpmp4adepay, m_aacdec, m_aconvert, m_convertcap, m_alsasink, NULL);
++            gst_element_link_many (m_udpsrc, m_rtpjitterbuffer, m_queue, m_rtpmp4adepay, m_aacdec, m_aconvert, m_convertcap, m_alsasink, NULL);
++
+         }else if(m_audioplugin == "Pulse GST"){
+             m_udpsrc = gst_element_factory_make("udpsrc", "Audio-input");
+             m_rtpjitterbuffer = gst_element_factory_make("rtpjitterbuffer", "rtpjitterbuffer");
+@@ -311,10 +317,8 @@ void QGstreamerAudioStreamingSession::componentComplete()
+             m_rtpmp4adepay = gst_element_factory_make("rtpmp4adepay", "rtpmp4adepay");
+             m_aacdec = gst_element_factory_make("avdec_aac", "avdec_aac");
+             m_aconvert = gst_element_factory_make("audioconvert", "audioconvert");
++            m_convertcap = gst_element_factory_make("capsfilter", "aconvert-cap");
+             m_pulsesink = gst_element_factory_make("pulsesink", "Audio-Display");
+-            
+-            gst_bin_add_many (GST_BIN (m_pipeline), m_udpsrc, m_rtpjitterbuffer, m_queue, m_rtpmp4adepay, m_aacdec, m_aconvert, m_pulsesink, NULL);
+-            gst_element_link_many (m_udpsrc, m_rtpjitterbuffer, m_queue, m_rtpmp4adepay, m_aacdec, m_aconvert, m_pulsesink, NULL);
+ 
+             g_object_set (G_OBJECT (m_udpsrc), "port", m_usrcport, NULL);
+             m_capsfilter = gst_caps_new_simple ("application/x-rtp",
+@@ -322,6 +326,15 @@ void QGstreamerAudioStreamingSession::componentComplete()
+                                                 NULL);
+             g_object_set (G_OBJECT (m_udpsrc), "caps", m_capsfilter, NULL);
+             gst_caps_unref (m_capsfilter);
++
++            m_convertcapfilter = gst_caps_new_simple ("audio/x-raw", "format",G_TYPE_STRING, "S16LE",NULL);
++            g_object_set (G_OBJECT (m_convertcap), "caps", m_convertcapfilter, NULL);
++            gst_caps_unref (m_convertcapfilter);
++
++            gst_bin_add_many (GST_BIN (m_pipeline), m_udpsrc, m_rtpjitterbuffer, m_queue, m_rtpmp4adepay, m_aacdec, m_aconvert, m_convertcap, m_pulsesink, NULL);
++            gst_element_link_many (m_udpsrc, m_rtpjitterbuffer, m_queue, m_rtpmp4adepay, m_aacdec, m_aconvert, m_convertcap, m_pulsesink, NULL);
++
++
+         }
+     }
+ }
+diff --git a/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.h b/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.h
+index 973ba2a..9cd0fe7 100644
+--- a/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.h
++++ b/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.h
+@@ -63,8 +63,8 @@ private:
+     
+     GstElement *m_pipeline;
+     GstElement *m_alsasrc, *m_aconvert, *m_aacenc, *m_rtpmp4apay, *m_udpsink;
+-    GstElement *m_udpsrc, *m_rtpjitterbuffer, *m_queue, *m_rtpmp4adepay, *m_alsasink, *m_aacdec;
+-    GstCaps *m_capsfilter;
++    GstElement *m_udpsrc, *m_rtpjitterbuffer, *m_queue, *m_rtpmp4adepay, *m_alsasink, *m_aacdec, *m_convertcap;
++    GstCaps *m_capsfilter, *m_convertcapfilter;
+     GstElement *m_pulsesrc, *m_pulsesink;
+ };
+ 
+-- 
+1.9.1
+

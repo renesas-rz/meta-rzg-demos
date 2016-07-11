@@ -17,3 +17,4 @@ do_install() {
 FILES_${PN} = "/home/root/loading-qt-app/* \
 "
 FILES_${PN}-dbg = "/home/root/loading-qt-app/.debug/*"
+INSANE_SKIP_${PN} = "already-stripped"

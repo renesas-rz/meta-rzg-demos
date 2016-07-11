@@ -1,0 +1,23 @@
+From 8fba3fbf6669f081cc6bda547c7890f45d214389 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Sun, 15 May 2016 18:00:22 +0700
+Subject: [PATCH] weston-update-weston-bar-larger-for-touch
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+
+diff --git a/clients/desktop-shell.c b/clients/desktop-shell.c
+index 2d60f90..49b50c6 100644
+--- a/clients/desktop-shell.c
++++ b/clients/desktop-shell.c
+@@ -499,7 +499,7 @@ panel_configure(void *data,
+ 	struct surface *surface = window_get_user_data(window);
+ 	struct panel *panel = container_of(surface, struct panel, base);
+ 
+-	window_schedule_resize(panel->window, width, 32);
++	window_schedule_resize(panel->window, width, 50);
+ }
+ 
+ static void
+-- 
+1.9.1
+

@@ -17,7 +17,14 @@ SRC_URI = " \
   file://0008-Update-for-Flexible-resolution.patch \
   file://0009-Update-new-path-for-simple-player.patch \
   file://0010-DoorPhone-Support-auto-recognize-screen-on-RZG1EM-an.patch \
+  file://welcome-screen5.6.tar.xz \
+  file://0011-DoorPhone-Modify-graph-display-of-memory-measurement.patch \
 "
+
+SRC_URI_append_iwg20m = " \
+  file://0012-DoorPhone-iWave-Modify-GUI-for-touch-screen.patch \
+"
+
 S = "${WORKDIR}/simpleplayer"
 
 SRC = "${THISDIR}/simple-player-qml"

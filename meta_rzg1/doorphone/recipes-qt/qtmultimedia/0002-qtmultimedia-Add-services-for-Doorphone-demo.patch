@@ -54,8 +54,8 @@ Note that this patch is used with upstream meta-qt5, revision
  src/multimedia/controls/controls.pri               |   12 +-
  src/multimedia/controls/qH264Streamingcontrol.cpp  |  371 +++++
  src/multimedia/controls/qH264Streamingcontrol.h    |  141 ++
- src/multimedia/controls/qMP4Playbackcontrol.cpp    |    1 +
- src/multimedia/controls/qMP4Playbackcontrol.h      |    1 +
+ src/multimedia/controls/qMP4Playbackcontrol.cpp    |    17 +
+ src/multimedia/controls/qMP4Playbackcontrol.h      |    32 +
  src/multimedia/controls/qMP4Recordercontrol.cpp    |   54 +
  src/multimedia/controls/qMP4Recordercontrol.h      |   93 ++
  src/multimedia/controls/qaudiostreamingcontrol.cpp |   17 +
@@ -214,7 +214,7 @@ diff --git a/qtmultimedia.pro b/qtmultimedia.pro
 index 4f675fe..7663fa2 100644
 --- a/qtmultimedia.pro
 +++ b/qtmultimedia.pro
-@@ -17,23 +17,21 @@ win32 {
+@@ -16,23 +16,21 @@ win32 {
  } else:!android {
      contains(QT_CONFIG, alsa):qtCompileTest(alsa)
      contains(QT_CONFIG, pulseaudio):qtCompileTest(pulseaudio)
@@ -2960,7 +2960,7 @@ diff --git a/src/imports/multimedia/multimedia.cpp b/src/imports/multimedia/mult
 index 4b31068..7734359 100644
 --- a/src/imports/multimedia/multimedia.cpp
 +++ b/src/imports/multimedia/multimedia.cpp
-@@ -53,6 +53,15 @@
+@@ -54,6 +54,15 @@
  #include "qdeclarativecameraimageprocessing_p.h"
  #include "qdeclarativecameraviewfinder_p.h"
  #include "qdeclarativetorch_p.h"
@@ -2976,7 +2976,7 @@ index 4b31068..7734359 100644
  
  QML_DECLARE_TYPE(QSoundEffect)
  
-@@ -75,14 +84,23 @@ public:
+@@ -76,14 +85,23 @@ public:
          Q_ASSERT(QLatin1String(uri) == QLatin1String("QtMultimedia"));
  
          // 5.0 types
@@ -3011,8 +3011,8 @@ index 71358ca..67965cc 100644
 +        qdeclarativeaudiostreaming_p.h \
          qdeclarativeaudio_p.h \
          qdeclarativemediametadata_p.h \
-         qdeclarativeradio_p.h \
-@@ -15,10 +16,23 @@ HEADERS += \
+         qdeclarativeplaylist_p.h \
+@@ -16,10 +17,23 @@ HEADERS += \
          qdeclarativecamerapreviewprovider_p.h \
          qdeclarativetorch_p.h \
          qdeclarativecameraviewfinder_p.h \
@@ -3035,9 +3035,9 @@ index 71358ca..67965cc 100644
          multimedia.cpp \
 +        qdeclarativeaudiostreaming.cpp \
          qdeclarativeaudio.cpp \
+         qdeclarativeplaylist.cpp \
          qdeclarativeradio.cpp \
-         qdeclarativeradiodata.cpp \
-@@ -32,8 +46,21 @@ SOURCES += \
+@@ -34,8 +48,21 @@ SOURCES += \
          qdeclarativecamerapreviewprovider.cpp \
          qdeclarativetorch.cpp \
          qdeclarativecameraviewfinder.cpp \
@@ -6159,19 +6159,18 @@ index b19532f..bb01e77 100644
      controls/qaudioencodersettingscontrol.h \
      controls/qaudioinputselectorcontrol.h \
      controls/qaudiooutputselectorcontrol.h \
-@@ -36,7 +37,10 @@ PUBLIC_HEADERS += \
-     controls/qvideowindowcontrol.h \
+@@ -37,6 +38,9 @@ PUBLIC_HEADERS += \
      controls/qmediaaudioprobecontrol.h \
      controls/qmediavideoprobecontrol.h \
--    controls/qmediaavailabilitycontrol.h
-+    controls/qmediaavailabilitycontrol.h \
+     controls/qmediaavailabilitycontrol.h \
+-    controls/qaudiorolecontrol.h
++    controls/qaudiorolecontrol.h \
 +    controls/qH264Streamingcontrol.h \
 +    controls/qMP4Playbackcontrol.h \
 +    controls/qMP4Recordercontrol.h
  
  PRIVATE_HEADERS += \
-     controls/qmediaplaylistcontrol_p.h \
-@@ -75,9 +79,13 @@ SOURCES += \
+@@ -76,10 +80,14 @@ SOURCES += \
      controls/qmediavideoprobecontrol.cpp \
      controls/qmediaavailabilitycontrol.cpp \
      controls/qaudiodecodercontrol.cpp \
@@ -6180,8 +6179,9 @@ index b19532f..bb01e77 100644
      controls/qaudioencodersettingscontrol.cpp \
      controls/qaudioinputselectorcontrol.cpp \
      controls/qaudiooutputselectorcontrol.cpp \
--    controls/qvideodeviceselectorcontrol.cpp
-+    controls/qvideodeviceselectorcontrol.cpp \
+     controls/qvideodeviceselectorcontrol.cpp \
+-    controls/qaudiorolecontrol.cpp
++    controls/qaudiorolecontrol.cpp \
 +    controls/qH264Streamingcontrol.cpp \
 +    controls/qMP4Playbackcontrol.cpp \
 +    controls/qMP4Recordercontrol.cpp
@@ -6715,16 +6715,63 @@ new file mode 100755
 index 0000000..4570cea
 --- /dev/null
 +++ b/src/multimedia/controls/qMP4Playbackcontrol.cpp
-@@ -0,0 +1 @@
-+#include "qmediacontrol_p.h"#include "qMP4Playbackcontrol.h"QT_BEGIN_NAMESPACEQMP4PlaybackControl::~QMP4PlaybackControl(){}QMP4PlaybackControl::QMP4PlaybackControl(QObject *parent):    QMediaControl(*new QMediaControlPrivate, parent){}#include "moc_qMP4Playbackcontrol.cpp"QT_END_NAMESPACE
+@@ -0,0 +1,17 @@
++#include "qmediacontrol_p.h"
++#include "qMP4Playbackcontrol.h"
++
++QT_BEGIN_NAMESPACE
++
++QMP4PlaybackControl::~QMP4PlaybackControl()
++{
++}
++
++QMP4PlaybackControl::QMP4PlaybackControl(QObject *parent):
++    QMediaControl(*new QMediaControlPrivate, parent)
++{
++}
++
++
++#include "moc_qMP4Playbackcontrol.cpp"
++QT_END_NAMESPACE
 \ No newline at end of file
 diff --git a/src/multimedia/controls/qMP4Playbackcontrol.h b/src/multimedia/controls/qMP4Playbackcontrol.h
 new file mode 100755
 index 0000000..02c3b60
 --- /dev/null
 +++ b/src/multimedia/controls/qMP4Playbackcontrol.h
-@@ -0,0 +1 @@
-+#ifndef QMP4PLAYBACKCONTROL_H#define QMP4PLAYBACKCONTROL_H#include <QtMultimedia/qmediacontrol.h>#include <QtMultimedia/qMP4Playback.h>#include <QtCore/qpair.h>QT_BEGIN_NAMESPACEclass Q_MULTIMEDIA_EXPORT QMP4PlaybackControl : public QMediaControl{    Q_OBJECTpublic:    ~QMP4PlaybackControl();        virtual void play() = 0;    virtual void stop() = 0;    virtual void pause() = 0;    virtual void setSource(QString source) = 0;    virtual void componentComplete() = 0;    Q_SIGNALS:    void statestatusChanged(QMP4Playback::State, QMP4Playback::Status);    protected:    QMP4PlaybackControl(QObject* parent = 0);};#define QMP4PlaybackControl_iid "org.qt-project.qt.mp4playbackcontrol/5.0"Q_MEDIA_DECLARE_CONTROL(QMP4PlaybackControl, QMP4PlaybackControl_iid)QT_END_NAMESPACE#endif // QMP4PLAYBACKCONTROL_H
+@@ -0,0 +1,32 @@
++#ifndef QMP4PLAYBACKCONTROL_H
++#define QMP4PLAYBACKCONTROL_H
++
++#include <QtMultimedia/qmediacontrol.h>
++#include <QtMultimedia/qMP4Playback.h>
++#include <QtCore/qpair.h>
++
++QT_BEGIN_NAMESPACE
++class Q_MULTIMEDIA_EXPORT QMP4PlaybackControl : public QMediaControl
++{
++    Q_OBJECT
++public:
++    ~QMP4PlaybackControl();
++    
++    virtual void play() = 0;
++    virtual void stop() = 0;
++    virtual void pause() = 0;
++    virtual void setSource(QString source) = 0;
++    virtual void componentComplete() = 0;
++    
++Q_SIGNALS:
++    void statestatusChanged(QMP4Playback::State, QMP4Playback::Status);
++    
++protected:
++    QMP4PlaybackControl(QObject* parent = 0);
++};
++
++#define QMP4PlaybackControl_iid "org.qt-project.qt.mp4playbackcontrol/5.0"
++Q_MEDIA_DECLARE_CONTROL(QMP4PlaybackControl, QMP4PlaybackControl_iid)
++
++QT_END_NAMESPACE
++#endif // QMP4PLAYBACKCONTROL_H
 \ No newline at end of file
 diff --git a/src/multimedia/controls/qMP4Recordercontrol.cpp b/src/multimedia/controls/qMP4Recordercontrol.cpp
 new file mode 100755
@@ -14747,9 +14794,8 @@ diff --git a/src/plugins/gstreamer/gstreamer.pro b/src/plugins/gstreamer/gstream
 index 0ff3510..e10cc3b 100644
 --- a/src/plugins/gstreamer/gstreamer.pro
 +++ b/src/plugins/gstreamer/gstreamer.pro
-@@ -3,7 +3,11 @@ TEMPLATE = subdirs
- SUBDIRS += \
-     audiodecoder \
+@@ -5,6 +5,10 @@ TEMPLATE = subdirs
+     camerabin \
      mediaplayer \
 -    mediacapture
 +    mediacapture \
@@ -14758,8 +14804,8 @@ index 0ff3510..e10cc3b 100644
 +    MP4Playback \
 +    MP4Recorder
  
- config_gstreamer_encodingprofiles {
-     SUBDIRS += camerabin
+ OTHER_FILES += \
+     gstreamer.json
 -- 
 1.9.1
 
