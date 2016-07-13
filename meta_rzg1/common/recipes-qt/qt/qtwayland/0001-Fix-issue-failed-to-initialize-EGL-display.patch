@@ -1,16 +1,14 @@
 From ea3a1da77eb6d7ad9bc1d1413242e4215ba2d703 Mon Sep 17 00:00:00 2001
 From: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
-Date: Thu, 9 Jun 2016 20:12:04 +0700
-Subject: [PATCH] DoorPhone-Fix issue HDMI display on iWave
+Date: Wed, 13 Jun 2016 15:00:04 +0700
+Subject: [PATCH] Fix issue failed to initialize EGL display
 
-When Qt framework of DoorPhone updates from Qt5.5 to Qt5.6, there is an issue with
-DoorPhone on iWave board, DoorPhone can not run on HDMI screen of iWave board.
-Reason is Qt5.6 removed event thread due to no real reason to keep it (as description
-of Qt5.6)
-
+When Qt framework updates from Qt5.5 to Qt5.6, there is an issue which lead to can not display on Wayland compositor.
+Reason is Qt5.6 removed event thread due to no real reason to keep it (as description of Qt5.6).
 This patch file re-add event thread for a workaround to fix that issue
 
 Signed-off-by: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+Update by: Tung Dang <tung.dang.jy@rvc.renesas.com>
 ---
  src/client/client.pro              |   2 +
  src/client/qwaylanddisplay.cpp     |  42 +++++++-------
