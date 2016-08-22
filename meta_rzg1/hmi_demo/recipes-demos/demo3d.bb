@@ -6,9 +6,15 @@ DEPENDS = " mesa gles-user-module weston wayland freetype libpng12 gstreamer1.0 
 SRC_URI = " \	
  file://Demo3D.tar.xz \
  file://Renesas.mp4 \
+ file://0001-Demo3D-add-option-to-set-window-width-height.patch \
 "
 
 INSANE_SKIP_${PN} = "already-stripped"
+
+do_patch() {
+    cd ${WORKDIR}/Demo3D
+    git apply ../*.patch
+}
 
 do_compile() {
     cd ${WORKDIR}/Demo3D
