@@ -25,6 +25,10 @@ create_sdk_files_prepend () {
     (cd ${SDK_OUTPUT}/${SDKPATHNATIVE}; \
          ln -sf ${SDKTARGETSYSROOT}${libdir}/${QT_DIR_NAME}/mkspecs mkspecs;)
 
+    # Generate oe-device-extra.pri
+    oe_device_extra_pri=${SDK_OUTPUT}/${SDKTARGETSYSROOT}${libdir}/${QT_DIR_NAME}/mkspecs/oe-device-extra.pri
+    touch $oe_device_extra_pri
+
     # Generate a qt.conf file to be deployed with the SDK
     qtconf=${SDK_OUTPUT}/${SDKPATHNATIVE}${OE_QMAKE_PATH_HOST_BINS}/qt.conf
     touch $qtconf
@@ -48,7 +52,7 @@ create_sdk_files_prepend () {
     echo 'HostBinaries = ${SDKPATHNATIVE}${OE_QMAKE_PATH_HOST_BINS}' >> $qtconf
 }
 
-IMAGE_INSTALL_append = " qtmultimedia"
+IMAGE_INSTALL_append = " qtmultimedia qtconnectivity qtwebchannel qtwebengine qtwebsockets qtquickcontrols qtwayland qtserialport "
 TOOLCHAIN_HOST_TASK_append = " nativesdk-qtbase-tools nativesdk-packagegroup-qt5-toolchain-host"
 
 ### For self-compile ###
