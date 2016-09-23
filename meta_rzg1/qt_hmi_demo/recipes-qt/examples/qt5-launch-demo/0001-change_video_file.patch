@@ -7,7 +7,7 @@ index 95479ef..41f05e6 100644
  
          anchors.fill: parent
 -        source: "bunny.mov"
-+        source: "renesas.mov"
++        source: "renesas-bigideasforeveryspace.mp4"
          autoLoad: true;
  
          layer.enabled: true;
@@ -16,7 +16,7 @@ index 95479ef..41f05e6 100644
      }
  
 -    centeredText: video.hasVideo ? "" : "'bunny.mov' is not found or cannot be played: " + video.errorString
-+    centeredText: video.hasVideo ? "" : "'renesas.mov' is not found or cannot be played: " + video.errorString
++    centeredText: video.hasVideo ? "" : "'renesas-bigideasforeveryspace.mp4' is not found or cannot be played: " + video.errorString
  
       onVisibleChanged: {
           if (slide.visible)

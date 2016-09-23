@@ -35,4 +35,5 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-good-rtsp \
     gstreamer1.0-plugins-ugly-x264 \
     wireless-firmware \
+    demo-videos \
 "
