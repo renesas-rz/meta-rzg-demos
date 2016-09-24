@@ -6,3 +6,5 @@ SRC_URI_append = " \
         file://0003-v4l2src-color-conversion-Use-memcpy_unalign-instead-of-memcpy-when-copy-data.patch \
 "
 
+# Use libmemcpy for color conversion in patch 0003 
+DEPENDS_append = " libmemcpy"
