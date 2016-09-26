@@ -11,7 +11,7 @@ SRC_URI = " \
 INSANE_SKIP_${PN} = "already-stripped"
 
 do_patch() {
-    cd ${S}/../mmpoc-scripts/
+    cd ${S}/../hmi-scripts/
     patch -p1 < ../0001-Update-new-video-names-change-name-for-easier-to-upl.patch
 }
 
