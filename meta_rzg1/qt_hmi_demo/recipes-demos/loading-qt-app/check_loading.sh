@@ -70,7 +70,7 @@ running_app(){
 		Max_pid_qt_app
 
 		#Get pid of newest Loading app
-		if [ "$pid_Loading" ] ; then  # Loading is calling
+		while [ "${pid_Loading}" -gt 1 ] ; do  # Loading is calling
 			#echo "Exist Loading app"
 			#echo "pid Loading : ${pid_Loading}"
 			check=(${pid_Loading})
@@ -88,12 +88,12 @@ running_app(){
 				killall Loading
 			else
 				#echo "pid loading app large than max  pid Qt app"
-			fi	
-		else 
-			#echo "Not exist loading app"
-		fi
-	else
-		#echo "Not exist Qt app "
+ 				killall Loading
+			fi
+            pid_Loading=$(pidof Loading)
+            #echo " --------------- ${pid_Loading}"
+        
+		 done	
 	fi
 }
 
