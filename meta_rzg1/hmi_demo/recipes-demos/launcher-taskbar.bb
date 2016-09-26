@@ -3,11 +3,17 @@ DESCRIPTION = "launcher taskbar"
 
 SRC_URI = " \	
  file://hmi-rzg-pkg-v1.0.tar.xz \
+ file://0001-Update-new-video-names-change-name-for-easier-to-upl.patch \
  file://Demo3D.png \
  file://Demo3D.sh \
 "
 
 INSANE_SKIP_${PN} = "already-stripped"
+
+do_patch() {
+    cd ${S}/../mmpoc-scripts/
+    patch -p1 < ../0001-Update-new-video-names-change-name-for-easier-to-upl.patch
+}
 
 do_install() {
     install -d ${D}/home/root/launcher-taskbar/hmi-icons

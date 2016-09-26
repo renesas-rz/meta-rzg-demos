@@ -1,0 +1,70 @@
+From 7a172e1d0bca44fea4b717f91a46288249b11d03 Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Sat, 24 Sep 2016 02:25:59 +0700
+Subject: [PATCH] Update new video names (change name for easier to upload to
+ webiste)
+
+Signed-off-by: HungTran <hung.tran.jy@rvc.renesas.com>
+---
+ HW-vs-SW-Comparison/fhd_hw_sw_playback.sh | 2 +-
+ HW-vs-SW-Comparison/hd_hw_sw_playback.sh  | 2 +-
+ Video-Streaming-From-Board-Lan.sh         | 2 +-
+ Video-Streaming-From-Board-Wifi.sh        | 4 ++--
+ 4 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/HW-vs-SW-Comparison/fhd_hw_sw_playback.sh b/HW-vs-SW-Comparison/fhd_hw_sw_playback.sh
+index 20d41fc..178e726 100755
+--- a/HW-vs-SW-Comparison/fhd_hw_sw_playback.sh
++++ b/HW-vs-SW-Comparison/fhd_hw_sw_playback.sh
+@@ -1,6 +1,6 @@
+ #!/bin/bash
+ # Play 2 file Fhd in sequence and show FPS comparation.
+-VIDEO=/home/root/videos/H264_FHD_60.mp4
++VIDEO=/home/root/videos/h264-fhd-60.mp4
+ FPS_LOG_1=/tmp/.log1.txt
+ FPS_LOG_2=/tmp/.log2.txt
+ DURATION=20
+diff --git a/HW-vs-SW-Comparison/hd_hw_sw_playback.sh b/HW-vs-SW-Comparison/hd_hw_sw_playback.sh
+index d1ae67a..2b59552 100755
+--- a/HW-vs-SW-Comparison/hd_hw_sw_playback.sh
++++ b/HW-vs-SW-Comparison/hd_hw_sw_playback.sh
+@@ -2,7 +2,7 @@
+ 
+ # Play 2 file Fhd in sequence and show FPS comparation.
+ # Input: para1='video_name'
+-VIDEO=/home/root/videos/H264_HD_30.mp4
++VIDEO=/home/root/videos/h264-hd-30.mp4
+ #RATE2=10.6Mbps
+ #RES1="1280x720(HW-based)"
+ #RES2="1280x720(SW-based)"
+diff --git a/Video-Streaming-From-Board-Lan.sh b/Video-Streaming-From-Board-Lan.sh
+index 83b1d34..3f86a77 100755
+--- a/Video-Streaming-From-Board-Lan.sh
++++ b/Video-Streaming-From-Board-Lan.sh
+@@ -4,7 +4,7 @@ IP_STREAM=$(cat /home/root/launcher-taskbar/mmpoc-scripts/IP_STREAM.info)
+ 
+ /home/root/launcher-taskbar/mmpoc-scripts/IPCamera-Demo/banner 100 50 "Streaming..." &
+ 
+-/home/root/RZ_scripts/RZ_GST-network-demo_transmit-video.sh /home/root/videos/H264_VGA_24.mp4 $IP_STREAM
++/home/root/RZ_scripts/RZ_GST-network-demo_transmit-video.sh /home/root/videos/h264-vga-24.mp4 $IP_STREAM
+ 
+ killall -9 -q banner
+ echo 3 > /proc/sys/vm/drop_caches
+diff --git a/Video-Streaming-From-Board-Wifi.sh b/Video-Streaming-From-Board-Wifi.sh
+index b243d93..d4cae39 100755
+--- a/Video-Streaming-From-Board-Wifi.sh
++++ b/Video-Streaming-From-Board-Wifi.sh
+@@ -4,7 +4,7 @@ PATH=$PATH:$(cat /home/root/launcher-taskbar/mmpoc-scripts/PATH.info)
+ 
+ /home/root/launcher-taskbar/mmpoc-scripts/IPCamera-Demo/banner 100 50 "Streaming..." &
+ 
+-/home/root/RZ_scripts/RZ_GST-network-demo_video-wireless-streaming.sh /home/root/videos/H264_WVGA_30.mp4
++/home/root/RZ_scripts/RZ_GST-network-demo_video-wireless-streaming.sh /home/root/videos/h264-wvga-30.mp4
+ 
+ killall -9 -q banner
+-echo 3 > /proc/sys/vm/drop_caches
+\ No newline at end of file
++echo 3 > /proc/sys/vm/drop_caches
+-- 
+1.9.1
+

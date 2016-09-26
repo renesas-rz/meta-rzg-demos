@@ -32,6 +32,7 @@ IMAGE_INSTALL_append = " \
     demos \
     launcher-taskbar \
     wireless-firmware \
+    demo-videos \
     weston-staticdev \
     demo3d \
 "
