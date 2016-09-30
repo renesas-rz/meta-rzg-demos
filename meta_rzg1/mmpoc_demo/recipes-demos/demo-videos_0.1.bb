@@ -23,7 +23,7 @@ do_install () {
     install -d ${D}/home/root/videos
 
     cp -RP ${WORKDIR}/*.mp4  ${D}/home/root/videos
-    
+
 }
 
 INSANE_SKIP_${PN} += "ldflags"
@@ -34,4 +34,3 @@ do_compile[noexec] = "1"
 PACKAGES = "${PN}"
 
 FILES_${PN} = " /* "
-

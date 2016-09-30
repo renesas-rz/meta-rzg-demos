@@ -1,3 +1,9 @@
-#Revision for qt5.6.1
-require qt5.6.1_git.inc
-SRCREV = "3938fe8fa82ee7fce0c735b36d9a49aabe91c9be"
+CONF_ADD_WAYLAND = "${@base_contains('DISTRO_FEATURES', 'wayland', ' -qpa wayland -no-xcb -no-eglfs -wayland', '', d)}"
+
+# Select wayland as the default platform abstraction plugin for Qt
+
+PACKAGECONFIG_CONFARGS_append += " \
+            ${CONF_ADD_WAYLAND} \
+            "
+
+DEPENDS_append = " gles-user-module"

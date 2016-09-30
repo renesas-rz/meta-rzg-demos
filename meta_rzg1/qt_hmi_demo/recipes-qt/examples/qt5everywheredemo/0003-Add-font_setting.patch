@@ -7,7 +7,7 @@ index e3572ea..8764951 100644
  #include <QQmlApplicationEngine>
  #include <QQmlContext>
 +#include <QFont>
- 
+
  int main(int argc, char *argv[])
  {
      QGuiApplication app(argc, argv);
@@ -18,4 +18,3 @@ index e3572ea..8764951 100644
 +    app.setFont(font);
      QQmlApplicationEngine engine;
      engine.load(QUrl(QStringLiteral("qrc:///qml/QtDemo/main.qml")));
- 

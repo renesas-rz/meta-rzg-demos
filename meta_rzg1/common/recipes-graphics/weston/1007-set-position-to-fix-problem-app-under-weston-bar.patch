@@ -1,0 +1,43 @@
+From a618f6931fa4bbc2aeaf11500929e9637803bf33 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Thu, 8 Sep 2016 19:24:35 +0700
+Subject: [PATCH 1/2] set-position-to-fix-problem-app-under-weston-bar
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ desktop-shell/shell.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index 11ec1b8..efc3f64 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -5549,6 +5549,7 @@ weston_view_set_initial_position(struct weston_view *view,
+	int ix = 0, iy = 0;
+	int32_t range_x, range_y;
+	int32_t x, y;
++   int32_t panel_width = 0, panel_height = 0;
+	struct weston_output *output, *target_output = NULL;
+	struct weston_seat *seat;
+	pixman_rectangle32_t area;
+@@ -5585,6 +5586,8 @@ weston_view_set_initial_position(struct weston_view *view,
+	 * If this is negative it means that the surface is bigger than
+	 * output.
+	 */
++
++   get_output_panel_size(shell, output, &panel_width, &panel_height);
+	get_output_work_area(shell, target_output, &area);
+
+	x = area.x;
+@@ -5598,6 +5601,9 @@ weston_view_set_initial_position(struct weston_view *view,
+	if (range_y > 0)
+		y += random() % range_y;
+
++	if(y < panel_height){
++       y = y + panel_height;
++    }
+	weston_view_set_position(view, x, y);
+ }
+
+--
+1.9.1

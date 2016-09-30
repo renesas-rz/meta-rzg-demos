@@ -1,0 +1,25 @@
+From 7bdad89830dbfa6853957f74f07ff7f1b81777e6 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Tue, 20 Sep 2016 14:31:54 +0700
+Subject: [PATCH] Add waylandsink as default playing in gstreamer playbin
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ ext/wayland/gstwaylandsink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/ext/wayland/gstwaylandsink.c b/ext/wayland/gstwaylandsink.c
+index aa24bad..8903e71 100644
+--- a/ext/wayland/gstwaylandsink.c
++++ b/ext/wayland/gstwaylandsink.c
+@@ -1126,7 +1126,7 @@ plugin_init (GstPlugin * plugin)
+   GST_DEBUG_CATEGORY_INIT (gstwayland_debug, "waylandsink", 0,
+       " wayland video sink");
+
+-  return gst_element_register (plugin, "waylandsink", GST_RANK_MARGINAL,
++  return gst_element_register (plugin, "waylandsink", GST_RANK_PRIMARY,
+       GST_TYPE_WAYLAND_SINK);
+ }
+
+--
+1.9.1

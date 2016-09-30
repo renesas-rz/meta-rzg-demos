@@ -1,0 +1,34 @@
+From d7bc4c75b8b1c30d9726b142618a42da9d68477f Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Tue, 13 Sep 2016 14:33:38 +0700
+Subject: [PATCH] Remove checking status of device to support display weston
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ src/libinput-seat.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/libinput-seat.c b/src/libinput-seat.c
+index c9f9ed2..577555c 100644
+--- a/src/libinput-seat.c
++++ b/src/libinput-seat.c
+@@ -249,7 +249,7 @@ udev_input_enable(struct udev_input *input)
+		if (!wl_list_empty(&seat->devices_list))
+			devices_found = 1;
+	}
+-
++/*
+	if (devices_found == 0) {
+		weston_log(
+			"warning: no input devices on entering Weston. "
+@@ -260,7 +260,7 @@ udev_input_enable(struct udev_input *input)
+			"udev device property ID_SEAT)\n");
+		return -1;
+	}
+-
++*/
+	return 0;
+ }
+
+--
+1.9.1

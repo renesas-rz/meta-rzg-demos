@@ -1,78 +1,20 @@
 
-EXTRA_IMAGE_FEATURES = "debug-tweaks tools-debug tools-profile"
+#EXTRA_IMAGE_FEATURES = "debug-tweaks tools-debug tools-profile"
 
 IMAGE_INSTALL_append = " \
-    mm-init \
-    qtwayland \
-    qtwayland-plugins \
-    qt5ledscreen \
-    qt5nmapcarousedemo \
-    qt5nmapper \
-    qt5-opengles2-test \
-    qtsmarthome \
-    quitbattery \
-    qtbase-fonts \
-    qtbase-plugins \
-    qtbase-tools \
-    qtbase-examples \
-    qtdeclarative \
-    qtdeclarative-plugins \
-    qtdeclarative-tools \
-    qtdeclarative-examples \
-    qtdeclarative-qmlplugins \
-    qtimageformats-plugins \
-    qtsvg \
-    qtsvg-plugins \
-    qtsensors \
-    qtscript \
-    qt3d \
-    qt3d-examples \
-    qt3d-qmlplugins \
-    qtserialport \
-    qtwebchannel \
-    qtwebchannel-qmlplugins \
-    qtwebengine \
-    qtwebengine-examples \
-    qtwebengine-qmlplugins \
-    qtwebsockets \
-    qtwebsockets-qmlplugins \
-    ca-certificates \
-    qtgraphicaleffects-qmlplugins \
-    qtconnectivity \
-    qtconnectivity-examples \
-    qtconnectivity-qmlplugins \
-    qtlocation-plugins \
-    qtlocation-qmlplugins \
-    cinematicexperience \
-    qtmultimedia \
-    qtmultimedia-examples \
-    qtmultimedia-plugins \
-    qtmultimedia-qmlplugins \
-    qt5everywheredemo \
-    qt5-launch-demo \
-    qt5-qml-presentation-system \
-    icu \
-    libicudata \
-    libicuuc \
-    libicui18n  \
+    packagegroup-qt5-examples \
+    wireless-firmware \
+    libegl \
+	\
     strace \
-    connman \
-    connman-client connman-tests \
-    launcher-taskbar \
-    qtquickcontrols-qmlplugins \
-    \
     gstreamer1.0-plugins-base-apps \
     gstreamer1.0-plugins-good-multifile \
     gstreamer1.0-plugins-good-rtp \
     gstreamer1.0-plugins-good-udp \
-    faac \
-    gstreamer1.0-plugins-bad-faac \
-    pulseaudio-server \
-    pulseaudio-module-echo-cancel \
-    gstreamer1.0-plugins-good-pulse \
     gstreamer1.0-plugins-good-rtpmanager \
     gstreamer1.0-plugins-base-app \
     libgstapp-1.0 \
+	jpeg \
     gstreamer1.0-plugins-good-jpeg \
     gstreamer1.0-plugins-base-volume \
     gstreamer1.0-plugins-base-audiorate \
@@ -82,7 +24,17 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-good-icydemux \
     gstreamer1.0-plugins-base-vspmfilter \
     libgstphotography-1.0 \
+	mm-init \
+	launcher-taskbar \
     loading-qt-app \
     qtpreload \
-    wireless-firmware \
+    faac \
+    gstreamer1.0-plugins-bad-faac \
+    qt5-launch-demo \
+    qt5-qml-presentation-system \
+	qtwebsockets \
+    qtwebengine \
+    qtwebengine-examples \
+    qtwebengine-qmlplugins \
+	demo-videos \
 "

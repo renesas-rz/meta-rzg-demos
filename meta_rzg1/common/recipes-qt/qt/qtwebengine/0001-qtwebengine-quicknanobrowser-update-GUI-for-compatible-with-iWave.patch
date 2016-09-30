@@ -12,14 +12,14 @@ index 8a7dc4a..f67c692 100644
 @@ -54,8 +54,8 @@ ApplicationWindow {
      property Item currentWebView: tabs.currentIndex < tabs.count ? tabs.getTab(tabs.currentIndex).item : null
      property int previousVisibility: Window.Windowed
- 
+
 -    width: 1300
 -    height: 900
 +    width: screenWidth - 10	// -10 for easier to click exit button
 +    height: screenHeight
      visible: true
      title: currentWebView && currentWebView.title
- 
+
 diff --git a/examples/webengine/quicknanobrowser/main.cpp b/examples/webengine/quicknanobrowser/main.cpp
 index b7ab036..f2cccb9 100644
 --- a/examples/webengine/quicknanobrowser/main.cpp
@@ -29,16 +29,16 @@ index b7ab036..f2cccb9 100644
  #include <QtQml/QQmlContext>
  #include <QtWebEngine/qtwebengineglobal.h>
 +#include <QtGui/QScreen>
- 
+
  static QUrl startupUrl()
  {
 @@ -71,10 +72,17 @@ int main(int argc, char **argv)
      Application app(argc, argv);
- 
+
      QtWebEngine::initialize();
 -
 -    QQmlApplicationEngine appEngine;
-+    
++
 +	QQmlApplicationEngine appEngine;
      Utils utils;
      appEngine.rootContext()->setContextProperty("utils", &utils);
@@ -51,7 +51,6 @@ index b7ab036..f2cccb9 100644
 +
      appEngine.load(QUrl("qrc:/ApplicationRoot.qml"));
      QMetaObject::invokeMethod(appEngine.rootObjects().first(), "load", Q_ARG(QVariant, startupUrl()));
- 
--- 
-1.9.1
 
+--
+1.9.1

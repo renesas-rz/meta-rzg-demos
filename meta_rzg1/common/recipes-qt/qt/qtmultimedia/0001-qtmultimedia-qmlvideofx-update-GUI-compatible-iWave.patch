@@ -27,7 +27,7 @@ index 626139f..3c8329f 100644
      rootObject->setProperty("fileName", fileName);
      viewer.rootObject()->setProperty("volume", volume);
 +    QObject::connect(viewer.engine(), SIGNAL(quit()), &viewer, SLOT(close()));
- 
+
  #ifdef PERFORMANCEMONITOR_SUPPORT
      if (performanceMonitorState.valid) {
 @@ -114,10 +116,14 @@ int main(int argc, char *argv[])
@@ -46,7 +46,7 @@ index 626139f..3c8329f 100644
 +		viewer.setResizeMode(QQuickView::SizeRootObjectToView);
 +	    viewer.show();
 +    }
- 
+
      // Delay invocation of init until the event loop has started, to work around
      // a GL context issue on Harmattan: without this, we get the following error
 diff --git a/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Button.qml b/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Button.qml
@@ -59,9 +59,9 @@ index aa2df98..d35a6e4 100644
      property alias horizontalAlign: text.horizontalAlignment
 +    property alias label: text.text;
 +	property alias label_size: text.font.pixelSize;
- 
+
      signal clicked
- 
+
 diff --git a/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml b/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml
 index 55d0f02..0410782 100644
 --- a/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml
@@ -72,12 +72,12 @@ index 55d0f02..0410782 100644
      property int scaledMargin: 2 * pixDens
 -    property int fontSize: 5 * pixDens
 +    property int fontSize: 4 * pixDens
- 
+
      QtObject {
          id: d
 @@ -91,8 +91,9 @@ Rectangle {
                  }
- 
+
          text: "No effect"
 -        width: itemWidth * 2
 +        width: itemWidth
@@ -89,7 +89,7 @@ index 55d0f02..0410782 100644
 @@ -101,6 +102,22 @@ Rectangle {
          color: "#303030"
      }
- 
+
 +    Button {
 +       id: exitButton
 +       anchors.right: root.right
@@ -109,6 +109,5 @@ index 55d0f02..0410782 100644
      Rectangle {
          id: lvbg
          width: itemWidth * 2
--- 
+--
 1.9.1
-

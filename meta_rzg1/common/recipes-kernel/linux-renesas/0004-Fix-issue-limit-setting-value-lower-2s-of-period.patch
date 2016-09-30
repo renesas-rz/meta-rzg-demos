@@ -1,0 +1,306 @@
+From 72a71316a784f6d9836f684bbf0c733c3e04f2e9 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Thu, 8 Sep 2016 22:46:41 +0700
+Subject: [PATCH 2/2] Fix-issue-limit-setting-value-lower-2s-of-period
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ drivers/pwm/Kconfig    | 14 ++++++++--
+ drivers/pwm/core.c     | 12 ++++++++
+ drivers/pwm/pwm-rcar.c | 76 ++++++++++++++++++++++++++++++++++++++++++++++----
+ drivers/pwm/sysfs.c    | 39 ++++++++++++++++++++++++++
+ include/linux/pwm.h    | 11 ++++++++
+ 5 files changed, 144 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/pwm/Kconfig b/drivers/pwm/Kconfig
+index 83a719f..b3b362a 100644
+--- a/drivers/pwm/Kconfig
++++ b/drivers/pwm/Kconfig
+@@ -313,8 +313,8 @@ config PWM_RENESAS_PWM
+    tristate "Renesas PWM support"
+    depends on ARCH_SHMOBILE
+    help
+-     This driver exposes the PWM Timer Module found
+-     in Renesas chips through the PWM API.
++     This driver exposes the PWM Timer Module found in Renesas chips through
++          the PWM API.
+
+      To compile this driver as a module, choose M here: the module
+      will be called pwm-rcar.
+@@ -432,4 +432,14 @@ config PWM_VT8500
+	  To compile this driver as a module, choose M here: the module
+	  will be called pwm-vt8500.
+
++config PWM_TIMER_SUPPORT
++   tristate "Renesas PWM support second unit flag"
++   depends on ARCH_SHMOBILE
++   default y
++   help
++     Provide option to change more unit of PWM Timer
++
++     Current PWM value can set nanosecond unit value only, this
++     setting can help us change unit to second.
++
+ endif
+diff --git a/drivers/pwm/core.c b/drivers/pwm/core.c
+index d24ca5f..9fdaa6d 100644
+--- a/drivers/pwm/core.c
++++ b/drivers/pwm/core.c
+@@ -893,6 +893,18 @@ bool pwm_can_sleep(struct pwm_device *pwm)
+ }
+ EXPORT_SYMBOL_GPL(pwm_can_sleep);
+
++#ifdef CONFIG_PWM_TIMER_SUPPORT
++
++// Function set time unit between nanosecond and second, default is nanosecond
++
++void pwm_set_time_unit(struct pwm_device *pwm, int unit)
++{
++   pwm->chip->ops->set_time_unit(pwm->chip, unit);
++}
++EXPORT_SYMBOL_GPL(pwm_set_time_unit);
++
++#endif /*CONFIG_PWM_TIMER_SUPPORT*/
++
+ #ifdef CONFIG_DEBUG_FS
+ static void pwm_dbg_show(struct pwm_chip *chip, struct seq_file *s)
+ {
+diff --git a/drivers/pwm/pwm-rcar.c b/drivers/pwm/pwm-rcar.c
+index 6e99a63..c40e983 100644
+--- a/drivers/pwm/pwm-rcar.c
++++ b/drivers/pwm/pwm-rcar.c
+@@ -35,10 +35,15 @@
+ #define  RCAR_PWMCNT_PH0_MASK	0x000003ff
+ #define  RCAR_PWMCNT_PH0_SHIFT	0
+
++#define  SUPPORT_TIME_UNIT_S
++#define  UNIT_S        1
++#define  UNIT_NS   0
++
+ struct rcar_pwm_chip {
+	struct pwm_chip chip;
+	void __iomem *base;
+	struct clk *clk;
++	int time_unit;
+ };
+
+ static inline struct rcar_pwm_chip *to_rcar_pwm_chip(struct pwm_chip *chip)
+@@ -68,12 +73,24 @@ static void rcar_pwm_update(struct rcar_pwm_chip *rp, u32 mask, u32 data,
+	rcar_pwm_write(rp, value, offset);
+ }
+
+-static int rcar_pwm_get_clock_division(struct rcar_pwm_chip *rp, int period_ns)
++static int rcar_pwm_get_clock_division(struct rcar_pwm_chip *rp, int period)
+ {
+	unsigned long clk_rate = clk_get_rate(rp->clk);
++	unsigned long long period_ns;
+	unsigned long long max; /* max cycle / nanoseconds */
+	unsigned int div;
+
++	if(rp->time_unit == UNIT_S) {
++       if(period > 264)
++           return -ERANGE;
++       else {
++           period_ns = (unsigned long long)period * 1000000000ULL;
++       }
++   }
++   else {
++       period_ns = (unsigned long long)period;
++   }
++
+	if (clk_rate == 0)
+		return -EINVAL;
+
+@@ -106,26 +123,58 @@ static void rcar_pwm_set_clock_control(struct rcar_pwm_chip *rp,
+ }
+
+ static int rcar_pwm_set_counter(struct rcar_pwm_chip *rp, int div, int duty_ns,
+-				int period_ns)
++				int period)
+ {
++    unsigned long long duty_ns, period_ns;
+	unsigned long long one_cycle, tmp;	/* 0.01 nanoseconds */
+	unsigned long clk_rate = clk_get_rate(rp->clk);
+	u32 cyc, ph;
+
+-	one_cycle = (unsigned long long)NSEC_PER_SEC * 100ULL * (1 << div);
++   //change period and duty to nano second unit time
++   if(rp->time_unit == UNIT_S) {
++       if(period > 264 || duty > 264)
++           return -ERANGE;
++       else {
++           duty_ns = (unsigned long long)duty * 1000000000ULL;
++           period_ns = (unsigned long long)period * 1000000000ULL;
++       }
++   }
++   else {
++       duty_ns = (unsigned long long)duty;
++       period_ns = (unsigned long long)period;
++   }
++
++   if(rp->time_unit == UNIT_S)
++       one_cycle = (unsigned long long)NSEC_PER_SEC * (1 << div);
++   else
++       one_cycle = (unsigned long long)NSEC_PER_SEC * 100ULL * (1 << div);
++
+	do_div(one_cycle, clk_rate);
+
+-	tmp = period_ns * 100ULL;
++	if(rp->time_unit == UNIT_S)
++		tmp = period_ns;
++	else
++		tmp = period_ns * 100ULL;
++
+	do_div(tmp, one_cycle);
+	cyc = (tmp << RCAR_PWMCNT_CYC0_SHIFT) & RCAR_PWMCNT_CYC0_MASK;
+
+-	tmp = duty_ns * 100ULL;
++	if(rp->time_unit == UNIT_S)
++		tmp = duty_ns;
++	else
++		tmp = duty_ns * 100ULL;
++
+	do_div(tmp, one_cycle);
+	ph = tmp & RCAR_PWMCNT_PH0_MASK;
+
+	/* Avoid prohibited setting */
+-	if (cyc == 0 || ph == 0)
++	if (cyc == 0)
+		return -EINVAL;
++	// Because write 0 to PH is prohibited, it is impossible to set duty
++	// cycle of PWM signal to 0%. Therefore, when duty cycle is set 0%
++	// from user, PH is set to 1 for the minumum duty cycle
++	if(ph == 0)
++		ph = 1;
+
+	rcar_pwm_write(rp, cyc | ph, RCAR_PWMCNT);
+
+@@ -136,6 +185,8 @@ static int rcar_pwm_request(struct pwm_chip *chip, struct pwm_device *pwm)
+ {
+	struct rcar_pwm_chip *rp = to_rcar_pwm_chip(chip);
+
++	rp->time_unit = UNIT_NS;
++
+	return clk_prepare_enable(rp->clk);
+ }
+
+@@ -195,12 +246,25 @@ static void rcar_pwm_disable(struct pwm_chip *chip, struct pwm_device *pwm)
+	rcar_pwm_update(rp, RCAR_PWMCR_EN0, 0, RCAR_PWMCR);
+ }
+
++#ifdef SUPPORT_TIME_UNIT_S
++// set time unit between nano second and second
++void rcar_pwm_set_time_unit(struct pwm_chip *chip, int unit)
++{
++   struct rcar_pwm_chip *rp = to_rcar_pwm_chip(chip);
++   //unit = 0: time unit is nano second, unit = 1: time unit is second
++   rp->time_unit = unit;
++}
++#endif /*SUPPORT_TIME_UNIT_S*/
++
+ static const struct pwm_ops rcar_pwm_ops = {
+	.request = rcar_pwm_request,
+	.free = rcar_pwm_free,
+	.config = rcar_pwm_config,
+	.enable = rcar_pwm_enable,
+	.disable = rcar_pwm_disable,
++#ifdef SUPPORT_TIME_UNIT_S
++	.set_time_unit = rcar_pwm_set_time_unit,
++#endif /*SUPPORT_TIME_UNIT_S*/
+	.owner = THIS_MODULE,
+ };
+
+diff --git a/drivers/pwm/sysfs.c b/drivers/pwm/sysfs.c
+index 9c90886..6456df5 100644
+--- a/drivers/pwm/sysfs.c
++++ b/drivers/pwm/sysfs.c
+@@ -127,6 +127,43 @@ static ssize_t enable_store(struct device *child,
+	return ret ? : size;
+ }
+
++static ssize_t pwm_set_time_unit_show(struct device *child,
++			       struct device_attribute *attr,
++			       char *buf)
++{
++	return 0;
++}
++
++static ssize_t pwm_set_time_unit_store(struct device *child,
++				struct device_attribute *attr,
++				const char *buf, size_t size)
++{
++	struct pwm_device *pwm = child_to_pwm_device(child);
++	int val, ret;
++
++	ret = kstrtoint(buf, 0, &val);
++	if (ret)
++		return ret;
++
++	switch (val) {
++	case 0:
++#ifdef CONFIG_PWM_TIMER_SUPPORT
++		pwm_set_time_unit(pwm,0);  // set time unit is nano second
++#endif /*CONFIG_PWM_TIMER_SUPPORT*/
++		break;
++	case 1:
++#ifdef CONFIG_PWM_TIMER_SUPPORT
++		pwm_set_time_unit(pwm,1);  // set time unit is second
++#endif /*CONFIG_PWM_TIMER_SUPPORT*/
++		break;
++	default:
++		ret = -EINVAL;
++		break;
++	}
++
++	return ret ? : size;
++}
++
+ static ssize_t polarity_show(struct device *child,
+			     struct device_attribute *attr,
+			     char *buf)
+@@ -171,12 +208,14 @@ static DEVICE_ATTR_RW(period);
+ static DEVICE_ATTR_RW(duty_cycle);
+ static DEVICE_ATTR_RW(enable);
+ static DEVICE_ATTR_RW(polarity);
++static DEVICE_ATTR(unit_s, 0644, pwm_set_time_unit_show, pwm_set_time_unit_store);
+
+ static struct attribute *pwm_attrs[] = {
+	&dev_attr_period.attr,
+	&dev_attr_duty_cycle.attr,
+	&dev_attr_enable.attr,
+	&dev_attr_polarity.attr,
++	&dev_attr_unit_s.attr,
+	NULL
+ };
+ ATTRIBUTE_GROUPS(pwm);
+diff --git a/include/linux/pwm.h b/include/linux/pwm.h
+index cfc3ed4..b8172c3 100644
+--- a/include/linux/pwm.h
++++ b/include/linux/pwm.h
+@@ -144,6 +144,11 @@ static inline enum pwm_polarity pwm_get_polarity(const struct pwm_device *pwm)
+	return pwm ? pwm->polarity : PWM_POLARITY_NORMAL;
+ }
+
++#ifdef CONFIG_PWM_TIMER_SUPPORT
++// set time unit between nanosecond and second
++void pwm_set_time_unit(struct pwm_device *pwm, int unit);
++#endif /*CONFIG_PWM_TIMER_SUPPORT*/
++
+ /**
+  * struct pwm_ops - PWM controller operations
+  * @request: optional hook for requesting a PWM
+@@ -164,6 +169,12 @@ struct pwm_ops {
+			    enum pwm_polarity polarity);
+	int (*enable)(struct pwm_chip *chip, struct pwm_device *pwm);
+	void (*disable)(struct pwm_chip *chip, struct pwm_device *pwm);
++
++#ifdef CONFIG_PWM_TIMER_SUPPORT
++	//set time unit
++	void (*set_time_unit)(struct pwm_chip *pwm, int unit);
++#endif /*CONFIG_PWM_TIMER_SUPPORT*/
++
+ #ifdef CONFIG_DEBUG_FS
+	void (*dbg_show)(struct pwm_chip *chip, struct seq_file *s);
+ #endif
+--
+1.9.1

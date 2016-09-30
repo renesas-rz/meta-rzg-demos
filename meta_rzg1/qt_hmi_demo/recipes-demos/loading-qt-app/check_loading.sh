@@ -7,7 +7,7 @@
 	pid_qt_qmlvideo=$(pidof qmlvideo)
 	pid_qt_qmlvideofx=$(pidof qmlvideofx)
 	pid_qt_webengine=$(pidof quicknanobrowser)
-	
+
 	Max=0
 	result=0
 	Get_only_one_pid_app(){
@@ -15,8 +15,8 @@
 		local temp1=($temp)
 		result=${temp1[0]}
 		#echo "Result get only one pid: ${result}"
-	}	
-	
+	}
+
 	Max_pid_qt_app() {
 		#echo "Get max Qt app"
 		if [ "${pid_qt_launch_demo}" ] ; then
@@ -60,10 +60,10 @@
 				Max=${result}
 				#echo "Max pid_qt_webengine: $Max"
 			fi
-		fi		
+		fi
 	}
-	
-running_app(){	
+
+running_app(){
 	if  [ "${pid_qt_launch_demo}" ] || [ "${pid_qt_everywhere_demo}" ] || [ "${pid_qt_cinematic_demo}" ]  || [ "${pid_qt_qmlvideo}" ]  || [ "${pid_qt_qmlvideofx}" ] || [ "${pid_qt_webengine}" ]  ; then
 		#echo "Exist qt-app"
 		#Get max pid Qt app
@@ -79,7 +79,7 @@ running_app(){
 			pid_loading_app=${result}
 			#echo "Max pid loading app: $pid_loading_app "
 			#echo "--------------------"
-			
+
 			#Compare pid loading app and qt app
 			if [ ${pid_loading_app} -lt ${Max} ] ; then # app is calling
 				#echo "pid loading app less than max  pid Qt app:  ${pid_loading_app} -lt ${Max}"
@@ -88,12 +88,12 @@ running_app(){
 				killall Loading
 			else
 				#echo "pid loading app large than max  pid Qt app"
- 				killall Loading
+				killall Loading
 			fi
             pid_Loading=$(pidof Loading)
             #echo " --------------- ${pid_Loading}"
-        
-		 done	
+
+		 done
 	fi
 }
 

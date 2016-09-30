@@ -1,7 +1,7 @@
 From efa52173810b49458e7bb3c7c31dbd08c722fe89 Mon Sep 17 00:00:00 2001
 From: TungDang <tung.dang.jy@rvc.renesas.com>
 Date: Fri, 13 May 2016 14:28:16 +0700
-Subject: [PATCH] qtmultimedia qmlvideofx correct Fullscreen setting for HDMI monitor 
+Subject: [PATCH] qtmultimedia qmlvideofx correct Fullscreen setting for HDMI monitor
 Note: Using for iWave board only
 
 Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
@@ -12,7 +12,7 @@ index 3c8329f..f616657 100644
 +++ b/examples/multimedia/video/qmlvideofx/main.cpp
 @@ -114,8 +114,8 @@ int main(int argc, char *argv[])
      viewer.rootContext()->setContextProperty("videoPath", videoPath);
- 
+
      viewer.setTitle("qmlvideofx");
 -    viewer.setFlags(Qt::Window | Qt::WindowSystemMenuHint | Qt::WindowTitleHint |
 -                          Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
@@ -20,7 +20,7 @@ index 3c8329f..f616657 100644
 +//                          Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
      const QString lowerArgument = QString::fromLatin1(argv[1]).toLower();
      if (lowerArgument == QLatin1String("--fullscreen")) {
- 		viewer.showFullScreen();
+		viewer.showFullScreen();
 diff --git a/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml b/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml
 index 0410782..5658794 100644
 --- a/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml
@@ -37,7 +37,6 @@ index 0410782..5658794 100644
 +                //
              }
          }
- 
--- 
-1.9.1
 
+--
+1.9.1

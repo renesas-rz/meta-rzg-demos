@@ -11,6 +11,6 @@ index dee035e..8bf88f1 100644
 -                    anchors.horizontalCenter: parent.horizontalCenter
 -                    source: "images/heading.png"
 -                }
- 
+
                  InfoViewItem {
                      text: "Welcome to <i>'Cinematic Experience'</i> demo. This application demonstrates the power of Qt5 and few of the new additions available in QtQuick 2.0. Below is a short summary of those new features which have been used in this demo application."

@@ -15,7 +15,7 @@ index cde7f5f..39b4861 100644
 --- a/qml/QtDemo/HelpScreen.qml
 +++ b/qml/QtDemo/HelpScreen.qml
 @@ -238,14 +238,14 @@ Item {
- 
+
                      if (root.width > root.height){
                          _x = navigationPanel.x+navigationPanel.width /2
 -                        _y = navigationPanel.y+navigationPanel.height*.33
@@ -24,7 +24,7 @@ index cde7f5f..39b4861 100644
                          pointer.y= root.height/2 -pointer.height/2
                          highlight.x=_x
                          highlight.y=_y
- 
+
                      }else{
 -                        _x=navigationPanel.x+navigationPanel.width*.33
 +                        _x=navigationPanel.x+navigationPanel.width*.24
@@ -32,7 +32,7 @@ index cde7f5f..39b4861 100644
                          pointer.x= root.width/2 -pointer.width/2
                          pointer.y= root.height/2 -pointer.height/2 +root.height*.2
 @@ -271,14 +271,14 @@ Item {
- 
+
                      if (root.width > root.height){
                          _x = navigationPanel.x+navigationPanel.width /2
 -                        _y = navigationPanel.y+navigationPanel.height-navigationPanel.width /2
@@ -41,7 +41,7 @@ index cde7f5f..39b4861 100644
                          pointer.y= root.height/2 -pointer.height/2
                          highlight.x=_x
                          highlight.y=_y
- 
+
                      }else{
 -                        _x=navigationPanel.x+navigationPanel.width-navigationPanel.height /2
 +                        _x=navigationPanel.x+navigationPanel.width*.625
@@ -70,7 +70,7 @@ index 435cdf7..2b24452 100644
 --- a/qml/QtDemo/main.qml
 +++ b/qml/QtDemo/main.qml
 @@ -45,8 +45,7 @@ import "style.js" as Style
- 
+
  Window {
      visible: true
 -    width: 1920
@@ -78,4 +78,3 @@ index 435cdf7..2b24452 100644
 +    visibility: "FullScreen"
      onWidthChanged: app.calculateScales();
      onHeightChanged: app.calculateScales();
- 

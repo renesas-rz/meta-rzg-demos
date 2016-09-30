@@ -10,11 +10,11 @@ index fc4fc3e..f9f54d5 100644
 --- a/tools/qmlscene/main.cpp
 +++ b/tools/qmlscene/main.cpp
 @@ -41,6 +41,7 @@
- 
+
  #include <QtGui/QGuiApplication>
  #include <QtGui/QOpenGLFunctions>
 +#include <QtGui/QScreen>
- 
+
  #include <QtQml/qqml.h>
  #include <QtQml/qqmlengine.h>
 @@ -552,6 +553,13 @@ int main(int argc, char ** argv)
@@ -31,6 +31,5 @@ index fc4fc3e..f9f54d5 100644
              QPointer<QQmlComponent> component = new QQmlComponent(&engine);
              for (int i = 0; i < imports.size(); ++i)
                  engine.addImportPath(imports.at(i));
--- 
+--
 1.9.1
-

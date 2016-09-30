@@ -29,20 +29,20 @@ index 6d6bf6e..61d4fe7 100644
 +++ b/Button.qml
 @@ -51,6 +51,7 @@ Rectangle {
      antialiasing: true
- 
+
      gradient: Gradient {
 +
          GradientStop { position: 0; color: Qt.rgba(0.5, 0.5, 0.5, pressed ? 0.7 : 0.5); }
          GradientStop { position: 1; color: Qt.rgba(0.2, 0.2, 0.2, pressed ? 0.7 : 0.5); }
      }
 @@ -59,6 +60,9 @@ Rectangle {
- 
+
      property bool pressed;
      property alias label: textItem.text;
 +    property alias label_size: textItem.font.pixelSize;
 +    signal clicked()
 +
- 
+
      Text {
          id: textItem
 @@ -72,6 +76,7 @@ Rectangle {
@@ -50,22 +50,22 @@ index 6d6bf6e..61d4fe7 100644
          anchors.fill: parent
          onPressed: root.pressed = !root.pressed;
 +        onClicked: root.clicked();
- 
+
      }
- 
+
 diff --git a/CanvasSlide.qml b/CanvasSlide.qml
 index c60a643..92193d7 100644
 --- a/CanvasSlide.qml
 +++ b/CanvasSlide.qml
 @@ -105,7 +105,7 @@ ctx.fill();
  ctx.stroke();
- 
+
  ctx.fillStyle = 'aquamarine'
 -ctx.font = '20px sansserif'
 +//ctx.font = '20px DejaVu-Sans'
  ctx.fillText('HTML Canvas API!', 100, 300);
  ctx.fillText('Imperative Drawing!', 100, 340);
- 
+
 diff --git a/DemoMain.qml b/DemoMain.qml
 index 05454be..7b8d544 100644
 --- a/DemoMain.qml
@@ -73,18 +73,18 @@ index 05454be..7b8d544 100644
 @@ -50,8 +50,8 @@ Item {
      property bool useSimpleGradient: false;
      property bool autorun: false;
- 
+
 -    width: 1280
 -    height: 720
 +    width: screenWidth
 +    height: screenHeight
- 
+
      NoisyGradient {
          anchors.fill: parent;
 @@ -134,6 +134,17 @@ Item {
          }
      }
- 
+
 -
 -
 +     Button {
@@ -108,10 +108,10 @@ index bb3192e..e67ac81 100644
 @@ -50,11 +50,11 @@ Slide
      Row {
          anchors.fill: parent
- 
+
 -        spacing: (width - 320 * 3) / 2
 +      spacing: (width - (screenWidth_demo / 3) * 2) / 2
- 
+
          Item {
 -            width: 320
 -            height: 480
@@ -122,7 +122,7 @@ index bb3192e..e67ac81 100644
                  id: load1
 @@ -62,28 +62,23 @@ Slide
          }
- 
+
          Item {
 -            width: 320
 -            height: 480
@@ -134,12 +134,12 @@ index bb3192e..e67ac81 100644
                  id: load2
              }
          }
- 
+
 -        Loader {
 -            id: load3
 -        }
      }
- 
+
      onVisibleChanged: {
          if (visible) {
 -            load1.source = "maroon/Maroon.qml"
@@ -165,29 +165,29 @@ index 12106fa..ddcb3d7 100644
 -        smooth: false
 +        smooth: true
          transformOrigin: Item.BottomLeft;
- 
+
          visible: true
- 
+
 -        scale: 4;
 +        scale: 2;
      }
- 
+
  }
 diff --git a/OpacityTransitionPresentation.qml b/OpacityTransitionPresentation.qml
 index 1fbe17e..7486979 100644
 --- a/OpacityTransitionPresentation.qml
 +++ b/OpacityTransitionPresentation.qml
 @@ -51,8 +51,8 @@ Presentation {
- 
+
      property bool inTransition: false;
- 
+
 -    property variant fromSlide;
 -    property variant toSlide;
 +    property variant fromSlide: QtObject {}
 +    property variant toSlide: QtObject {}
- 
+
      property int transitionTime: 500;
- 
+
 diff --git a/ParticleSlide.qml b/ParticleSlide.qml
 index b630a34..868e8ff 100644
 --- a/ParticleSlide.qml
@@ -195,21 +195,21 @@ index b630a34..868e8ff 100644
 @@ -57,7 +57,7 @@ Slide
              NumberAnimation { to: 1; duration: 1000 }
          }
- 
+
 -        spacing: (width - 320 * 3) / 2
 +        spacing: (width - 200 * 2) / 2
- 
+
          Loader {
              id: load1
 @@ -67,20 +67,15 @@ Slide
              id: load2
          }
- 
+
 -        Loader {
 -            id: load3
 -        }
      }
- 
+
      onVisibleChanged: {
          if (visible) {
 -            load1.source = "particles/velocityfrommotion.qml"
@@ -230,40 +230,40 @@ index ab4ccb4..5b9651a 100644
 @@ -47,8 +47,8 @@ import Qt.labs.presentation 1.0
  OpacityTransitionPresentation {
      id: presentation
- 
+
 -    width: 1280
 -    height: 720
 +    width: parent.width
 +    height: parent.height
- 
+
      transitionTime: 2000
- 
+
 diff --git a/calqlatr/Calqlatr.qml b/calqlatr/Calqlatr.qml
 index 7640fbd..aff50fe 100644
 --- a/calqlatr/Calqlatr.qml
 +++ b/calqlatr/Calqlatr.qml
 @@ -45,8 +45,8 @@ import "content/calculator.js" as CalcEngine
- 
+
  Rectangle {
      id: window
 -    width: 320
 -    height: 480
 +    width: screenWidth_demo /3
-+    height: screenHeight_demo 
++    height: screenHeight_demo
      focus: true
      color: "#272822"
- 
+
 diff --git a/calqlatr/content/Button.qml b/calqlatr/content/Button.qml
 index c355c2d..a148158 100644
 --- a/calqlatr/content/Button.qml
 +++ b/calqlatr/content/Button.qml
 @@ -49,11 +49,11 @@ Item {
      signal clicked
- 
+
      width: 30
 -    height: 50
 +    height: 46
- 
+
      Text {
          id: textItem
 -        font.pixelSize: 48
@@ -276,14 +276,14 @@ index 853c763..5f70cdb 100644
 --- a/calqlatr/content/NumberPad.qml
 +++ b/calqlatr/content/NumberPad.qml
 @@ -42,8 +42,8 @@ import QtQuick 2.0
- 
+
  Grid {
      columns: 3
 -    columnSpacing: 32
 -    rowSpacing: 16
 +    columnSpacing: 30
 +    rowSpacing: 0
- 
+
      Button { text: "7" }
      Button { text: "8" }
 diff --git a/main.qml b/main.qml
@@ -292,7 +292,7 @@ index a3ba875..8f909a1 100644
 +++ b/main.qml
 @@ -39,4 +39,6 @@
  ****************************************************************************/
- 
+
  DemoMain {
 +	property int screenWidth_demo : screenWidth
 +    property int screenHeight_demo: screenHeight
@@ -302,7 +302,7 @@ index 270935d..a051a27 100644
 --- a/particles/customemitter.qml
 +++ b/particles/customemitter.qml
 @@ -43,8 +43,10 @@ import QtQuick.Particles 2.0
- 
+
  ParticleSystem {
      id: sys
 -    width: 320
@@ -312,21 +312,21 @@ index 270935d..a051a27 100644
 +    width: 200
 +    height: 300
      running: true
- 
+
      property real petalLength: 180
 diff --git a/particles/emitmask.qml b/particles/emitmask.qml
 index 1c3bade..ac7ff6a 100644
 --- a/particles/emitmask.qml
 +++ b/particles/emitmask.qml
 @@ -43,8 +43,8 @@ import QtQuick.Particles 2.0
- 
+
  Item {
- 
+
 -    width: 320
 -    height: 480
 +    width: 200
 +    height: 300
- 
+
      ParticleSystem {
          width: 300
 diff --git a/particles/velocityfrommotion.qml b/particles/velocityfrommotion.qml
@@ -334,14 +334,14 @@ index 2aa3617..e1d65e1 100644
 --- a/particles/velocityfrommotion.qml
 +++ b/particles/velocityfrommotion.qml
 @@ -45,8 +45,8 @@ Item {
- 
+
      id: root
- 
+
 -    height: 480
 -    width: 320
 +    height: 300
 +    width: 200
- 
+
      MouseArea {
          id: mouseArea
 diff --git a/samegame/Samegame.qml b/samegame/Samegame.qml
@@ -349,14 +349,13 @@ index 2b0b82a..a3c56bf 100644
 --- a/samegame/Samegame.qml
 +++ b/samegame/Samegame.qml
 @@ -46,7 +46,7 @@ import "content"
- 
+
  Rectangle {
      id: root
 -    width: 320; height: 480
 +    width: screenWidth_demo /3 ; height: screenHeight_demo
      property int acc: 0
- 
- 
--- 
-1.9.1
 
+
+--
+1.9.1

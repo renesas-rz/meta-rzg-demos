@@ -1,7 +1,7 @@
 LICENSE = "CLOSED"
 DESCRIPTION = "Loading Qt app"
 
-SRC_URI += " \	
+SRC_URI += " \
  file://Loading \
  file://check_loading.sh \
 "

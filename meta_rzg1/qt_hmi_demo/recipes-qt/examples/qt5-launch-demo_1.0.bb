@@ -11,6 +11,7 @@ SRC_URI = "git://code.qt.io/{non-gerrit}/qt-labs/qt5-launch-demo.git \
            file://0001-change_video_file.patch \
            http://www.renesas.com/ja-jp/media/products/microcontrollers-microprocessors/rz/rzg/qt-videos/renesas-bigideasforeveryspace.mp4;name=video \
            file://0002-qt5-launch-demo-update-QtWebKit-to-QtWebEngine.patch \
+		   file://0003-qt5-launch-demo-work-around-issue-cannot-play-video.patch \
 "
 
 SRC_URI[video.md5sum] = "44748e486a971d1e039fbfc3bc15b6f1"
@@ -20,16 +21,19 @@ SRC_URI_append_iwg20m += " \
     file://0001-qt5-launch-demo-update-GUI-compatible-with-iWave.patch \
 "
 
+SRC_URI_append_skrzg1e += " \
+    file://0004-qt5-launch-demo-improve-performance-for-RZG1E-only.patch \
+"
+
 S = "${WORKDIR}/git"
 
 #require recipes-qt/qt5/qt5.inc
 
 do_install() {
     install -d ${D}${datadir}/${PN}
-    cp -a ${S}/* ${D}${datadir}/${PN} 
+    cp -a ${S}/* ${D}${datadir}/${PN}
     install -m 755 ${WORKDIR}/renesas-bigideasforeveryspace.mp4 ${D}${datadir}/${PN}
 }
 
 #FILES_${PN}-dbg += "${datadir}/${P}/.debug"
 FILES_${PN} += "${datadir}/${PN}"
-

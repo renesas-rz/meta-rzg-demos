@@ -8,3 +8,4 @@ export QT_QPA_PLATFORM=wayland
 
 export PATH=$PATH:/usr/share/qt5/examples/multimedia/video/qmlvideofx/
 export LD_PRELOAD=/usr/lib/libEGL.so
+export LD_LIBRARY_PATH="/usr/lib/gstreamer-1.0:/lib:/usr/lib:/usr/local/lib"

@@ -1,2 +1,1 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
-
+FILESEXTRAPATHS_prepend := "${THISDIR}/weston-init:"

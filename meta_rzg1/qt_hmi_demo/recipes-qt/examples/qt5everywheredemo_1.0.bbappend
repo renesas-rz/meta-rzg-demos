@@ -2,7 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 LIC_FILES_CHKSUM = "file://main.cpp;md5=71adff51aafebb2633598bbadd6aad70"
 SRCREV = "35d72a2eba7456a2efc5eb8b77afbc00f69ba0ac"
-DEPENDS_append += "qtmultimedia qtsvg" 
+DEPENDS_append += "qtmultimedia qtsvg"
 
 SRC_URI_append += " \
     file://0001-set_window_size.patch \

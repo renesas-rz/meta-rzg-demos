@@ -1,39 +1,13 @@
-From 670d7ab75ceb1c48661e5e0fcedab09582637071 Mon Sep 17 00:00:00 2001
-From: Huy Trung Hoang <huy.hoang.ym@rvc.renesas.com>
-Date: Fri, 28 Aug 2015 11:17:04 +0700
-Subject: [PATCH] example: test-multicast2: revise pipeline to read from UDPSrc
-
-Signed-off-by: Huy Trung Hoang <huy.hoang.ym@rvc.renesas.com>
----
- examples/test-multicast2.c | 39 ++++++++++++++++++++++++---------------
- 1 file changed, 24 insertions(+), 15 deletions(-)
-
 diff --git a/examples/test-multicast2.c b/examples/test-multicast2.c
-index 1d8e6f2..08718ec 100644
+index 1d8e6f2..84133e2 100644
 --- a/examples/test-multicast2.c
 +++ b/examples/test-multicast2.c
-@@ -25,20 +25,22 @@
- static gboolean
- timeout (GstRTSPServer * server, gboolean ignored)
- {
--  GstRTSPSessionPool *pool;
-+    GstRTSPSessionPool *pool;
- 
--  pool = gst_rtsp_server_get_session_pool (server);
--  gst_rtsp_session_pool_cleanup (pool);
--  g_object_unref (pool);
-+    pool = gst_rtsp_server_get_session_pool (server);
-+    gst_rtsp_session_pool_cleanup (pool);
-+    g_object_unref (pool);
- 
--  return TRUE;
-+    return TRUE;
+@@ -35,10 +35,11 @@ timeout (GstRTSPServer * server, gboolean ignored)
  }
  
  static void
 -media_constructed (GstRTSPMediaFactory * factory, GstRTSPMedia * media)
-+media_constructed (GstRTSPMediaFactory * factory, GstRTSPMedia * media,
-+    gpointer user_data)
++media_constructed (GstRTSPMediaFactory * factory, GstRTSPMedia * media, gpointer user_data)
  {
    guint i, n_streams;
  
@@ -41,7 +15,7 @@ index 1d8e6f2..08718ec 100644
    n_streams = gst_rtsp_media_n_streams (media);
  
    for (i = 0; i < n_streams; i++) {
-@@ -51,8 +53,8 @@ media_constructed (GstRTSPMediaFactory * factory, GstRTSPMedia * media)
+@@ -51,8 +52,8 @@ media_constructed (GstRTSPMediaFactory * factory, GstRTSPMedia * media)
      /* make a new address pool */
      pool = gst_rtsp_address_pool_new ();
  
@@ -52,7 +26,7 @@ index 1d8e6f2..08718ec 100644
      gst_rtsp_address_pool_add_range (pool, min, max,
          5000 + (10 * i), 5010 + (10 * i), 1);
      g_free (min);
-@@ -71,6 +73,16 @@ main (int argc, char *argv[])
+@@ -71,6 +72,16 @@ main (int argc, char *argv[])
    GstRTSPMountPoints *mounts;
    GstRTSPMediaFactory *factory;
  
@@ -69,7 +43,7 @@ index 1d8e6f2..08718ec 100644
    gst_init (&argc, &argv);
  
    loop = g_main_loop_new (NULL, FALSE);
-@@ -87,11 +99,8 @@ main (int argc, char *argv[])
+@@ -87,11 +98,8 @@ main (int argc, char *argv[])
     * any launch line works as long as it contains elements named pay%d. Each
     * element with pay%d names will be a stream */
    factory = gst_rtsp_media_factory_new ();
@@ -83,7 +57,7 @@ index 1d8e6f2..08718ec 100644
  
    gst_rtsp_media_factory_set_shared (factory, TRUE);
  
-@@ -99,7 +108,7 @@ main (int argc, char *argv[])
+@@ -99,7 +107,7 @@ main (int argc, char *argv[])
        media_constructed, NULL);
  
    /* attach the test factory to the /test url */
@@ -92,7 +66,7 @@ index 1d8e6f2..08718ec 100644
  
    /* don't need the ref to the mapper anymore */
    g_object_unref (mounts);
-@@ -111,7 +120,7 @@ main (int argc, char *argv[])
+@@ -111,7 +119,7 @@ main (int argc, char *argv[])
    g_timeout_add_seconds (2, (GSourceFunc) timeout, server);
  
    /* start serving */
@@ -101,6 +75,3 @@ index 1d8e6f2..08718ec 100644
    g_main_loop_run (loop);
  
    return 0;
--- 
-1.9.1
-

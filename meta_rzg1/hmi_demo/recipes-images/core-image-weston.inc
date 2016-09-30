@@ -10,11 +10,6 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-good-multifile \
     gstreamer1.0-plugins-good-rtp \
     gstreamer1.0-plugins-good-udp \
-    faac \
-    gstreamer1.0-plugins-bad-faac \
-    pulseaudio-server \
-    pulseaudio-module-echo-cancel \
-    gstreamer1.0-plugins-good-pulse \
     gstreamer1.0-plugins-good-rtpmanager \
     gstreamer1.0-rtsp-server \
     gstreamer1.0-plugins-base-app \
@@ -33,6 +28,4 @@ IMAGE_INSTALL_append = " \
     launcher-taskbar \
     wireless-firmware \
     demo-videos \
-    weston-staticdev \
-    demo3d \
 "

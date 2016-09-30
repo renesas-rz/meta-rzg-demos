@@ -1,7 +1,7 @@
 LICENSE = "CLOSED"
 DESCRIPTION = "preload qt libs"
 
-SRC_URI += " \	
+SRC_URI += " \
  file://qtpreload.sh \
  file://qtpreload \
 "

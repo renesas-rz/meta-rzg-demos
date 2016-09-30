@@ -1,0 +1,18 @@
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index 4794922..de3ae0d 100755
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -2275,7 +2275,13 @@ set_toplevel(struct shell_surface *shsurf)
+	shell_surface_set_parent(shsurf, NULL);
+	surface_clear_next_states(shsurf);
+	shsurf->type = SHELL_SURFACE_TOPLEVEL;
++	struct weston_seat *seat;
+
++	wl_list_for_each(seat, &shsurf->shell->compositor->seat_list, link) {
++		if (!seat->keyboard)
++			continue;
++		activate(shsurf->shell, shsurf->surface, seat, true);
++  }
+	/* The layer_link is updated in set_surface_type(),
+	 * called from configure. */
+ }

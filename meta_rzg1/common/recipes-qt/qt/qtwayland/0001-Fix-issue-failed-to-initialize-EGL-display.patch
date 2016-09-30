@@ -45,9 +45,9 @@ index a6f52bc..42c6fe6 100644
 --- a/src/client/qwaylanddisplay.cpp
 +++ b/src/client/qwaylanddisplay.cpp
 @@ -33,6 +33,7 @@
- 
+
  #include "qwaylanddisplay_p.h"
- 
+
 +#include "qwaylandeventthread_p.h"
  #include "qwaylandintegration_p.h"
  #include "qwaylandwindow_p.h"
@@ -56,13 +56,13 @@ index a6f52bc..42c6fe6 100644
      , mLastInputWindow(0)
  {
      qRegisterMetaType<uint32_t>("uint32_t");
-+    
++
 +    mEventThreadObject = new QWaylandEventThread(0);
 +    mEventThread = new QThread(this);
 +    mEventThread->setObjectName(QStringLiteral("QtWayland"));
 +    mEventThreadObject->moveToThread(mEventThread);
 +    mEventThread->start();
- 
+
 -    mDisplay = wl_display_connect(NULL);
 -    if (mDisplay == NULL) {
 -        qErrnoWarning(errno, "Failed to create display");
@@ -70,15 +70,15 @@ index a6f52bc..42c6fe6 100644
 -    }
 +    mEventThreadObject->displayConnect();
 +    mDisplay = mEventThreadObject->display(); //blocks until display is available
- 
+
      struct ::wl_registry *registry = wl_display_get_registry(mDisplay);
      init(registry);
-+    
++
 +    connect(mEventThreadObject, SIGNAL(newEventsRead()), this, SLOT(flushRequests()));
 +    connect(mEventThreadObject, &QWaylandEventThread::fatalError, this, &QWaylandDisplay::exitWithError);
- 
+
      mWindowManagerIntegration.reset(new QWaylandWindowManagerIntegration(this));
- 
+
 @@ -168,28 +175,17 @@ QWaylandDisplay::~QWaylandDisplay(void)
      }
      mScreens.clear();
@@ -99,20 +99,20 @@ index a6f52bc..42c6fe6 100644
 +    mEventThread->wait();
 +    delete mEventThreadObject;
  }
- 
+
  void QWaylandDisplay::flushRequests()
  {
 -    if (wl_display_prepare_read(mDisplay) == 0) {
 -        wl_display_read_events(mDisplay);
 -    }
 +
- 
+
      if (wl_display_dispatch_pending(mDisplay) < 0) {
 -        checkError();
 +        mEventThreadObject->checkError();
          exitWithError();
      }
- 
+
 @@ -200,13 +196,15 @@ void QWaylandDisplay::flushRequests()
  void QWaylandDisplay::blockingReadEvents()
  {
@@ -122,14 +122,14 @@ index a6f52bc..42c6fe6 100644
          exitWithError();
      }
  }
- 
+
  void QWaylandDisplay::exitWithError()
  {
 +    mEventThread->quit();
 +    mEventThread->wait();
      ::exit(1);
  }
- 
+
 diff --git a/src/client/qwaylanddisplay_p.h b/src/client/qwaylanddisplay_p.h
 index b53e057..0463e34 100644
 --- a/src/client/qwaylanddisplay_p.h
@@ -139,7 +139,7 @@ index b53e057..0463e34 100644
      void waitForScreens();
      void exitWithError();
 -    void checkError() const;
- 
+
      struct Listener {
          RegistryListener listener;
 @@ -188,6 +187,8 @@ private:
@@ -370,19 +370,18 @@ index 39fff53..9c9558b 100644
  #include <QtGui/QSurfaceFormat>
  #include <QtGui/QOpenGLContext>
 -#include <QSocketNotifier>
- 
+
  #include <qpa/qplatforminputcontextfactory_p.h>
  #include <qpa/qplatformaccessibility.h>
 @@ -203,9 +202,6 @@ void QWaylandIntegration::initialize()
      QObject::connect(dispatcher, SIGNAL(aboutToBlock()), mDisplay, SLOT(flushRequests()));
      QObject::connect(dispatcher, SIGNAL(awake()), mDisplay, SLOT(flushRequests()));
- 
+
 -    int fd = wl_display_get_fd(mDisplay->wl_display());
 -    QSocketNotifier *sn = new QSocketNotifier(fd, QSocketNotifier::Read, mDisplay);
 -    QObject::connect(sn, SIGNAL(activated(int)), mDisplay, SLOT(flushRequests()));
  }
- 
- QPlatformFontDatabase *QWaylandIntegration::fontDatabase() const
--- 
-1.9.1
 
+ QPlatformFontDatabase *QWaylandIntegration::fontDatabase() const
+--
+1.9.1

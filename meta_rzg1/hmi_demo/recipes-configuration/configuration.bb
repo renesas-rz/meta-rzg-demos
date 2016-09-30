@@ -1,7 +1,7 @@
 LICENSE = "CLOSED"
 DESCRIPTION = "This is configuration for environments"
 
-FILESEXTRAPATHS = "${THISDIR}/files:"
+FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
 SRC_URI = "file://profile "
 	   
 do_install () {

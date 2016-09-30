@@ -10,23 +10,23 @@ index 36416db..dc9d354 100644
 --- a/SlideDeck.qml
 +++ b/SlideDeck.qml
 @@ -185,11 +187,11 @@ Wayland support - Wayland-compatible Qt backend and compositor framework"
- 
+
      /********************************************************************************
       *
 -     * WebKit
 +     * WebEngine
       *
       */
- 
+
 -    WebkitSlide { }
 +    WebengineSlide { }
- 
- 
- 
+
+
+
 @@ -215,6 +217,8 @@ Wayland support - Wayland-compatible Qt backend and compositor framework"
- 
+
          Image {
- 	    z: -1
+	    z: -1
 +            width: 250
 +            height: 250
              opacity: 0.7
@@ -263,6 +263,5 @@ index 5ff70b2..0000000
 -    centeredText: webkitLoader.status == Loader.Error ? "Qt WebKit not installed or otherwise failed to load" : ""
 -}
 -
--- 
+--
 1.9.1
-

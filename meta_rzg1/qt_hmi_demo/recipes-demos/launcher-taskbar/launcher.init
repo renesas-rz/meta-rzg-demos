@@ -18,10 +18,9 @@ killproc() {
 case "$1" in
   start)
 	amixer set "LINEOUT Mixer DACL" on
-	amixer set "DVC Out" 80%
-	amixer set "DVC In" 1%
+	amixer set "Digital" 100%
 	. /etc/profile
-	export LD_PRELOAD=/usr/lib/libEGL.so 
+	export LD_PRELOAD=/usr/lib/libEGL.so
   ;;
 
   stop)

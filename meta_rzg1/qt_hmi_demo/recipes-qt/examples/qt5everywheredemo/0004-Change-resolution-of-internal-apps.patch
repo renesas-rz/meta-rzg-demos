@@ -29,7 +29,7 @@ index 2618807..7219df5 100644
 +++ b/qml/QtDemo/engine.js
 @@ -69,13 +69,13 @@ var groupPositions = [
          ]
- 
+
  var imageSources = ["phone1.png","phone2.png", "phone3.png","tablet1.png", "car_device.png", "medical_device.png", "laptop1.png", "laptop2.png", "tv.png"]
 -var widths = [300, 360, 366, 758, 625, 600, 918, 923, 800]
 -var heights = [605, 706, 720, 564, 386, 488, 600, 600, 638]

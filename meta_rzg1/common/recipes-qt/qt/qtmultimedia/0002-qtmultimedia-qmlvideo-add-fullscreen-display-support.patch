@@ -16,9 +16,9 @@ index cc4437f..670547f 100644
 --- a/examples/multimedia/video/qmlvideo/main.cpp
 +++ b/examples/multimedia/video/qmlvideo/main.cpp
 @@ -130,8 +130,13 @@ int main(int argc, char *argv[])
- 
+
      QMetaObject::invokeMethod(rootObject, "init");
- 
+
 -    viewer.setMinimumSize(QSize(640, 360));
 -    viewer.show();
 +    const QString lowerArgument = QString::fromLatin1(argv[1]).toLower();
@@ -28,9 +28,8 @@ index cc4437f..670547f 100644
 +        viewer.setMinimumSize(QSize(640, 360));
 +        viewer.show();
 +    }
- 
+
      return app.exec();
  }
--- 
+--
 1.9.1
-

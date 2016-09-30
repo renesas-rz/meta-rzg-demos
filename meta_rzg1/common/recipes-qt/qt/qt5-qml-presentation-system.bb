@@ -22,4 +22,3 @@ do_install() {
 #FILES_${PN}-dbg += "${datadir}/${P}/.debug"
 FILES_${PN} += "${datadir} \
 	        ${libdir}/*"
-

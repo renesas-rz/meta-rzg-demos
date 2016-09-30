@@ -9,5 +9,5 @@ index 151f7da..93255c2 100755
 -        hideSource: true
 +        hideSource: false
      }
- 
+
      LogoContainer {

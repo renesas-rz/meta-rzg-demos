@@ -29,7 +29,7 @@ index d1ae67a..2b59552 100755
 --- a/HW-vs-SW-Comparison/hd_hw_sw_playback.sh
 +++ b/HW-vs-SW-Comparison/hd_hw_sw_playback.sh
 @@ -2,7 +2,7 @@
- 
+
  # Play 2 file Fhd in sequence and show FPS comparation.
  # Input: para1='video_name'
 -VIDEO=/home/root/videos/H264_HD_30.mp4
@@ -42,12 +42,12 @@ index 83b1d34..3f86a77 100755
 --- a/Video-Streaming-From-Board-Lan.sh
 +++ b/Video-Streaming-From-Board-Lan.sh
 @@ -4,7 +4,7 @@ IP_STREAM=$(cat /home/root/launcher-taskbar/mmpoc-scripts/IP_STREAM.info)
- 
+
  /home/root/launcher-taskbar/mmpoc-scripts/IPCamera-Demo/banner 100 50 "Streaming..." &
- 
+
 -/home/root/RZ_scripts/RZ_GST-network-demo_transmit-video.sh /home/root/videos/H264_VGA_24.mp4 $IP_STREAM
 +/home/root/RZ_scripts/RZ_GST-network-demo_transmit-video.sh /home/root/videos/h264-vga-24.mp4 $IP_STREAM
- 
+
  killall -9 -q banner
  echo 3 > /proc/sys/vm/drop_caches
 diff --git a/Video-Streaming-From-Board-Wifi.sh b/Video-Streaming-From-Board-Wifi.sh
@@ -55,16 +55,15 @@ index b243d93..d4cae39 100755
 --- a/Video-Streaming-From-Board-Wifi.sh
 +++ b/Video-Streaming-From-Board-Wifi.sh
 @@ -4,7 +4,7 @@ PATH=$PATH:$(cat /home/root/launcher-taskbar/mmpoc-scripts/PATH.info)
- 
+
  /home/root/launcher-taskbar/mmpoc-scripts/IPCamera-Demo/banner 100 50 "Streaming..." &
- 
+
 -/home/root/RZ_scripts/RZ_GST-network-demo_video-wireless-streaming.sh /home/root/videos/H264_WVGA_30.mp4
 +/home/root/RZ_scripts/RZ_GST-network-demo_video-wireless-streaming.sh /home/root/videos/h264-wvga-30.mp4
- 
+
  killall -9 -q banner
 -echo 3 > /proc/sys/vm/drop_caches
 \ No newline at end of file
 +echo 3 > /proc/sys/vm/drop_caches
--- 
+--
 1.9.1
-

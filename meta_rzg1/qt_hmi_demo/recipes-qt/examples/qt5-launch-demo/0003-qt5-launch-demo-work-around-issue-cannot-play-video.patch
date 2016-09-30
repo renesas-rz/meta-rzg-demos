@@ -1,0 +1,48 @@
+From ee1fdbf7029207f4c5715d23d9b633ef55e850d9 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Tue, 20 Sep 2016 21:16:26 +0700
+Subject: [PATCH] qt5-launch-demo-work-around-issue-cannot-play-video
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ VideoSlide.qml | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/VideoSlide.qml b/VideoSlide.qml
+index 41f05e6..e9c6553 100644
+--- a/VideoSlide.qml
++++ b/VideoSlide.qml
+@@ -59,6 +59,7 @@ Slide {
+
+         layer.enabled: true;
+         layer.smooth: true;
++/*
+         layer.effect: Displace {
+             displacementSource: normalMap
+             displacement: button.pressed ? 1.0 : 0.0
+@@ -66,6 +67,7 @@ Slide {
+                 NumberAnimation { duration: 1000 }
+             }
+         }
++*/
+     }
+
+     Rectangle {
+@@ -102,7 +104,7 @@ Slide {
+          else
+              video.pause();
+      }
+-
++/*
+      Button {
+          id: button
+          anchors.bottom: video.bottom
+@@ -112,5 +114,5 @@ Slide {
+          width: height * 4;
+          height: parent.height * 0.1
+      }
+-
++*/
+ }
+--
+1.9.1
