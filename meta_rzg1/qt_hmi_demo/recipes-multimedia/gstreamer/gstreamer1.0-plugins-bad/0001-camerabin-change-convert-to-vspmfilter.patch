@@ -1,0 +1,22 @@
+diff --git a/gst/camerabin2/gstviewfinderbin.c b/gst/camerabin2/gstviewfinderbin.c
+index 9fdd79e..eb63efa 100644
+--- a/gst/camerabin2/gstviewfinderbin.c
++++ b/gst/camerabin2/gstviewfinderbin.c
+@@ -199,10 +199,14 @@ gst_viewfinder_bin_create_elements (GstViewfinderBin * vfbin)
+     gst_ghost_pad_set_target (GST_GHOST_PAD (vfbin->ghostpad), NULL);
+ 
+     /* add the elements, user wants them */
+-    csp = gst_element_factory_make ("videoconvert", "vfbin-csp");
++    csp = gst_element_factory_make ("vspmfilter", "vfbin-csp");
++    g_object_set(csp, "outbuf-alloc", 1, NULL);
+     if (!csp) {
+-      missing_element_name = "videoconvert";
+-      goto missing_element;
++      csp = gst_element_factory_make ("videoconvert", "vfbin-csp");
++      if (!csp) {
++        missing_element_name = "videoconvert";
++        goto missing_element;
++      }
+     }
+     gst_bin_add (GST_BIN_CAST (vfbin), csp);
+ 
