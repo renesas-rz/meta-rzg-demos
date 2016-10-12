@@ -1,3 +1,3 @@
 FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-PACKAGECONFIG_append =" x264 \"
+PACKAGECONFIG_append =" x264 mad "
