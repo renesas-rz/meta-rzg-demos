@@ -35,7 +35,6 @@ do_configure_append() {
     kernel_configure_variable USB_VIDEO_CLASS=m
     kernel_configure_variable USB_VIDEO_CLASS_INPUT_EVDEV=y
     kernel_configure_variable USB_GSPCA=m
-    kernel_configure_variable VIDEO_RENESAS_VSP1 n
     kernel_configure_variable PROFILING=y
     kernel_configure_variable OPROFILE=m
 
