@@ -1,0 +1,48 @@
+From c04ea23de47d78f8b9017a1bb6f75c57710f2db7 Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Mon, 14 Nov 2016 18:46:05 +0700
+Subject: [PATCH] remove redundancy amixer setting in /etc/profile and add
+ bashrc for weston resolution variables
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ bashrc  | 12 ++++++++++++
+ profile |  3 ---
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+ create mode 100644 bashrc
+
+diff --git a/bashrc b/bashrc
+new file mode 100644
+index 0000000..2133d8e
+--- /dev/null
++++ b/bashrc
+@@ -0,0 +1,12 @@
++getWestonWidth() {
++  echo $(weston-info | grep -wB1 'current preferred' | head -n 1 | awk '{print $2}')
++}
++#export -f getWestonWidth
++
++getWestonHeight() {
++  echo $(weston-info | grep -wB1 'current preferred' | head -n 1 | awk '{print $5}')
++}
++#export -f getWestonHeight
++
++export D_WIDTH=`getWestonWidth`
++export D_HEIGHT=`getWestonHeight`
+diff --git a/profile b/profile
+index 481e282..9503266 100755
+--- a/profile
++++ b/profile
+@@ -2,9 +2,6 @@ export LD_LIBRARY_PATH="/usr/lib/gstreamer-1.0:/lib:/usr/lib:/usr/local/lib"
+ export XDG_RUNTIME_DIR=/run/user/root
+ export PATH=/home/root/RZ_scripts:$PATH
+ 
+-amixer set 'DVC Out' 10
+-amixer set 'LINEOUT Mixer DACL' on
+-    
+ modprobe -a mmngr mmngrbuf s3ctl uvcs_cmn vspm fdpm
+     
+ alias ls='ls --color=auto'
+-- 
+1.9.1
+
