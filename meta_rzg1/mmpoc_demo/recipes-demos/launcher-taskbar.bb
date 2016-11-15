@@ -47,6 +47,7 @@ do_patch() {
     patch -p1 < 0008-IPCamDemo-display-full-weston-resolution.patch
     patch -p1 < 0009-MJPEG-Cam-Demo-add-scale-down-resolution-for-LVDS-80.patch
     patch -p1 < 0010-StreamVideoDemo-display-weston-resolution-in-receivi.patch
+    cp mmpoc-scripts/File-Player-Demo/81-auto.rules mmpoc-automount/.
 }
 
 do_install() {
