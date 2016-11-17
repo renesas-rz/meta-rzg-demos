@@ -13,6 +13,7 @@ SRC_URI = " \
  file://0008-IPCamDemo-display-full-weston-resolution.patch \
  file://0009-MJPEG-Cam-Demo-add-scale-down-resolution-for-LVDS-80.patch \
  file://0010-StreamVideoDemo-display-weston-resolution-in-receivi.patch \
+ file://0011-MJPEG-demo-increase-delay-to-capture-FPS-of-Logitech.patch \
  file://mmpoc-icons-small/Audio-Demo-icon.png \
  file://mmpoc-icons-small/Camera-Preview-Record-icon.png \
  file://mmpoc-icons-small/Exit.png \
@@ -47,6 +48,7 @@ do_patch() {
     patch -p1 < 0008-IPCamDemo-display-full-weston-resolution.patch
     patch -p1 < 0009-MJPEG-Cam-Demo-add-scale-down-resolution-for-LVDS-80.patch
     patch -p1 < 0010-StreamVideoDemo-display-weston-resolution-in-receivi.patch
+    patch -p1 < 0011-MJPEG-demo-increase-delay-to-capture-FPS-of-Logitech.patch
     cp mmpoc-scripts/File-Player-Demo/81-auto.rules mmpoc-automount/.
 }
 
