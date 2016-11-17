@@ -1,0 +1,200 @@
+From 47e5403ba2e75201225a0e6ddb17468790c62813 Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Mon, 14 Nov 2016 19:57:47 +0700
+Subject: [PATCH 07/10] HW-SW-ComparisionDemo:add weston resolution
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ .../HW-vs-SW-Comparison/fhd_hw_sw_playback.sh      | 28 ++++++++++--------
+ .../HW-vs-SW-Comparison/hd_hw_sw_playback.sh       | 33 ++++++++++++++++------
+ mmpoc-scripts/HW-vs-SW-Comparison/record.sh        | 27 ++++++++++--------
+ 3 files changed, 58 insertions(+), 30 deletions(-)
+
+diff --git a/mmpoc-scripts/HW-vs-SW-Comparison/fhd_hw_sw_playback.sh b/mmpoc-scripts/HW-vs-SW-Comparison/fhd_hw_sw_playback.sh
+index 178e726..239ca24 100755
+--- a/mmpoc-scripts/HW-vs-SW-Comparison/fhd_hw_sw_playback.sh
++++ b/mmpoc-scripts/HW-vs-SW-Comparison/fhd_hw_sw_playback.sh
+@@ -1,22 +1,28 @@
+ #!/bin/bash
++source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
++PX=`expr 100 \* $D_WIDTH / 1920 / 32 \* 32`
++PY=`expr 850 \* $D_HEIGHT / 1080`
++W=`expr 1920 \* $D_WIDTH / 1920 / 32 \* 32`
++H=`expr 1080 \* $D_HEIGHT / 1080`
++
+ # Play 2 file Fhd in sequence and show FPS comparation.
+ VIDEO=/home/root/videos/h264-fhd-60.mp4
+ FPS_LOG_1=/tmp/.log1.txt
+ FPS_LOG_2=/tmp/.log2.txt
+ DURATION=20
+-X_POSITION=100
+-Y_POSITION=900
++X_POSITION=`expr 100 \* $D_WIDTH / 1920 / 32 \* 32`
++Y_POSITION=`expr 900 \* $D_HEIGHT / 1080`
+ 
+ # Play with HW
+ if [ -e $VIDEO ];then
+    echo "Play HD video with HW engine"
+    gst-launch-1.0  --padprobe v:sink --timer filesrc location=$VIDEO ! qtdemux \
+-    ! omxh264dec ! waylandsink name=v position-x=0 position-y=0 qos=false > $FPS_LOG_1 &
+-   sleep 3 
+-   /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner  100 850 "HW decoding FullHD@1920x1080-60fps-40Mbps"&
++    ! omxh264dec ! waylandsink name=v position-x=0 position-y=0 out-width=$W out-height=$H qos=false > $FPS_LOG_1 &
++   sleep 3
++   /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner $PX $PY "HW decoding FullHD@1920x1080-60fps-40Mbps"&
+    /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/fps_out $FPS_LOG_1 $X_POSITION $Y_POSITION &
+ 
+-   sleep $DURATION 
++   sleep $DURATION
+    disown  $(pidof fps_out)
+    killall -q -9  banner > /dev/null
+    killall -q -9  fps_out > /dev/null
+@@ -31,14 +37,14 @@ sync
+ 
+ # Play with SW
+ if [ -e $VIDEO ];then
+-   echo "SW-based playing" 
++   echo "SW-based playing"
+    gst-launch-1.0  --padprobe v:sink --timer filesrc location=$VIDEO ! qtdemux ! avdec_h264 \
+-   ! videoconvert ! video/x-raw, format=BGR  ! waylandsink name=v sync=false position-x=0 position-y=0  > $FPS_LOG_2 &
+-   sleep 5 
+-   /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner  100 850 "SW decoding FullHD@1920x1080-60fps-40Mbps"&
++   ! videoconvert ! video/x-raw, format=BGR  ! waylandsink name=v sync=false position-x=0 position-y=0 out-width=$W out-height=$H > $FPS_LOG_2 &
++   sleep 5
++   /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner $PX $PY "SW decoding FullHD@1920x1080-60fps-40Mbps"&
+    /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/fps_out $FPS_LOG_2 $X_POSITION $Y_POSITION &
+ 
+-   sleep $DURATION 
++   sleep $DURATION
+    disown  $(pidof fps_out)
+    killall -q -9  banner > /dev/null
+    killall -q -9  fps_out > /dev/null
+diff --git a/mmpoc-scripts/HW-vs-SW-Comparison/hd_hw_sw_playback.sh b/mmpoc-scripts/HW-vs-SW-Comparison/hd_hw_sw_playback.sh
+index 2b59552..23fa43a 100755
+--- a/mmpoc-scripts/HW-vs-SW-Comparison/hd_hw_sw_playback.sh
++++ b/mmpoc-scripts/HW-vs-SW-Comparison/hd_hw_sw_playback.sh
+@@ -1,9 +1,26 @@
+ #!/bin/bash
++source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
++W=`expr 1280 \* $D_WIDTH / 1920 / 32 \* 32`
++H=`expr 720 \* $D_HEIGHT / 1080`
++PX=`expr 700 \* $D_WIDTH / 1920 / 32 \* 32`
++PY=`expr 400 \* $D_HEIGHT / 1080`
++
++XM=`expr 50 \* $D_WIDTH / 1920 / 32 \* 32`
++YM=`expr 500 \* $D_HEIGHT / 1080`
++LM=`expr 50 \* $D_HEIGHT / 1080`
++
++LX=$XM
++LY=$YM
++LPY=`expr $LY + $LM`
++
++LX2=`expr $PX + $XM`
++LY2=`expr $PY + $YM`
++LPY2=`expr $LY2 + $LM`
+ 
+ # Play 2 file Fhd in sequence and show FPS comparation.
+ # Input: para1='video_name'
+ VIDEO=/home/root/videos/h264-hd-30.mp4
+-#RATE2=10.6Mbps
++#RATE2=10.6MbpsLX
+ #RES1="1280x720(HW-based)"
+ #RES2="1280x720(SW-based)"
+ FPS_LOG_1=/tmp/.log3.txt
+@@ -18,17 +35,17 @@ fi
+ # Play with HW
+ echo "Play HD video with HW engine"
+ gst-launch-1.0  --padprobe v:sink --timer filesrc location=$VIDEO ! qtdemux \
+-! omxh264dec ! waylandsink name=v position-x=0 position-y=0 qos=false > $FPS_LOG_1 &
++! omxh264dec ! waylandsink name=v position-x=0 position-y=0 out-width=$W out-height=$H qos=false > $FPS_LOG_1 &
+ 
+ gst-launch-1.0  --padprobe v:sink --timer filesrc location=$VIDEO ! qtdemux ! avdec_h264 \
+-! videoconvert ! video/x-raw, format=BGR  ! waylandsink name=v sync=false position-x=700 position-y=400  > $FPS_LOG_2 &
++! videoconvert ! video/x-raw, format=BGR  ! waylandsink name=v sync=false position-x=$PX position-y=$PY out-width=$W out-height=$H > $FPS_LOG_2 &
+ sleep 5
+-/home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner  50 550 "HW decoding HD@1280x720-30fps-10.6Mbps" &
+-/home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/fps_out $FPS_LOG_1 50 600   &
+-/home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner  800 900 "SW decoding HD@1280x720-30fps-10.6Mbps" &
+-/home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/fps_out $FPS_LOG_2 800 950  &
++/home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner  $LX $LY "HW decoding HD@1280x720-30fps-10.6Mbps" &
++/home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/fps_out $FPS_LOG_1 $LX $LPY &
++/home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner  $LX2 $LY2 "SW decoding HD@1280x720-30fps-10.6Mbps" &
++/home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/fps_out $FPS_LOG_2 $LX2 $LPY2  &
+ 
+-sleep $DURATION 
++sleep $DURATION
+ killall -q -9 fps_out > /dev/null
+ killall -q -9 banner > /dev/null
+ killall -q -9 gst-launch-1.0 > /dev/null
+diff --git a/mmpoc-scripts/HW-vs-SW-Comparison/record.sh b/mmpoc-scripts/HW-vs-SW-Comparison/record.sh
+index 7244830..3db7cd5 100755
+--- a/mmpoc-scripts/HW-vs-SW-Comparison/record.sh
++++ b/mmpoc-scripts/HW-vs-SW-Comparison/record.sh
+@@ -1,4 +1,9 @@
+ #!/bin/bash
++source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
++W=`expr 1920 \* $D_WIDTH / 1920 / 32 \* 32`
++H=`expr 1080 \* $D_HEIGHT / 1080`
++PX=`expr 100 \* $D_WIDTH / 1920 / 32 \* 32`
++PY=`expr 200 \* $D_HEIGHT / 1080`
+ 
+ # Play 2 file Fhd in sequence and show FPS comparation.
+ # Input: para1='video_name'
+@@ -6,20 +11,20 @@ VIDEO1=/media/video1.mp4
+ VIDEO2=/media/video2.mp4
+ FPS_LOG_1=/tmp/.log5.txt
+ FPS_LOG_2=/tmp/.log6.txt
+-X_POS=100
+-Y_POS=100
++X_POS=`expr 100 \* $D_WIDTH / 1920 / 32 \* 32`
++Y_POS=`expr 100 \* $D_HEIGHT / 1080`
+ 
+ /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner ${X_POS} ${Y_POS}  "HW-encoded recording. Please wait..." &
+ gst-launch-1.0 -e v4l2src num-buffers=300 ! video/x-raw,format=UYVY, width=720,height=480 \
+ ! vspmfilter outbuf-alloc=true ! video/x-raw, format=NV12,width=1920,height=1080 ! \
+-omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! qtmux ! filesink location=$VIDEO1  
++omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! qtmux ! filesink location=$VIDEO1
+ 
+ killall -q banner
+ sync
+ 
+ /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner ${X_POS} ${Y_POS}  "SW-encoded recording. Please wait..." &
+ #gst-launch-1.0 -e v4l2src num-buffers=50 ! video/x-raw,format=UYVY,width=720,height=480 ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=1920,height=1080 ! x264enc bitrate=10485 tune=zerolatency ! h264parse ! qtmux ! filesink location=$VIDEO2 -rp filesink0:sink
+-gst-launch-1.0 -e v4l2src num-buffers=50 ! video/x-raw,format=UYVY,width=720,height=480 ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=1920,height=1080 ! x264enc bitrate=3485 tune=zerolatency ! h264parse ! qtmux ! filesink location=$VIDEO2 
++gst-launch-1.0 -e v4l2src num-buffers=50 ! video/x-raw,format=UYVY,width=720,height=480 ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=1920,height=1080 ! x264enc bitrate=3485 tune=zerolatency ! h264parse ! qtmux ! filesink location=$VIDEO2
+ 
+ killall -q banner
+ pidof gst-launch-1.0>/dev/null
+@@ -31,11 +36,11 @@ sync
+ 
+ if [ -e $VIDEO1 ];then
+    gst-launch-1.0  --padprobe v:sink --timer filesrc location=$VIDEO1 ! qtdemux \
+-   ! omxh264dec ! waylandsink name=v position-x=0 position-y=0 qos=false > $FPS_LOG_1 &
+-   sleep 1 
++   ! omxh264dec ! waylandsink name=v position-x=0 position-y=0 out-width=$W out-height=$H qos=false > $FPS_LOG_1 &
++   sleep 1
+    /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner ${X_POS} ${Y_POS}  "HW-encoded video file @10.5Mbps 1920x1080" &
+-   /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/fps_out $FPS_LOG_1 100 200 &
+-   sleep 10 
++   /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/fps_out $FPS_LOG_1 $PX $PY &
++   sleep 10
+ else
+    echo "File $VIDEO1 is not existed!!!"
+ fi
+@@ -47,10 +52,10 @@ echo 3 > /proc/sys/vm/drop_caches
+ 
+ if [ -e $VIDEO2 ];then
+    gst-launch-1.0  --padprobe v:sink --timer filesrc location=$VIDEO2 ! qtdemux \
+-   ! omxh264dec ! waylandsink name=v position-x=0 position-y=0 qos=false > $FPS_LOG_2 &
+-   sleep 2 
++   ! omxh264dec ! waylandsink name=v position-x=0 position-y=0 out-width=$W out-height=$H qos=false > $FPS_LOG_2 &
++   sleep 2
+    /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/banner ${X_POS} ${Y_POS}  "SW-encoded video file @3.5Mbps 1920x1080" &
+-   /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/fps_out $FPS_LOG_2 100 200 &
++   /home/root/launcher-taskbar/mmpoc-scripts/HW-vs-SW-Comparison/fps_out $FPS_LOG_2 $PX $PY &
+    sleep 10
+ else
+    echo "File $VIDEO2 is not existed!!!"
+-- 
+1.9.1
+

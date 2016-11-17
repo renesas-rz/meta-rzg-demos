@@ -1,0 +1,49 @@
+From 55fe360021ef255ebd3d593a98745db19ed2443b Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Mon, 14 Nov 2016 19:41:44 +0700
+Subject: [PATCH 10/10] StreamVideoDemo:display weston resolution in receiving
+ video
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ .../Video-Streaming-From-Device-Wifi/run_receive-movie.sh | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
+
+diff --git a/mmpoc-scripts/Video-Streaming-From-Device-Wifi/run_receive-movie.sh b/mmpoc-scripts/Video-Streaming-From-Device-Wifi/run_receive-movie.sh
+index 2d5a4bc..e43bf49 100755
+--- a/mmpoc-scripts/Video-Streaming-From-Device-Wifi/run_receive-movie.sh
++++ b/mmpoc-scripts/Video-Streaming-From-Device-Wifi/run_receive-movie.sh
+@@ -1,19 +1,26 @@
+ #!/bin/bash
++source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
++
++PX=`expr 100 \* $D_WIDTH / 1920 / 32 \* 32`
++PY=`expr 50 \* $D_HEIGHT / 1080`
++PY2=`expr 100 \* $D_HEIGHT / 1080`
++W=`expr 1920 \* $D_WIDTH / 1920 / 32 \* 32`
++H=`expr 1080 \* $D_HEIGHT / 1080`
+ 
+ LOG=/tmp.log
+ 
+-/home/root/launcher-taskbar/mmpoc-scripts/Video-Streaming-From-Device-Wifi/banner 100 50 "Receiving stream ..." &
++/home/root/launcher-taskbar/mmpoc-scripts/Video-Streaming-From-Device-Wifi/banner $PX $PY "Receiving stream ..." &
+ 
+ gst-launch-1.0 --padprobe v:sink --timer udpsrc port=1234 \
+ caps=\"application/x-rtp\" ! rtph264depay ! h264parse ! \
+-omxh264dec ! waylandsink  qos=false max-lateness=-1 name=v > $LOG &
++omxh264dec ! waylandsink qos=false max-lateness=-1 position-x=0 position-y=0 out-width=$W out-height=$H name=v > $LOG &
+ 
+-gst-launch-1.0 udpsrc port=1236 caps="application/x-rtp, media=(string)audio, config=(string)1208, sizelength=(string)13" ! queue ! rtpmp4gdepay ! aacparse ! faad ! alsasink &
++gst-launch-1.0 udpsrc port=1236 caps="application/x-rtp, media=(string)audio, config=(string)1208, sizelength=(string)13" ! queue ! rtpmp4gdepay ! faad ! alsasink &
+ 
+ sleep 2s
+ echo "FPS: 0" > $LOG
+ 
+-/home/root/launcher-taskbar/mmpoc-scripts/Video-Streaming-From-Device-Wifi/fps_show $LOG 100 100
++/home/root/launcher-taskbar/mmpoc-scripts/Video-Streaming-From-Device-Wifi/fps_show $LOG $PX $PY2
+ 
+ rm -rf $LOG
+ killall -2 -q gst-launch-1.0
+-- 
+1.9.1
+

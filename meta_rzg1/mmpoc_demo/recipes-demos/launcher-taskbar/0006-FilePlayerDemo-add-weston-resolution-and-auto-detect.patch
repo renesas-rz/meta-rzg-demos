@@ -1,0 +1,156 @@
+From 793a4e77edd531499e02cdb46798e8f516f4d65f Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Mon, 14 Nov 2016 19:35:11 +0700
+Subject: [PATCH 06/10] FilePlayerDemo:add weston resolution and auto detect
+ number of display and automount USB
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ mmpoc-scripts/File-Player-Demo/81-auto.rules |  2 +
+ mmpoc-scripts/File-Player-Demo/autoplay.sh   | 89 ++++++++++++++++++++--------
+ 2 files changed, 66 insertions(+), 25 deletions(-)
+
+diff --git a/mmpoc-scripts/File-Player-Demo/81-auto.rules b/mmpoc-scripts/File-Player-Demo/81-auto.rules
+index e815430..3e5bf4e 100755
+--- a/mmpoc-scripts/File-Player-Demo/81-auto.rules
++++ b/mmpoc-scripts/File-Player-Demo/81-auto.rules
+@@ -25,6 +25,8 @@ ENV{ID_FS_LABEL_ENC}=="?*",   ACTION=="remove",      SUBSYSTEMS=="usb", RUN+="/u
+ #MMC 
+ #ENV{DEVTYPE}=="disk",   ACTION=="add",      SUBSYSTEMS=="block", RUN+="/usr/local/sbin/udev-echo.sh"
+ ENV{DEVNAME}=="/dev/mmcblk[0-9]p[1-9]",  ENV{ID_PATH}!="platform-sh_mmcif", ACTION=="add",      SUBSYSTEMS=="block", RUN+="/usr/local/sbin/udev-mmc-automount.sh %k"
++ENV{DEVNAME}=="/dev/sda[1-9]",  ENV{ID_PATH}!="platform-sh_mmcif", ACTION=="add",      SUBSYSTEMS=="block", RUN+="/usr/local/sbin/udev-mmc-automount.sh %k"
+ #ENV{DEVNAME}=="/dev/mmcblk[-9]p[1-9]"    ,ENV{DEVTYPE}=="disk",   ACTION=="add",      SUBSYSTEMS=="block", RUN+="/usr/local/sbin/udev-echo.sh"
+ 
+ ENV{DEVNAME}=="/dev/mmcblk[0-9]p[1-9]", ENV{ID_PATH}!="platform-sh_mmcif", ACTION=="remove",      SUBSYSTEMS=="block", RUN+="/usr/local/sbin/udev-mmc-autounmount.sh %k"
++ENV{DEVNAME}=="/dev/sda[1-9]", ENV{ID_PATH}!="platform-sh_mmcif", ACTION=="remove",      SUBSYSTEMS=="block", RUN+="/usr/local/sbin/udev-mmc-autounmount.sh %k"
+diff --git a/mmpoc-scripts/File-Player-Demo/autoplay.sh b/mmpoc-scripts/File-Player-Demo/autoplay.sh
+index d431214..51c91f2 100755
+--- a/mmpoc-scripts/File-Player-Demo/autoplay.sh
++++ b/mmpoc-scripts/File-Player-Demo/autoplay.sh
+@@ -1,12 +1,21 @@
+ #!/bin/bash
++source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
++
++# Number of display
++N=`weston-info | grep -c 'current'`
++
++# Fist display resolution
++W1=`weston-info | grep -wB1 'current' | head -n 1 | awk '{print $2}'`
++H1=`weston-info | grep -wB1 'current' | head -n 1 | awk '{print $5}'`
++
+ #Variable
+ ALL_LIST=/tmp/allvideo
+-X_POS=100
+-Y_POS=100
++X_POS=`expr 100 \* $D_WIDTH / 1920 / 32 \* 32`
++Y_POS=`expr 100 \* $D_HEIGHT / 1080`
+ DURATION=10
+ 
+ find /tmp/ -name "*.playlist" > ${ALL_LIST}
+-while read PLAYLIST ; do 
++while read PLAYLIST ; do
+   #Play video file search by automount
+    if [ ! -f $PLAYLIST ];then
+        echo "Playlist $PLAYLIST is not existed !!!"
+@@ -14,46 +23,76 @@ while read PLAYLIST ; do
+     RECORD_FILE=`tail -1 $PLAYLIST`
+       # Record video into sdcard/usb
+       if [ ! -f $RECORD_FILE ];then
+-        
++
+       echo "Record into ${RECORD_FILE} "
+-      /home/root/launcher-taskbar/mmpoc-scripts/File-Player-Demo/banner ${X_POS} ${Y_POS}  "Recording..." &
+-      gst-launch-1.0 -e v4l2src ! video/x-raw,format=UYVY, width=720,height=480 \
+-      ! vspmfilter outbuf-alloc=true ! video/x-raw, format=NV12,width=1280,height=720 \
+-      ! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! qtmux ! filesink location=$RECORD_FILE & 
++   gst-launch-1.0 -e v4l2src ! video/x-raw,format=UYVY, width=720,height=480 \
++   ! vspmfilter outbuf-alloc=true ! video/x-raw, format=NV12,width=1280,height=720 \
++   ! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! qtmux ! filesink location=$RECORD_FILE &
+     #With audio
+       #gst-launch-1.0 -e qtmux name=muxer ! filesink location=${RECORD_FILE} alsasrc provide-clock=false \
+       #! faac ! queue ! muxer.audio_0 v4l2src \
+       #! video/x-raw,format=UYVY, width=720,height=480 ! vspmfilter outbuf-alloc=true \
+       #! video/x-raw, format=NV12,width=1280,height=720 \
+       #! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! queue ! muxer.video_0 &
++      /home/root/launcher-taskbar/mmpoc-scripts/File-Player-Demo/banner ${X_POS} ${Y_POS}  "Recording..." &
+       sleep $DURATION
+       killall -9 banner > /dev/null
+-      killall -2 gst-launch-1.0 > /dev/null
+-      echo 3 > /proc/sys/vm/drop_caches
++      killall gst-launch-1.0 > /dev/null
+       sync
++      echo 3 > /proc/sys/vm/drop_caches
+ 
+       else
+-     echo "File ${RECORD_FILE} already existed!!!"
++        echo "File ${RECORD_FILE} already existed!!!"
+       fi
+       /home/root/launcher-taskbar/mmpoc-scripts/File-Player-Demo/banner ${X_POS} ${Y_POS}  "Playing..." &
+-      while read line ; do 
++      while read line ; do
+           if [ -f $line ];then
+              echo "Playing file $line"
+              if [[ $line == ${RECORD_FILE} ]]; then
+-             gst-launch-1.0  --padprobe v:sink --timer  filesrc \
+-             location=$line ! qtdemux ! omxh264dec ! tee name=t t. ! queue ! vspmfilter ! \
+-             video/x-raw,format=BGRA ! waylandsink position-x=0 position-y=0 name=v \
+-             t. ! vspmfilter ! video/x-raw,format=BGRA ! waylandsink position-x=1921 position-y=0
++    if [ $N -eq 2 ]; then
++      # Second display resolution
++      W2=`weston-info | grep -wB1 'current' | tail -n 2 | head -n 1 | awk '{print $2}'`
++      H2=`weston-info | grep -wB1 'current' | tail -n 2 | head -n 1 | awk '{print $5}'`
++      PX2=`expr $W1 + 1`
++
++      gst-launch-1.0 -e --padprobe v:sink --timer filesrc location=$line \
++      ! qtdemux name=demuxer demuxer.video_0 ! queue ! omxh264dec ! \
++      tee name=t t. ! queue ! \
++      vspmfilter ! video/x-raw,format=BGRA ! waylandsink position-x=0 position-y=0 qos=false max-lateness=-1 \
++      t. ! queue ! \
++      vspmfilter ! video/x-raw,format=BGRA ! waylandsink position-x=$PX2 position-y=0 out-width=$W2 out-height=$H2 qos=false max-lateness=-1
++    else
++      echo Display in $W1 x $H1
++      gst-launch-1.0 -e --padprobe v:sink --timer filesrc location=$line \
++      ! qtdemux name=demuxer demuxer.video_0 ! queue ! omxh264dec ! \
++      tee name=t t. ! queue ! \
++      vspmfilter ! video/x-raw,format=BGRA ! waylandsink position-x=0 position-y=0 out-width=$W1 out-height=$H1 qos=false max-lateness=-1
++    fi
+              else
+-             gst-launch-1.0 --padprobe v:sink --timer filesrc location=$line \
+-             ! qtdemux name=demuxer demuxer.video_0 \
+-             ! queue ! omxh264dec ! tee name=t t. ! queue ! vspmfilter ! video/x-raw,format=BGRA \
+-             ! waylandsink position-x=0 position-y=0 qos=false max-lateness=-1 \
+-             t. ! queue ! vspmfilter ! video/x-raw,format=BGRA ! waylandsink position-x=1921 position-y=0 qos=false max-lateness=-1 \
+-             name=v demuxer.audio_0 ! queue ! faad ! alsasink &
+-             sleep $DURATION
+-             killall -2 gst-launch-1.0 > /dev/null
+-             
++    if [ $N -eq 2 ]; then
++      # Second display resolution
++      W2=`weston-info | grep -wB1 'current' | tail -n 2 | head -n 1 | awk '{print $2}'`
++      H2=`weston-info | grep -wB1 'current' | tail -n 2 | head -n 1 | awk '{print $5}'`
++      PX2=`expr $W1 + 1`
++
++      gst-launch-1.0 -e --padprobe v:sink --timer filesrc location=$line \
++      ! qtdemux name=demuxer demuxer.video_0 ! queue ! omxh264dec ! \
++      tee name=t t. ! queue ! \
++      vspmfilter ! video/x-raw,format=BGRA ! waylandsink position-x=0 position-y=0 qos=false max-lateness=-1 \
++      t. ! queue ! \
++      vspmfilter ! video/x-raw,format=BGRA ! waylandsink position-x=$PX2 position-y=0 out-width=$W2 out-height=$H2 qos=false max-lateness=-1 \
++      name=v demuxer.audio_0 ! queue ! faad ! alsasink &
++    else
++      echo Display in $W1 x $H1
++      gst-launch-1.0 -e --padprobe v:sink --timer filesrc location=$line \
++      ! qtdemux name=demuxer demuxer.video_0 ! queue ! omxh264dec ! \
++      tee name=t t. ! queue ! \
++      vspmfilter ! video/x-raw,format=BGRA ! waylandsink position-x=0 position-y=0 out-width=$W1 out-height=$H1 qos=false max-lateness=-1 \
++      name=v demuxer.audio_0 ! queue ! faad ! alsasink &
++    fi
++     sleep $DURATION
++     killall gst-launch-1.0 > /dev/null
++     sleep 2
+              fi
+           fi
+       done < ${PLAYLIST}
+-- 
+1.9.1
+
