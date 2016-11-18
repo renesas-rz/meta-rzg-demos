@@ -1,0 +1,30 @@
+From abde858bd2c4f53ace5ca26af77b45b7f73af3f1 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Wed, 16 Nov 2016 16:37:22 +0700
+Subject: [PATCH] Fix warning issue when fullscreen mode
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ examples/multimedia/video/qmlvideo/main.cpp | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/examples/multimedia/video/qmlvideo/main.cpp b/examples/multimedia/video/qmlvideo/main.cpp
+index 670547f..c34dc59 100644
+--- a/examples/multimedia/video/qmlvideo/main.cpp
++++ b/examples/multimedia/video/qmlvideo/main.cpp
+@@ -79,7 +79,11 @@ int main(int argc, char *argv[])
+ #endif
+             else if ("-url" == arg) {
+                 sourceIsUrl = true;
+-            } else {
++            }
++            else if ("--fullscreen" == arg) {
++                // Do nothing
++            }
++            else {
+                 qtTrace() << "Option" << arg << "ignored";
+             }
+         } else {
+-- 
+1.9.1
+

@@ -1,0 +1,318 @@
+From ac0adb557e9d38f1cb67b7692d2e305b30d0cf07 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Tue, 15 Nov 2016 14:38:19 +0700
+Subject: [PATCH] Set-app-flexible-screen
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ main.cpp |  33 +++++---
+ main.qml | 261 ++++++++++++++++++++++++++++++++-------------------------------
+ 2 files changed, 152 insertions(+), 142 deletions(-)
+
+diff --git a/main.cpp b/main.cpp
+index 4e72baa..263292c 100755
+--- a/main.cpp
++++ b/main.cpp
+@@ -1,12 +1,21 @@
+-#include <QGuiApplication>
+-#include <QQmlApplicationEngine>
+-
+-int main(int argc, char *argv[])
+-{
+-    QGuiApplication app(argc, argv);
+-
+-    QQmlApplicationEngine engine;
+-    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
+-
+-    return app.exec();
+-}
++#include <QGuiApplication>
++#include <QQmlApplicationEngine>
++#include <QScreen>
++#include <QtQml/qqmlcontext.h>
++
++int main(int argc, char *argv[])
++{
++    QGuiApplication app(argc, argv);
++
++    QQmlApplicationEngine engine;
++//  QQmlEngine engine;
++    QScreen *screen = QGuiApplication::screens().at(1);
++    if (screen == NULL)
++       screen = QGuiApplication::screens().at(0);
++    engine.rootContext()->setContextProperty("screenWidth", screen->availableSize().width());
++    engine.rootContext()->setContextProperty("screenHeight", screen->availableSize().height());
++
++    engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
++
++    return app.exec();
++}
+diff --git a/main.qml b/main.qml
+index 152ff7e..4bc7245 100755
+--- a/main.qml
++++ b/main.qml
+@@ -1,130 +1,131 @@
+-import QtQuick 2.6
+-import QtQuick.Window 2.2
+-import QtMultimedia 5.0
+-
+-Window {
+-    visible: true
+-    visibility: "FullScreen"
+-    x: 0; y: 0
+-    title: qsTr("CameraRecorder app")
+-    /*refer time data for recording file name*/
+-
+-    Rectangle {
+-        id: root
+-        width: parent.width
+-        height: parent.height
+-        x:0; y: 0
+-        color: "steelblue"
+-
+-        Text {
+-            id: title_t
+-            x: root.width*(80/100)
+-            y: root.height*(10/100)
+-            anchors.margins: 5
+-            text: "Qt \nRecorder \nApp"
+-            elide: Text.ElideRight
+-            color: "#f9970b"
+-            font.bold: true
+-            font.pixelSize: root.width*(3/100)
+-        }
+-
+-        Image {
+-            id: record_image
+-            source: "images/Record_image.png"
+-            x: root.width*(10/100)
+-            y: root.height*(80/100)
+-            width: 0; height: 0
+-            fillMode: Image.PreserveAspectFit
+-            onStatusChanged: if (record_image.status == Image.Ready) console.log('Loaded')
+-
+-        }
+-
+-        CameraButton{
+-             id: m_record
+-             x: root.width*(80/100)
+-             y: root.height*(80/100)
+-             width: parent.width*(15/100)
+-             height: parent.height*(10/100)
+-             text: "Record"
+-             onClicked: {
+-                 //recording camera
+-                 /* Generate different name */
+-                 record_image.width = root.width*(5/100)
+-                 record_image.height = root.width*(5/100)
+-                 camera.stop()
+-                 camera_recorder.start()
+-
+-
+-             }
+-
+-         }
+-
+-         CameraButton{
+-             id: m_stop
+-             x: root.width*(80/100)
+-             y: root.height*(60/100)
+-             width: parent.width*(15/100)
+-             height: parent.height*(10/100)
+-             text: "Stop record"
+-             onClicked: {
+-                 record_image.width = 0
+-                 record_image.height = 0
+-                 //stop recording camera
+-                 camera_recorder.stop()
+-             }
+-         }
+-
+-         CameraButton{
+-             id: m_camera
+-             x: root.width*(80/100)
+-             y: root.height*(40/100)
+-             width: parent.width*(15/100)
+-             height: parent.height*(10/100)
+-             text: "Start camera"
+-             onClicked: {
+-                 record_image.width = 0
+-                 record_image.height = 0
+-                 //stop recording camera
+-                 camera.start()
+-             }
+-         }
+-
+-         Camera
+-         {
+-            id:camera
+-            captureMode: Camera.CaptureViewfinder
+-         }
+-
+-         Rectangle {
+-            x: root.width*(10/100)
+-            y: root.height*(10/100)
+-            width: root.width*(50/100)
+-            height: root.height*(50/100)
+-            color: "black"
+-            focus : visible // to receive focus and capture key events when visible
+-
+-         }
+-
+-         VideoOutput {
+-            source: camera
+-            x: root.width*(10/100)
+-            y: root.height*(10/100)
+-            width: root.width*(50/100)
+-            height: root.height*(50/100)
+-            focus : visible // to receive focus and capture key events when visible
+-         }
+-
+-        /*record camera*/
+-        CameraRecorderMode {
+-            id: camera_recorder
+-            fSinkLocation: "/record.mp4"
+-            x_position: root.width*(10/100)
+-            y_position: root.height*(10/100)
+-            out_width: root.width*(50/100)
+-            out_height: root.height*(50/100)
+-
+-            onStatusChanged: {
+-            }
+-        }
+-    }
+- }
++import QtQuick 2.6
++import QtQuick.Window 2.2
++import QtMultimedia 5.0
++
++Window {
++    visible: true
++    //visibility: "FullScreen"
++	width: screenWidth*(90/100); height: screenHeight*(90/100)
++    x: 0; y: 0
++    title: qsTr("CameraRecorder app")
++    /*refer time data for recording file name*/
++
++    Rectangle {
++        id: root
++        width: parent.width
++        height: parent.height
++        x:0; y: 0
++        color: "steelblue"
++
++        Text {
++            id: title_t
++            x: root.width*(80/100)
++            y: root.height*(10/100)
++            anchors.margins: 5
++            text: "Qt \nRecorder \nApp"
++            elide: Text.ElideRight
++            color: "#f9970b"
++            font.bold: true
++            font.pixelSize: root.width*(3/100)
++        }
++
++        Image {
++            id: record_image
++            source: "images/Record_image.png"
++            x: root.width*(10/100)
++            y: root.height*(80/100)
++            width: 0; height: 0
++            fillMode: Image.PreserveAspectFit
++            onStatusChanged: if (record_image.status == Image.Ready) console.log('Loaded')
++
++        }
++
++        CameraButton{
++             id: m_record
++             x: root.width*(80/100)
++             y: root.height*(80/100)
++             width: parent.width*(15/100)
++             height: parent.height*(10/100)
++             text: "Record"
++             onClicked: {
++                 //recording camera
++                 /* Generate different name */
++                 record_image.width = root.width*(5/100)
++                 record_image.height = root.width*(5/100)
++                 camera.stop()
++                 camera_recorder.start()
++
++
++             }
++
++         }
++
++         CameraButton{
++             id: m_stop
++             x: root.width*(80/100)
++             y: root.height*(60/100)
++             width: parent.width*(15/100)
++             height: parent.height*(10/100)
++             text: "Stop record"
++             onClicked: {
++                 record_image.width = 0
++                 record_image.height = 0
++                 //stop recording camera
++                 camera_recorder.stop()
++             }
++         }
++
++         CameraButton{
++             id: m_camera
++             x: root.width*(80/100)
++             y: root.height*(40/100)
++             width: parent.width*(15/100)
++             height: parent.height*(10/100)
++             text: "Start camera"
++             onClicked: {
++                 record_image.width = 0
++                 record_image.height = 0
++                 //stop recording camera
++                 camera.start()
++             }
++         }
++
++         Camera
++         {
++            id:camera
++            captureMode: Camera.CaptureViewfinder
++         }
++
++         Rectangle {
++            x: root.width*(10/100)
++            y: root.height*(10/100)
++            width: root.width*(50/100)
++            height: root.height*(50/100)
++            color: "black"
++            focus : visible // to receive focus and capture key events when visible
++
++         }
++
++         VideoOutput {
++            source: camera
++            x: root.width*(10/100)
++            y: root.height*(10/100)
++            width: root.width*(50/100)
++            height: root.height*(50/100)
++            focus : visible // to receive focus and capture key events when visible
++         }
++
++        /*record camera*/
++        CameraRecorderMode {
++            id: camera_recorder
++            fSinkLocation: "/record.mp4"
++            x_position: root.width*(10/100)
++            y_position: root.height*(10/100)
++            out_width: root.width*(50/100)
++            out_height: root.height*(50/100)
++
++            onStatusChanged: {
++            }
++        }
++    }
++ }
+-- 
+1.9.1
+
