@@ -40,6 +40,7 @@ do_patch() {
     mv mmpoc-icons-small mmpoc-icons
     rm mmpoc-scripts/PowerVR-Demo/OGLES2Water
     cp OGLES2Water mmpoc-scripts/PowerVR-Demo/.
+    chmod 755 mmpoc-scripts/PowerVR-Demo/OGLES2Water
     patch -p1 < 0003-fix-audio-issue-no-sound-in-playing-MP3-and-correct-.patch
     patch -p1 < 0004-Glmask3D-demo-add-display-weston-resolution.patch
     patch -p1 < 0005-update-script-PowerVR-use-width-height-arguments.patch
