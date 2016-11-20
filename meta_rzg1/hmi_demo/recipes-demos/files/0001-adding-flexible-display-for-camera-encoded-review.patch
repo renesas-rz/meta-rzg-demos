@@ -4,13 +4,13 @@ Date: Tue, 15 Nov 2016 15:30:18 +0700
 Subject: [PATCH 1/2] adding flexible display for camera encoded review
 
 ---
- RZ_scripts/RZ_GST-demo_encoded-review.sh | 34 +++++++++++++++++++++++++-------
+ RZ_GST-demo_encoded-review.sh | 34 +++++++++++++++++++++++++-------
  1 file changed, 27 insertions(+), 7 deletions(-)
 
-diff --git a/RZ_scripts/RZ_GST-demo_encoded-review.sh b/RZ_scripts/RZ_GST-demo_encoded-review.sh
-index 0567675..c67a6d2 100644
---- a/RZ_scripts/RZ_GST-demo_encoded-review.sh
-+++ b/RZ_scripts/RZ_GST-demo_encoded-review.sh
+diff --git aRZ_GST-demo_encoded-review.sh b/RZ_GST-demo_encoded-review.sh
+index 0567675..c67a6d2 100755
+--- a/RZ_GST-demo_encoded-review.sh
++++ b/RZ_GST-demo_encoded-review.sh
 @@ -5,13 +5,35 @@ if [ -z "$1" ]; then
  else
  	TIME=$1

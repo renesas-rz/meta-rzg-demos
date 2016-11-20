@@ -5,13 +5,13 @@ Subject: [PATCH 2/2] adding scaling function for video playback this change
  add scaling function to RZ_GST-demo_video-playback.sh
 
 ---
- RZ_scripts/RZ_GST-demo_video-playback.sh | 50 ++++++++++++++++++++++++--------
+ RZ_GST-demo_video-playback.sh | 50 ++++++++++++++++++++++++--------
  1 file changed, 38 insertions(+), 12 deletions(-)
 
-diff --git a/RZ_scripts/RZ_GST-demo_video-playback.sh b/RZ_scripts/RZ_GST-demo_video-playback.sh
-index f4daabb..079f415 100644
---- a/RZ_scripts/RZ_GST-demo_video-playback.sh
-+++ b/RZ_scripts/RZ_GST-demo_video-playback.sh
+diff --git a/RZ_GST-demo_video-playback.sh b/RZ_GST-demo_video-playback.sh
+index f4daabb..079f415 100755
+--- a/RZ_GST-demo_video-playback.sh
++++ b/RZ_GST-demo_video-playback.sh
 @@ -4,14 +4,17 @@ function f_help()
  {
  	printf "\n"

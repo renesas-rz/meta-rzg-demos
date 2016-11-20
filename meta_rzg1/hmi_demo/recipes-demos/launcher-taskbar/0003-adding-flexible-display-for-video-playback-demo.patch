@@ -7,13 +7,13 @@ Subject: [PATCH 3/3] adding flexible display for video playback demo Note:
  feature.
 
 ---
- hmi-scripts/Video_Playback.sh | 3 ++-
+ Video_Playback.sh | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hmi-scripts/Video_Playback.sh b/hmi-scripts/Video_Playback.sh
-index 90a572c..d766381 100644
---- a/hmi-scripts/Video_Playback.sh
-+++ b/hmi-scripts/Video_Playback.sh
+diff --git a/Video_Playback.sh b/Video_Playback.sh
+index 90a572c..d766381 100755
+--- a/Video_Playback.sh
++++ b/Video_Playback.sh
 @@ -1,4 +1,5 @@
  #!/bin/bash
 +source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
