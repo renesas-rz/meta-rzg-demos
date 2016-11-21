@@ -1,0 +1,36 @@
+From 298ba5682d82e17e984060e2cbb06625f23723cb Mon Sep 17 00:00:00 2001
+From: Chuan Anh Nguyen <chuan.nguyen.jy@rvc.renesas.com>
+Date: Mon, 7 Nov 2016 23:50:30 +0700
+Subject: [PATCH] Remove unecessary application
+
+---
+ content/Data_Storage_Model.qml | 14 --------------
+ 1 file changed, 14 deletions(-)
+
+diff --git a/content/Data_Storage_Model.qml b/content/Data_Storage_Model.qml
+index 449da24..4e838c5 100644
+--- a/content/Data_Storage_Model.qml
++++ b/content/Data_Storage_Model.qml
+@@ -11,19 +11,5 @@ ListModel {
+ 					detail:"SQL Support in Qt\n\nbooks: show SQL classes work";
+ 					image: "images/data_storage/sqliteman.svg"}
+ 
+-	ListElement{name: "Local Storage";
+-					path:"/usr/share/qt5/examples/quick/localstorage/localstorage/localstorage";
+-					detail:"Local Storage\n\nlocalstorage: create/insert simple SQ table";
+-					image: "images/data_storage/file-manager-blue.svg"}
+-
+-	ListElement{name: "QSettings Class";
+-					path:"/usr/share/qtsettingdemo-1.0/QSettingDemontration";
+-					detail:"QSetting\n\nqsetting: application settings";
+-					image: "images/data_storage/steam_icon_26500.svg"}
+-
+-	ListElement{name: "File Archiving";
+-					path:"/usr/share/qtarchivedemo-1.0/QArchiveDemo";
+-					detail:"File Archiving\n\narchive: compress/uncompress a file";
+-					image: "images/data_storage/file-roller.svg"}
+ }
+ 
+-- 
+1.9.1
+

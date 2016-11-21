@@ -1,0 +1,27 @@
+From 30b3cb890e058093659a900070b531e1f85c0bdb Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Sat, 5 Nov 2016 12:06:32 +0700
+Subject: [PATCH] Add omxh26enc to qt-framework-launcher
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ content/Multimedia_Model.qml | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/content/Multimedia_Model.qml b/content/Multimedia_Model.qml
+index 096ef36..e8a260b 100644
+--- a/content/Multimedia_Model.qml
++++ b/content/Multimedia_Model.qml
+@@ -6,4 +6,10 @@ ListModel {
+					detail:"Video - Camera\n\nqmlvideo: video playback and camera review";
+					image: "images/multimedia/accessories-camera.svg"}
+
++    ListElement{name: "Camera Recorder";
++                    path:"/usr/share/qt-omxh264enc-demo-1.0/omxh264enc_demo";
++                    detail:"Record camera by omxh26enc\n\nomxh264enc_demo: Record camera by omxh26enc";
++					image: "images/multimedia/media-player-banshee.svg"}
++
++
+ }
+--
+1.9.1

@@ -1,0 +1,40 @@
+From dffc4dc9872be8e694074440991c2e705f50a7e6 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Wed, 16 Nov 2016 16:57:19 +0700
+Subject: [PATCH] config size for compatible with LVDS screen
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ qml/smarthome/smarthome.qml | 2 +-
+ src/main.cpp                | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/qml/smarthome/smarthome.qml b/qml/smarthome/smarthome.qml
+index 42dd4da..b7e48d0 100644
+--- a/qml/smarthome/smarthome.qml
++++ b/qml/smarthome/smarthome.qml
+@@ -50,7 +50,7 @@ elements. The screen switch logic is implemented using QML States and QML Transi
+ Item {
+     id: smartHome
+     width: 800
+-    height: 480
++    height: 400
+     smooth: false
+ 
+     property int parentOpacity: (parent == null) ? 1 : parent.opacity
+diff --git a/src/main.cpp b/src/main.cpp
+index dad6f66..b835e17 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -14,7 +14,7 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
+ 
+     QObject::connect((QObject*)viewer.engine(), SIGNAL(quit()), &app, SLOT(quit()));
+ 
+-    viewer.resize(800, 480);
++    viewer.resize(800, 400);
+     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
+ 
+     viewer.show();
+-- 
+1.9.1
+

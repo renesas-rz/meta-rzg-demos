@@ -1,0 +1,26 @@
+From adf09994538b037b4f3f3fd2bf1447847296f032 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Fri, 11 Nov 2016 16:59:34 +0700
+Subject: [PATCH] Update CMA config to solve issue low memory
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ arch/arm/configs/iwg20m_defconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/configs/iwg20m_defconfig b/arch/arm/configs/iwg20m_defconfig
+index 4417dc5..00f64e4 100644
+--- a/arch/arm/configs/iwg20m_defconfig
++++ b/arch/arm/configs/iwg20m_defconfig
+@@ -752,7 +752,7 @@ CONFIG_DMA_CMA=y
+ #
+ # Default contiguous memory area size:
+ #
+-CONFIG_CMA_SIZE_MBYTES=128
++CONFIG_CMA_SIZE_MBYTES=176
+ CONFIG_CMA_SIZE_SEL_MBYTES=y
+ # CONFIG_CMA_SIZE_SEL_PERCENTAGE is not set
+ # CONFIG_CMA_SIZE_SEL_MIN is not set
+-- 
+1.9.1
+
