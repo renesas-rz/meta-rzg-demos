@@ -1,0 +1,95 @@
+From 706cbb7e46c5b9cd7ea8a439580d4a9796e67686 Mon Sep 17 00:00:00 2001
+From: Chuan Anh Nguyen <chuan.nguyen.jy@rvc.renesas.com>
+Date: Mon, 7 Nov 2016 23:10:54 +0700
+Subject: [PATCH] Make application compatible with flexible resolution
+
+---
+ QUItBattery.pro |  3 +++
+ main.cpp        | 27 ++++++++++++++++++++++++++-
+ quitbattery.qrc | 21 +++++++++++++++++++++
+ 3 files changed, 50 insertions(+), 1 deletion(-)
+ create mode 100644 quitbattery.qrc
+
+diff --git a/QUItBattery.pro b/QUItBattery.pro
+index 13ac94e..35bdf54 100644
+--- a/QUItBattery.pro
++++ b/QUItBattery.pro
+@@ -17,3 +17,6 @@ SOURCES += main.cpp
+ # Please do not modify the following two lines. Required for deployment.
+ include(qtquick2applicationviewer/qtquick2applicationviewer.pri)
+ qtcAddDeployment()
++
++RESOURCES += \
++    quitbattery.qrc
+diff --git a/main.cpp b/main.cpp
+index d7b9ca1..4e7cf2e 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -1,12 +1,37 @@
+ #include <QtGui/QGuiApplication>
+ #include "qtquick2applicationviewer.h"
++#include <QtGui/QScreen>
++#include <QDebug>
++
++#include "fileio.h"
+
+ int main(int argc, char *argv[])
+ {
+     QGuiApplication app(argc, argv);
+
++    //Show information of screen (all monitors)
++    // If 2 screen availabe, chose the larger as it is usually default
++    QScreen *screen, *tmp_screen;
++    if(QGuiApplication::screens().at(0) == NULL)
++        screen = QGuiApplication::screens().at(1);
++    else if(QGuiApplication::screens().at(1) == NULL)
++        screen = QGuiApplication::screens().at(0);
++    else {
++        screen = QGuiApplication::screens().at(0);
++        tmp_screen = QGuiApplication::screens().at(1);
++        if((screen->availableSize().width() * screen->availableSize().height()) < (tmp_screen->availableSize().width() * tmp_screen->availableSize().height()))
++            screen = QGuiApplication::screens().at(1);
++    }
++    qDebug() << "Information for screen:" << screen->name();
++    qDebug() << "  Available geometry:" << screen->availableGeometry().x() << screen->availableGeometry().y() << screen->availableGeometry().width() << "x" << screen->availableGeometry().height();
++    qDebug() << "  Available size:" << screen->availableSize().width() << "x" << screen->availableSize().height();
++
+     QtQuick2ApplicationViewer viewer;
+-    viewer.setMainQmlFile(QStringLiteral("qml/QUItBattery/main.qml"));
++    //viewer.setMainQmlFile(QStringLiteral("/usr/share/quitbattery-1.0.0/qml/QUItBattery/main.qml"));
++    viewer.setSource(QUrl("qrc:///QUItBattery_1.0.0/qml/QUItBattery/main.qml"));
++    viewer.resize(screen->availableSize().width() - 50, screen->availableSize().height() - 100);
++    viewer.setFlags(Qt::CustomizeWindowHint | Qt::WindowStaysOnTopHint);
++
+     viewer.showExpanded();
+
+     return app.exec();
+diff --git a/quitbattery.qrc b/quitbattery.qrc
+new file mode 100644
+index 0000000..18c19bf
+--- /dev/null
++++ b/quitbattery.qrc
+@@ -0,0 +1,21 @@
++<RCC>
++    <qresource prefix="/QUItBattery_1.0.0">
++        <file>qml/QUItBattery/main.qml</file>
++        <file>qml/QUItBattery/Slider.qml</file>
++        <file>qml/QUItBattery/ToggleButton.qml</file>
++        <file>qml/QUItBattery/images/arrows.png</file>
++        <file>qml/QUItBattery/images/background2.jpg</file>
++        <file>qml/QUItBattery/images/glass.png</file>
++        <file>qml/QUItBattery/images/handle.png</file>
++        <file>qml/QUItBattery/images/plug.png</file>
++        <file>qml/QUItBattery/images/rotate.png</file>
++        <file>qml/QUItBattery/images/title.png</file>
++        <file>qml/QUItBattery/images/toggle.png</file>
++        <file>qml/QUItBattery/QUItBatteryComponent/QUItBattery.qml</file>
++        <file>qml/QUItBattery/QUItBatteryComponent/images/bar_level2.png</file>
++        <file>qml/QUItBattery/QUItBatteryComponent/images/battery2.png</file>
++        <file>qml/QUItBattery/QUItBatteryComponent/images/battery_bar.png</file>
++        <file>qml/QUItBattery/QUItBatteryComponent/images/lightning.png</file>
++        <file>qml/QUItBattery/QUItBatteryComponent/images/particle.png</file>
++    </qresource>
++</RCC>
+--
+1.9.1

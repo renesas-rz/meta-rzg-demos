@@ -1,0 +1,72 @@
+From f18ac7c472ee219a4ad48fc7920eccde633823d9 Mon Sep 17 00:00:00 2001
+From: NamNguyen <nam.nguyen.xb@rvc.renesas.com>
+Date: Tue, 15 Nov 2016 15:30:18 +0700
+Subject: [PATCH 1/2] adding flexible display for camera encoded review
+
+---
+ RZ_GST-demo_encoded-review.sh | 34 +++++++++++++++++++++++++-------
+ 1 file changed, 27 insertions(+), 7 deletions(-)
+
+diff --git aRZ_GST-demo_encoded-review.sh b/RZ_GST-demo_encoded-review.sh
+index 0567675..c67a6d2 100755
+--- a/RZ_GST-demo_encoded-review.sh
++++ b/RZ_GST-demo_encoded-review.sh
+@@ -5,13 +5,35 @@ if [ -z "$1" ]; then
+ else
+ 	TIME=$1
+ fi
++# get $D_WIDTH $D_HEIGHt which are resolution of main screen
++source /home/root/.bashrc
++# calculate output size of video to fit with the main screen
++out_width=`expr $D_WIDTH \* 800 / 1920 / 32 \* 32`
++if [ $out_width -gt 800 ]; then
++	out_width=800
++fi
++out_height=`expr $out_width \* 3 / 5`
++if [ $out_height -le 240 ]; then
++	out_height=240
++else
++	out_height=480
++fi
+ 
++x_record=`expr $D_WIDTH / 2 - $out_width`
++y_record=$x_record
++x_replay=`expr $D_WIDTH / 2`
++y_replay=$y_record
++# replay camera
+ function replay()
+ {
+ 	printf "\e[34mPlaying... $1\e[0m\n"
+-	gst-launch-1.0 -e filesrc location=$1 ! h264parse ! omxh264dec ! waylandsink position-x=900 position-y=100 out-width=800 out-height=480 qos=false
++	gst-launch-1.0 -e \
++	filesrc location=$1 ! \
++	h264parse ! \
++	omxh264dec ! \
++	waylandsink position-x=$x_replay position-y=$y_replay out-width=$out_width out-height=$out_height qos=false
+ }
+-
++# record camera
+ function record()
+ {
+ 	printf "\e[34mRecording... $1\e[0m\n"
+@@ -23,14 +45,12 @@ function record()
+ 	video/x-raw,format=NV12,width=640,height=480 ! \
+ 	omxh264enc target-bitrate=10485760 ! \
+ 	filesink location=$1 t. ! \
+-	vspmfilter ! video/x-raw,format=BGRA,width=800,height=480 ! \
+-	waylandsink position-x=100 position-y=100 qos=false
++	vspmfilter ! video/x-raw,format=BGRA, width=$out_width, height=$out_height ! \
++	waylandsink position-x=$x_record position-y=$y_record qos=false
+ }
+ 
+-sync
+-
+ record recorded-video-1.h264
+ replay recorded-video-1.h264 &
+ record recorded-video-2.h264
+-
+ sync
++
+-- 
+1.9.1
+

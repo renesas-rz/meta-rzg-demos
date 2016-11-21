@@ -1,0 +1,119 @@
+From 7d946cceb64e49d3a751d1ad55e05a69053078d9 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Tue, 15 Nov 2016 14:42:53 +0700
+Subject: [PATCH] Improve performance and GUI for app
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ main.qml | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 58 insertions(+), 5 deletions(-)
+
+diff --git a/main.qml b/main.qml
+index 4bc7245..532657b 100755
+--- a/main.qml
++++ b/main.qml
+@@ -19,10 +19,10 @@ Window {
+ 
+         Text {
+             id: title_t
+-            x: root.width*(80/100)
+-            y: root.height*(10/100)
++            x: root.width*(25/100)
++            y: root.height*(70/100)
+             anchors.margins: 5
+-            text: "Qt \nRecorder \nApp"
++            text: "Qt Recorder App"
+             elide: Text.ElideRight
+             color: "#f9970b"
+             font.bold: true
+@@ -87,6 +87,23 @@ Window {
+                  record_image.height = 0
+                  //stop recording camera
+                  camera.start()
++                 mediaPlayer.stop()
++             }
++         }
++
++         CameraButton{
++             id: m_playback
++             x: root.width*(80/100)
++             y: root.height*(20/100)
++             width: parent.width*(15/100)
++             height: parent.height*(10/100)
++             text: "Play Record file"
++             onClicked: {
++                 record_image.width = 0
++                 record_image.height = 0
++                 //stop recording camera
++                 camera.stop()
++                 mediaPlayer.play()
+              }
+          }
+ 
+@@ -102,11 +119,11 @@ Window {
+             width: root.width*(50/100)
+             height: root.height*(50/100)
+             color: "black"
+-            focus : visible // to receive focus and capture key events when visible
+ 
+          }
+ 
+          VideoOutput {
++			id: output_camera
+             source: camera
+             x: root.width*(10/100)
+             y: root.height*(10/100)
+@@ -118,7 +135,7 @@ Window {
+         /*record camera*/
+         CameraRecorderMode {
+             id: camera_recorder
+-            fSinkLocation: "/record.mp4"
++            fSinkLocation: "/home/root/record.mp4"
+             x_position: root.width*(10/100)
+             y_position: root.height*(10/100)
+             out_width: root.width*(50/100)
+@@ -127,5 +144,41 @@ Window {
+             onStatusChanged: {
+             }
+         }
++
++		VideoOutput {
++			id: output_playback
++            x: root.width*(10/100)
++            y: root.height*(10/100)
++            width: root.width*(50/100)
++            height: root.height*(50/100)
++
++			source: mediaPlayer
++
++			property alias duration: mediaPlayer.duration
++			property alias mediaSource: mediaPlayer.source
++			property alias metaData: mediaPlayer.metaData
++			property alias playbackRate: mediaPlayer.playbackRate
++			property alias position: mediaPlayer.position
++			property alias volume: mediaPlayer.volume
++
++			signal sizeChanged
++			signal fatalError
++
++			onHeightChanged: output_playback.sizeChanged()
++
++			MediaPlayer {
++				id: mediaPlayer
++				autoLoad: false
++				loops: Audio.Infinite
++				source:"file:///home/root/record.mp4"
++
++				onError: {
++					if (MediaPlayer.NoError != error) {
++						console.log("[qmlvideo] VideoItem.onError error " , error , " errorString " , errorString)
++						output_playback.fatalError()
++					}
++				}
++			}
++		}
+     }
+  }
+-- 
+1.9.1
+

@@ -1,0 +1,25 @@
+From 2a3c36f86648ebc13fd1b648e4035c8e5da70678 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Tue, 8 Nov 2016 12:49:06 +0700
+Subject: [PATCH] Change address webpage offline to show for customer
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ WebKitSlideContent.qml | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/WebKitSlideContent.qml b/WebKitSlideContent.qml
+index ea5a364..2f38bb4 100644
+--- a/WebKitSlideContent.qml
++++ b/WebKitSlideContent.qml
+@@ -37,7 +37,7 @@ Item {
+         anchors.top: browser.bottom;
+         anchors.horizontalCenter: browser.horizontalCenter
+         font.pixelSize: slide.height * 0.05;
+-        text: "http://qt.digia.com"
++        text: "/home/root/renesas_iWave_info.html"
+         onAccepted: browser.reload();
+         color: "white"
+
+--
+1.9.1
