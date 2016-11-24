@@ -1,0 +1,62 @@
+#!/bin/sh
+
+case "$1" in
+	start)
+		export LD_LIBRARY_PATH="/lib:/usr/lib:/usr/local/lib:"
+		amixer set "LINEOUT Mixer DACL" on
+		amixer set "DVC In" 15
+		amixer set "Digital" 200,200
+		amixer set 'Headphone' 89%
+		amixer set 'PCM' 70%
+		amixer set 'Mic' 33%
+		amixer set 'Capture' 73%
+		amixer set 'Capture Attenuate Switch (-6dB)' 50%
+		amixer set 'DVC Out' 35%
+		modprobe -a mmngr mmngrbuf s3ctl uvcs_cmn vspm fdpm vsp2
+		export XDG_RUNTIME_DIR=/run/user/root
+		echo 2 > /proc/sys/kernel/printk   # Disable kernel warning, or it will appear rapidly due to network
+		export LD_PRELOAD="/usr/lib/libEGL.so"   # This is need to run Qt app on Wayland
+
+		echo "Start Doorphone"
+		# Auto run Doorphone demo, only on Basephone
+		ipaddr=`ifconfig eth0 | awk '/inet addr/{print substr($2,6)}'`
+		if [ $ipaddr = "192.168.10.100" ]
+		then
+			/home/root/doorphone/simpleplayer &
+		fi
+
+		# Run outdoor script if this is Outdoor
+		if [ $ipaddr = "192.168.10.101" ]
+		then
+			/home/root/doorphone/run_outdoor_opencv.sh
+		fi
+	;;
+
+	stop)
+		echo "Stopping Doorphone"
+		# Kill Doorphone on Basephone
+		ipaddr=`ifconfig eth0 | awk '/inet addr/{print substr($2,6)}'`
+		if [ $ipaddr = "192.168.10.100" ]
+		then
+			killall simpleplayer &> /dev/null
+		fi
+
+		# Kill Doorphone on Outdoor
+		if [ $ipaddr = "192.168.10.101" ]
+		then
+			killall run_outdoor_opencv.sh gst-launch-1.0 guess-mess GPIO_button &> /dev/null
+		fi
+	;;
+
+	restart)
+		$0 stop
+		sleep 1
+		$0 start
+	;;
+
+	*)
+		echo "usage: $0 { start | stop | restart }"
+	;;
+esac
+
+exit 0

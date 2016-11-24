@@ -19,6 +19,7 @@ SRC_URI = " \
   file://0010-DoorPhone-Support-auto-recognize-screen-on-RZG1EM-an.patch \
   file://welcome-screen5.6.tar.xz \
   file://0011-DoorPhone-Modify-graph-display-of-memory-measurement.patch \
+  file://0013-doorphone-simpleplayer-Enable-function-to-select-1-b.patch \
 "
 
 SRC_URI_append_iwg20m = " \
