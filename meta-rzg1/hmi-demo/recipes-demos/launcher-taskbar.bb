@@ -9,6 +9,7 @@ SRC_URI = " \
  file://0001-adding-3D-demo-to-Exit-script.patch \
  file://0002-play-glmask-full-screen.patch \
  file://0003-adding-flexible-display-for-video-playback-demo.patch \
+ file://0001-Scaling-down-height-of-Glmark3D-demo-because-of-wayl.patch \
 "
 #SRC_URI = " \	
 # file://hmi-rzg-pkg-v1.0.tar.xz \
@@ -24,6 +25,7 @@ do_patch() {
     patch -p1 < ../0001-adding-3D-demo-to-Exit-script.patch
     patch -p1 < ../0002-play-glmask-full-screen.patch
     patch -p1 < ../0003-adding-flexible-display-for-video-playback-demo.patch
+    patch -p1 < ../0001-Scaling-down-height-of-Glmark3D-demo-because-of-wayl.patch
 }
 
 do_install() {
