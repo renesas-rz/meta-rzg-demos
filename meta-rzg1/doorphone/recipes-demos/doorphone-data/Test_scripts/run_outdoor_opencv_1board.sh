@@ -1,6 +1,8 @@
 #!/bin/sh
 
-cp /home/root/videos/vga*.h264 /tmp/
+cp /home/root/videos/vga1.h264 /tmp/
+
+CAM_DEV=$(cat /home/root/doorphone/CAM_DEV)
 
 if [ -z $CAM_DEV ]; then
 	CAM_DEV="/dev/video0"
@@ -20,9 +22,9 @@ rtph264pay pt=96 config-interval=3 mtu=9000 ! udpsink host=127.255.255.255 port=
 while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga1.h264 ! video/x-h264,framerate=30/1 ! \
 h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=127.255.255.255 port=1235 &> /dev/null; \
 done &
-while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga2.h264 ! video/x-h264,framerate=30/1 ! \
+while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga1.h264 ! video/x-h264,framerate=30/1 ! \
 h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=127.255.255.255 port=1236 &> /dev/null; \
 done &
-while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga3.h264 ! video/x-h264,framerate=30/1 ! \
+while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga1.h264 ! video/x-h264,framerate=30/1 ! \
 h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=127.255.255.255 port=1237 &> /dev/null; \
 done &

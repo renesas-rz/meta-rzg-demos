@@ -2,6 +2,8 @@
 
 cp /home/root/videos/vga*.h264 /tmp/
 
+CAM_DEV=$(cat /home/root/doorphone/CAM_DEV)
+
 if [ -z $CAM_DEV ]; then
 	CAM_DEV="/dev/video0"
 fi
