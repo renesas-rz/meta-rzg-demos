@@ -20,6 +20,7 @@ SRC_URI = " \
   file://welcome-screen5.6.tar.xz \
   file://0011-DoorPhone-Modify-graph-display-of-memory-measurement.patch \
   file://0013-doorphone-simpleplayer-Enable-function-to-select-1-b.patch \
+  file://0014-main.qml-input-host-and-port-from-qml-when-switch-mo.patch \
 "
 
 SRC_URI_append_iwg20m = " \

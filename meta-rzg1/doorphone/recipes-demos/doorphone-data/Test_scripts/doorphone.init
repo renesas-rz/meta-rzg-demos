@@ -3,9 +3,6 @@
 case "$1" in
 	start)
 		export LD_LIBRARY_PATH="/lib:/usr/lib:/usr/local/lib:"
-		amixer set "LINEOUT Mixer DACL" on
-		amixer set "DVC In" 15
-		amixer set "Digital" 200,200
 		amixer set 'Headphone' 89%
 		amixer set 'PCM' 70%
 		amixer set 'Mic' 33%
@@ -30,6 +27,12 @@ case "$1" in
 		then
 			/home/root/doorphone/run_outdoor_opencv.sh
 		fi
+		
+		if [ $ipaddr = "192.168.11.100" ]
+		then
+			ifconfig eth0 192.168.10.100
+			/home/root/doorphone/simpleplayer &
+		fi
 	;;
 
 	stop)
@@ -45,6 +48,12 @@ case "$1" in
 		if [ $ipaddr = "192.168.10.101" ]
 		then
 			killall run_outdoor_opencv.sh gst-launch-1.0 guess-mess GPIO_button &> /dev/null
+		fi
+		
+		if [ $ipaddr = "192.168.11.100" ]
+		then
+			killall simpleplayer run_outdoor_opencv_1board.sh gst-launch-1.0 &> /dev/null
+			ifconfig eth0 192.168.10.100
 		fi
 	;;
 
