@@ -45,6 +45,7 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-bad-camerabin2 \
     gstreamer1.0-plugins-good-icydemux \
     libgstphotography-1.0 \
+    gstreamer1.0-plugins-good-alaw \
 "
 
 
