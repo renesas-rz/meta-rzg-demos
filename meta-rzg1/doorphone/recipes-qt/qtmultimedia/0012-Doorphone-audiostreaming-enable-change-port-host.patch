@@ -99,7 +99,15 @@ index fc8e30a..d6c1ee1 100755
  }
  
  void QGstreamerAudioStreamingSession::setUsinkHost(QString host)
-@@ -230,6 +244,25 @@ void QGstreamerAudioStreamingSession::setUsinkPort(int port)
+@@ -225,6 +237,7 @@ void QGstreamerAudioStreamingSession::setUsinkHost(QString host)
+ #endif
+     qDebug() << "setUsinkHost";
+     m_usinkhost = host;
++    g_object_set (G_OBJECT (m_udpsink), "host", m_usinkhost.toLatin1().constData(), NULL);
+ }
+ 
+ void QGstreamerAudioStreamingSession::setUsinkPort(int port)
+@@ -230,6 +245,24 @@ void QGstreamerAudioStreamingSession::setUsinkPort(int port)
      qDebug() << Q_FUNC_INFO << port;
  #endif
      m_usinkport = port;
@@ -118,7 +126,6 @@ index fc8e30a..d6c1ee1 100755
 +		gst_element_set_state (m_udpsink, GST_STATE_PLAYING);
 +		gst_element_set_state (m_pipeline, GST_STATE_PLAYING);
 +	} else {
-+		g_object_set (G_OBJECT (m_udpsink), "host", m_usinkhost.toLatin1().constData(), NULL);
 +		g_object_set (G_OBJECT (m_udpsink), "port", m_usinkport, NULL);
 +		g_object_set (G_OBJECT (m_udpsink), "sync", m_usinksync, NULL);
 +	}
