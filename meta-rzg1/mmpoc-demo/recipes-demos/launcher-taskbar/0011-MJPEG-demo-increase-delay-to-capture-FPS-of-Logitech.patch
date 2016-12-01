@@ -1,0 +1,27 @@
+From e2f2ea4e24bf898c21cd9af3aca879633bceb284 Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Thu, 17 Nov 2016 10:05:55 +0700
+Subject: [PATCH 11/11] MJPEG-demo:increase delay to capture FPS of Logitech
+ Webcam V-U0018
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ mmpoc-scripts/MJPEG-Camera-Demo/MJPEG-Camera-Demo.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mmpoc-scripts/MJPEG-Camera-Demo/MJPEG-Camera-Demo.sh b/mmpoc-scripts/MJPEG-Camera-Demo/MJPEG-Camera-Demo.sh
+index afd9b39..2c54b75 100755
+--- a/mmpoc-scripts/MJPEG-Camera-Demo/MJPEG-Camera-Demo.sh
++++ b/mmpoc-scripts/MJPEG-Camera-Demo/MJPEG-Camera-Demo.sh
+@@ -23,7 +23,7 @@ jpegdec ! videoconvert ! video/x-raw,format=BGRA ! \
+ waylandsink sync=0 max-lateness=-1 qos=0 name=v position-x=$POSX \
+ position-y=$POSY out-width=$W out-height=$H > $LOG &
+ 
+-sleep 2s
++sleep 3s
+ 
+ /home/root/launcher-taskbar/mmpoc-scripts/MJPEG-Camera-Demo/fps_show $LOG $POSX $POSY &
+ 
+-- 
+1.9.1
+

@@ -1,0 +1,35 @@
+From 100b25d43b84bfa4d00faa8d6c049706c142e065 Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Mon, 14 Nov 2016 19:40:58 +0700
+Subject: [PATCH 09/10] MJPEG-Cam-Demo:add scale down resolution for LVDS
+ 800x480
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ mmpoc-scripts/MJPEG-Camera-Demo/MJPEG-Camera-Demo.sh | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/mmpoc-scripts/MJPEG-Camera-Demo/MJPEG-Camera-Demo.sh b/mmpoc-scripts/MJPEG-Camera-Demo/MJPEG-Camera-Demo.sh
+index e7074c4..afd9b39 100755
+--- a/mmpoc-scripts/MJPEG-Camera-Demo/MJPEG-Camera-Demo.sh
++++ b/mmpoc-scripts/MJPEG-Camera-Demo/MJPEG-Camera-Demo.sh
+@@ -1,4 +1,7 @@
+ #!/bin/bash
++source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
++W=`expr 640 \* $D_WIDTH / 1920 / 32 \* 32`
++H=`expr 480 \* $D_HEIGHT / 1080`
+ 
+ LOG=/home/root/launcher-taskbar/mmpoc-scripts/mjpeg-tmp.log
+ LOG1=/home/root/launcher-taskbar/mmpoc-scripts/mjpeg-tmp-1.log
+@@ -18,7 +21,7 @@ fi
+ gst-launch-1.0 --padprobe v:sink --timer v4l2src device=$JPEG_CAM ! \
+ jpegdec ! videoconvert ! video/x-raw,format=BGRA ! \
+ waylandsink sync=0 max-lateness=-1 qos=0 name=v position-x=$POSX \
+-position-y=$POSY > $LOG &
++position-y=$POSY out-width=$W out-height=$H > $LOG &
+ 
+ sleep 2s
+ 
+-- 
+1.9.1
+

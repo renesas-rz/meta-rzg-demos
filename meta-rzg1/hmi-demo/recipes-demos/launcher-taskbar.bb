@@ -6,13 +6,24 @@ SRC_URI = " \
  file://0001-Update-new-video-names-change-name-for-easier-to-upl.patch \
  file://Demo3D.png \
  file://Demo3D.sh \
+ file://0001-adding-3D-demo-to-Exit-script.patch \
+ file://0002-play-glmask-full-screen.patch \
+ file://0003-adding-flexible-display-for-video-playback-demo.patch \
 "
-
+#SRC_URI = " \	
+# file://hmi-rzg-pkg-v1.0.tar.xz \
+# file://0001-Update-new-video-names-change-name-for-easier-to-upl.patch \
+# file://Demo3D.png \
+# file://Demo3D.sh \
+#"
 INSANE_SKIP_${PN} = "already-stripped"
 
 do_patch() {
     cd ${S}/../hmi-scripts/
     patch -p1 < ../0001-Update-new-video-names-change-name-for-easier-to-upl.patch
+    patch -p1 < ../0001-adding-3D-demo-to-Exit-script.patch
+    patch -p1 < ../0002-play-glmask-full-screen.patch
+    patch -p1 < ../0003-adding-flexible-display-for-video-playback-demo.patch
 }
 
 do_install() {
