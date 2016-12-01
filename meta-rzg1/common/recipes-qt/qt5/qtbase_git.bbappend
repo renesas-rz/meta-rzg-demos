@@ -6,3 +6,4 @@ FILESEXTRAPATHS_append := "${THISDIR}/qtbase:"
 
 # add necessary packages
 PACKAGECONFIG_append += " sm"
+PACKAGECONFIG[nis] = ""
