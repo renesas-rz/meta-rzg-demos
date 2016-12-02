@@ -1,0 +1,34 @@
+From e0b37a4e0f0191de28927ddbdf2bb3339c61b6df Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Wed, 23 Nov 2016 13:20:44 +0700
+Subject: [PATCH] Glmask3D-Demo:scale base launcher taskbar height
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ mmpoc-scripts/Glmask3D-Demo.sh | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/mmpoc-scripts/Glmask3D-Demo.sh b/mmpoc-scripts/Glmask3D-Demo.sh
+index 5e0ec18..0bcb835 100755
+--- a/mmpoc-scripts/Glmask3D-Demo.sh
++++ b/mmpoc-scripts/Glmask3D-Demo.sh
+@@ -2,7 +2,15 @@
+ 
+ source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
+ 
+-glmark2-es2-wayland -b :show-fps=true -s ${D_WIDTH}x${D_HEIGHT} &
++TASKBAR_H=`cat /etc/xdg/weston/weston.ini | grep '^launcher-taskbar-height' | cut -d '=' -f2`
++if [ -z $TASKBAR_H ]; then
++    TASKBAR_H=100
++fi
++
++W=`expr 1920 \* $D_WIDTH / 1920 / 32 \* 32`
++H=`expr 1080 \* $D_HEIGHT / 1080 \- $TASKBAR_H`
++
++glmark2-es2-wayland -b :show-fps=true -s ${W}x${H} &
+ 
+ sleep 15s
+ 
+-- 
+1.9.1
+

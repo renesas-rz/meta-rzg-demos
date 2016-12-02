@@ -1,0 +1,44 @@
+From 22363b46225fe40b061aaa761e4424e840ea32bf Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Wed, 23 Nov 2016 11:52:29 +0700
+Subject: [PATCH] Weston:add launcher-taskbar-height entry in weston.ini for
+ run time setting launcher taskbar height
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ clients/desktop-shell.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/clients/desktop-shell.c b/clients/desktop-shell.c
+index 2d60f90..98093c0 100644
+--- a/clients/desktop-shell.c
++++ b/clients/desktop-shell.c
+@@ -132,6 +132,8 @@ struct unlock_dialog {
+ 	struct desktop *desktop;
+ };
+ 
++static unsigned int g_panel_height = 0;
++
+ static void
+ panel_add_launchers(struct panel *panel, struct desktop *desktop);
+ 
+@@ -499,7 +501,7 @@ panel_configure(void *data,
+ 	struct surface *surface = window_get_user_data(window);
+ 	struct panel *panel = container_of(surface, struct panel, base);
+ 
+-	window_schedule_resize(panel->window, width, 32);
++	window_schedule_resize(panel->window, width, g_panel_height);
+ }
+ 
+ static void
+@@ -1343,6 +1345,7 @@ int main(int argc, char *argv[])
+ 	desktop.config = weston_config_parse("weston.ini");
+ 	s = weston_config_get_section(desktop.config, "shell", NULL, NULL);
+ 	weston_config_section_get_bool(s, "locking", &desktop.locking, 1);
++	weston_config_section_get_uint(s, "launcher-taskbar-height", &g_panel_height, 50);
+ 
+ 	desktop.display = display_create(&argc, argv);
+ 	if (desktop.display == NULL) {
+-- 
+1.9.1
+
