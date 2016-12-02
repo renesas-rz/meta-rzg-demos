@@ -6,7 +6,7 @@ SRC_URI = " \
  file://RZ_scripts.tar.xz \
  file://0001-adding-flexible-display-for-camera-encoded-review.patch \
  file://0002-adding-scaling-function-for-video-playback.patch \
- file://0001-adding-flexible-display-for-video-streaming.patch \
+ file://0003-adding-flexible-display-for-video-streaming.patch \
  file://ATT93936.bashrc \
 "
 # SRC_URI = " \
@@ -16,7 +16,7 @@ do_patch() {
     cd ${S}/../RZ_scripts/
     patch -p1 < ../0001-adding-flexible-display-for-camera-encoded-review.patch
     patch -p1 < ../0002-adding-scaling-function-for-video-playback.patch
-    patch -p1 < ../0001-adding-flexible-display-for-video-streaming.patch
+    patch -p1 < ../0003-adding-flexible-display-for-video-streaming.patch
 }
 
 do_install () {
