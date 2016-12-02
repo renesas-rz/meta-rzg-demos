@@ -1,0 +1,56 @@
+From 147cfe25442874db7580849de1875e9a2ba3fd8a Mon Sep 17 00:00:00 2001
+From: Chuan Anh Nguyen <chuan.nguyen.jy@rvc.renesas.com>
+Date: Wed, 30 Nov 2016 08:27:16 +0700
+Subject: [PATCH] main.qml: input host and port from qml when switch mode
+
+---
+ qml/simpleplayer/main.qml | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/qml/simpleplayer/main.qml b/qml/simpleplayer/main.qml
+index b7c5f15..31be8cf 100755
+--- a/qml/simpleplayer/main.qml
++++ b/qml/simpleplayer/main.qml
+@@ -857,16 +857,17 @@ Rectangle {
+ 					}
+ 					onClicked: {
+ 						if(checked) {
+-							if (is1boardSelect == false) {
+-								is1boardSelect = true
++							if (is1boardSelect == true) {
++								is1boardSelect = false
+ 								ScriptLauncher.appName = "killall run_outdoor_opencv_1board.sh gst-launch-1.0"
+ 								ScriptLauncher.launchScript()
+ 								ScriptLauncher.appName = "rm -f /tmp/vga1.h264 /tmp/vga2.h264 /tmp/vga3.h264 "
+ 								ScriptLauncher.launchScript()
+-								ScriptLauncher.appName = "sync"
+-								ScriptLauncher.launchScript()
+ 								ScriptLauncher.appName = "ifconfig eth0 192.168.10.100"
+ 								ScriptLauncher.launchScript()
++								
++								austream_send.usinkHost = "192.168.10.101"
++								austream_send.usinkPort = 2001
+ 							}
+ 						}
+ 					}
+@@ -884,12 +885,15 @@ Rectangle {
+ 					}
+ 					onClicked: {
+ 						if (checked) {
+-							if (is1boardSelect == true) {
+-								is1boardSelect = false
++							if (is1boardSelect == false) {
++								is1boardSelect = true
+ 								ScriptLauncher.appName = "ifconfig eth0 192.168.11.100"
+ 								ScriptLauncher.launchScript()
+ 								ScriptLauncher.appName = "/home/root/doorphone/run_outdoor_opencv_1board.sh"
+ 								ScriptLauncher.launchScript()
++								
++								austream_send.usinkHost = "127.0.0.1"
++								austream_send.usinkPort = 2000
+ 							}
+ 						}
+ 					}
+-- 
+1.9.1
+
