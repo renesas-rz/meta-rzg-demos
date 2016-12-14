@@ -1,11 +1,7 @@
 LICENSE = "CLOSED"
 
 FILESEXTRAPATHS = "${THISDIR}/doorphone-data:"
-SRC_URI = "file://Test_scripts.tar.xz \
-           file://0001-Modify-for-easier-to-change-location.patch \
-"
-SRC_URI_append_iwg20m = " \
-	file://0002-DoorPhone-iWave-Fix-audio-issue-on-outdoor-script.patch \
+SRC_URI = "file://Test_scripts/* \
 "
 
 S = "${WORKDIR}/Test_scripts"
@@ -45,6 +41,7 @@ do_install () {
     #cp -RP ${S}/BasePhone/weston.ini     ${D}/${sysconfdir}/xdg/weston/
     cp -RP ${S}/BasePhone/mail_list.txt  ${D}/
     cp -RP ${S}/BasePhone/mail           ${D}/home/root/doorphone
+    cp -RP ${S}/CAM_DEV	           		 ${D}/home/root/doorphone
 
     #cp -RP ${S}/BasePhone/interfaces_basephone      ${D}/${sysconfdir}/network/interfaces
 
@@ -53,7 +50,7 @@ do_install () {
     install -m755 ${S}/OutDoor/guess-mess             ${D}/home/root/doorphone
     install -m755 ${S}/OutDoor/loop_script.sh         ${D}/home/root/doorphone
     install -m755 ${S}/OutDoor/run_outdoor_opencv.sh  ${D}/home/root/doorphone
-    
+    install -m755 ${S}/run_outdoor_opencv_1board.sh   ${D}/home/root/doorphone
 }
 
 INSANE_SKIP_${PN} += "ldflags"
