@@ -16,9 +16,13 @@ SRC_URI_append_iwg20m = " \
 	 file://0011-DoorPhone-iWave-Fix-audio-issue-on-basephone.patch \
 "
 
-SRC_URI_append = " \
-	 file://0012-Doorphone-audiostreaming-enable-change-port-host.patch \
+SRC_URI_append_iwg21m = " \
+	 file://0011-DoorPhone-iWave-Fix-audio-issue-on-basephone.patch \
 "
+
+#SRC_URI_append = " \
+#	 file://0012-Doorphone-audiostreaming-enable-change-port-host.patch \
+#"
 
 DEPENDS += " gstreamer1.0-rtsp-server axistatlib qtquickcontrols "
 RDEPENDS_${PN} += " gstreamer1.0-rtsp-server axistatlib qtquickcontrols-qmlplugins "
