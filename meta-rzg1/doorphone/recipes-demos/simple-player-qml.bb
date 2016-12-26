@@ -27,6 +27,10 @@ SRC_URI_append_iwg20m = " \
   file://0012-DoorPhone-iWave-Modify-GUI-for-touch-screen.patch \
 "
 
+SRC_URI_append_iwg21m = " \
+  file://0012-DoorPhone-iWave-Modify-GUI-for-touch-screen.patch \
+"
+
 S = "${WORKDIR}/simpleplayer"
 
 SRC = "${THISDIR}/simple-player-qml"
