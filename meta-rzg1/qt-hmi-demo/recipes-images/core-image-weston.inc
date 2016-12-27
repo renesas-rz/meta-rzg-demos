@@ -89,3 +89,8 @@ IMAGE_INSTALL_append = " \
     qtpreload \
     wireless-firmware \
 "
+
+IMAGE_INSTALL_remove = " \
+    qt-framework-launcher \
+"
+
