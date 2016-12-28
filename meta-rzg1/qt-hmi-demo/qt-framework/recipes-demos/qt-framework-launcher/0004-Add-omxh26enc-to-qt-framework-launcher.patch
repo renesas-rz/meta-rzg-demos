@@ -17,7 +17,7 @@ index 096ef36..e8a260b 100644
 					image: "images/multimedia/accessories-camera.svg"}
 
 +    ListElement{name: "Camera Recorder";
-+                    path:"/usr/share/qt-omxh264enc-demo-1.0/omxh264enc_demo";
++                    path:"/usr/share/qt5/examples/multimedia/declarative-camera/declarative-camera";
 +                    detail:"Record camera by omxh26enc\n\nomxh264enc_demo: Record camera by omxh26enc";
 +					image: "images/multimedia/media-player-banshee.svg"}
 +
