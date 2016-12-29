@@ -90,7 +90,13 @@ IMAGE_INSTALL_append = " \
     wireless-firmware \
 "
 
-IMAGE_INSTALL_remove = " \
-    qt-framework-launcher \
-"
 
+# Remove qt-framework-launcher inherited from qt-framework since we
+# do not need it here.
+# Note that IMAGE_INSTALL_remove does not work
+python () {
+
+    img_install = d.getVar('IMAGE_INSTALL', True)
+    img_install = img_install.replace("qt-framework-launcher", "")
+    d.setVar('IMAGE_INSTALL', img_install)
+}
