@@ -6,7 +6,8 @@
 	pid_qt_cinematic_demo=$(pidof Qt5_CinematicExperience)
 	pid_qt_qmlvideo=$(pidof qmlvideo)
 	pid_qt_qmlvideofx=$(pidof qmlvideofx)
-	pid_qt_webengine=$(pidof quicknanobrowser)
+	pid_qt_webkit=$(pidof browser)
+	pid_qt_smarthome=$(pidof smarthome)
 	
 	Max=0
 	result=0
@@ -54,17 +55,24 @@
 				#echo "Max pid_qt_qmlvideofx: $Max"
 			fi
 		fi
-		if [ "${pid_qt_webengine}" ]  ; then
-			Get_only_one_pid_app ${pid_qt_webengine}
+		if [ "${pid_qt_webkit}" ]  ; then
+			Get_only_one_pid_app ${pid_qt_webkit}
 			if [  "${Max}" -lt "${result}" ] ; then
 				Max=${result}
-				#echo "Max pid_qt_webengine: $Max"
+				#echo "Max pid_qt_webkit: $Max"
 			fi
 		fi		
+		if [ "${pid_qt_smarthome}" ]  ; then
+			Get_only_one_pid_app ${pid_qt_smarthome}
+			if [  "${Max}" -lt "${result}" ] ; then
+				Max=${result}
+				#echo "Max pid_qt_smarthome: $Max"
+			fi
+		fi
 	}
 	
 running_app(){	
-	if  [ "${pid_qt_launch_demo}" ] || [ "${pid_qt_everywhere_demo}" ] || [ "${pid_qt_cinematic_demo}" ]  || [ "${pid_qt_qmlvideo}" ]  || [ "${pid_qt_qmlvideofx}" ] || [ "${pid_qt_webengine}" ]  ; then
+	if  [ "${pid_qt_launch_demo}" ] || [ "${pid_qt_everywhere_demo}" ] || [ "${pid_qt_cinematic_demo}" ]  || [ "${pid_qt_qmlvideo}" ]  || [ "${pid_qt_qmlvideofx}" ] || [ "${pid_qt_webkit}" ] || [ "${pid_qt_smarthome}" ] ; then
 		#echo "Exist qt-app"
 		#Get max pid Qt app
 		Max_pid_qt_app

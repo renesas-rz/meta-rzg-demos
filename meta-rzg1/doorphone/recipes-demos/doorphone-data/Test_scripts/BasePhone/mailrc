@@ -1,0 +1,17 @@
+account its {
+	set folder=imaps://doorphone.notification@imap.gmail.com
+	set record=+Sent
+	set from="DoorPhone <doorphone.notification@gmail.com>"
+	set smtp-use-starttls
+	set smtp=smtp://smtp.gmail.com:587
+	set smtp-auth-user=doorphone.notification@gmail.com
+	set smtp-auth=login
+	set password-doorphone.notification@imap.gmail.com="14092015"
+	set smtp-auth-password="14092015"
+	set sendmail="/usr/bin/msmtp"
+	set nss-config-dir=/etc/ssl/certs
+	set ssl-verify=ignore
+
+
+}
+

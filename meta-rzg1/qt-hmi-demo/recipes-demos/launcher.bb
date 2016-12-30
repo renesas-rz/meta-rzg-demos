@@ -1,7 +1,7 @@
 LICENSE = "CLOSED"
 DESCRIPTION = "launcher"
 
-DEPENDS = "qtdeclarative qtquickcontrols" 
+DEPENDS = "qtbase qtdeclarative"
 RDEPENDS_${PN} = "bash"
 
 SRC_URI = " \

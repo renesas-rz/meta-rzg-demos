@@ -1,0 +1,32 @@
+From 32f990edbf970012c637bc83899a0f457a2bc4d3 Mon Sep 17 00:00:00 2001
+From: Loc Pham <loc.pham.xh@rvc.renesas.com>
+Date: Wed, 28 Dec 2016 10:35:16 +0700
+Subject: [PATCH] Fix missing avatar picture, support for iwaveN
+
+According to file README in source code directory cinematicexperience, there are two ways to make app "fullscreen":
+1. Use option "--fullscreen"
+2. Define width and height property inside file Qt5CinematicExperience.qml
+
+Because we used option "--fullscreen", so we don't need to define width and height property. 
+I removed them and result is movie avatar appears (in small screen)
+---
+ Qt5_CinematicExperience.qml | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/Qt5_CinematicExperience.qml b/Qt5_CinematicExperience.qml
+index 58b8b6d..2a7b795 100644
+--- a/Qt5_CinematicExperience.qml
++++ b/Qt5_CinematicExperience.qml
+@@ -4,9 +4,6 @@ import "content"
+ Item {
+     id: mainWindow
+ 
+-    width: 1920
+-    height: 1080
+-
+     QtObject {
+         id: settings
+         // These are used to scale fonts according to screen size
+-- 
+1.9.1
+

@@ -1,0 +1,39 @@
+From 6ee83b17a31e0462c57fc2e145084e3246bdb969 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Wed, 16 Nov 2016 16:30:40 +0700
+Subject: [PATCH] Fix wrong GUI and warning when fullscreen mode
+
+---
+ examples/multimedia/video/qmlvideofx/main.cpp                | 3 +++
+ examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml | 1 +
+ 2 files changed, 4 insertions(+)
+
+diff --git a/examples/multimedia/video/qmlvideofx/main.cpp b/examples/multimedia/video/qmlvideofx/main.cpp
+index f616657..2785f07 100644
+--- a/examples/multimedia/video/qmlvideofx/main.cpp
++++ b/examples/multimedia/video/qmlvideofx/main.cpp
+@@ -73,6 +73,9 @@ int main(int argc, char *argv[])
+                 // Do nothing
+             }
+ #endif
++            else if ("--fullscreen" == arg) {
++                // Do nothing
++            }
+             else {
+                 qtTrace() << "Option" << arg << "ignored";
+             }
+diff --git a/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml b/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml
+index fb36373..e262f84 100644
+--- a/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml
++++ b/examples/multimedia/video/qmlvideofx/qml/qmlvideofx/Main.qml
+@@ -37,6 +37,7 @@ import QtQuick.Window 2.1
+ Rectangle {
+     id: root
+     color: "black"
++    anchors.fill: parent
+     property string fileName
+     property alias volume: content.volume
+     property bool perfMonitorsLogging: false
+-- 
+1.9.1
+

@@ -1,0 +1,31 @@
+From ae0d196b56f35de818aae8a2227ee3a6cea9347f Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Thu, 17 Nov 2016 20:30:10 +0700
+Subject: [PATCH] update script PowerVR use width height arguments
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ mmpoc-scripts/PowerVR-Demo/PowerVR-Demo.sh | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/mmpoc-scripts/PowerVR-Demo/PowerVR-Demo.sh b/mmpoc-scripts/PowerVR-Demo/PowerVR-Demo.sh
+index f8c0b49..23a9632 100755
+--- a/mmpoc-scripts/PowerVR-Demo/PowerVR-Demo.sh
++++ b/mmpoc-scripts/PowerVR-Demo/PowerVR-Demo.sh
+@@ -1,7 +1,10 @@
+ #!/bin/bash
++source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
+ 
+-/home/root/launcher-taskbar/mmpoc-scripts/PowerVR-Demo/OGLES2Water &
++/home/root/launcher-taskbar/mmpoc-scripts/PowerVR-Demo/OGLES2Water -width=$D_WIDTH -height=$D_HEIGHT &
+ 
+ sleep 20s
+ 
+-killall -q -9 OGLES2Water
+\ No newline at end of file
++killall -q -9 OGLES2Water
++
++exit 0
+-- 
+1.9.1
+

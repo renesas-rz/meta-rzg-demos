@@ -1,4 +1,9 @@
-#Revision to update qt5.6.1
-require qt5.6.1_git.inc
-SRCREV = "ffcc913971dae8e49e83d724f4d3f530ef04eb38"
+FILESEXTRAPATHS_append := "${THISDIR}/qtmultimedia:"
 
+SRC_URI_append_iwg20m += " \
+    file://0001-Fix-wrong-GUI-and-warning-when-fullscreen-mode.patch \
+"
+
+SRC_URI_append_iwg21m += " \
+    file://0001-Fix-wrong-GUI-and-warning-when-fullscreen-mode.patch \
+"

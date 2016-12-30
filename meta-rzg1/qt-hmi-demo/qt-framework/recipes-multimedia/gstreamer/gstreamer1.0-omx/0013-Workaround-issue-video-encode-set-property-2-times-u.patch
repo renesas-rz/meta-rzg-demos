@@ -1,0 +1,37 @@
+From fe1f7f841a25db44814500fb0350cb2a109c0736 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Wed, 28 Dec 2016 09:13:19 +0700
+Subject: [PATCH] Workaround issue video encode call set property 2 times using
+ wrong value
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ omx/gstomxvideoenc.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/omx/gstomxvideoenc.c b/omx/gstomxvideoenc.c
+index 1ea92be..7a3bff9 100644
+--- a/omx/gstomxvideoenc.c
++++ b/omx/gstomxvideoenc.c
+@@ -534,11 +534,17 @@ static void
+ gst_omx_video_enc_set_property (GObject * object, guint prop_id,
+     const GValue * value, GParamSpec * pspec)
+ {
++  /* FIX ME */
++  // Work around issue call func gst_omx_video_enc_set_property() 2 times lead to wrong values.
++  static gboolean repeat = 0;
+   GstOMXVideoEnc *self = GST_OMX_VIDEO_ENC (object);
+ 
+   switch (prop_id) {
+     case PROP_CONTROL_RATE:
+-      self->control_rate = g_value_get_enum (value);
++      if (!repeat){
++		repeat = 1;
++		self->control_rate = g_value_get_enum (value);
++      }
+       break;
+     case PROP_TARGET_BITRATE:
+       self->target_bitrate = g_value_get_uint (value);
+-- 
+1.9.1
+

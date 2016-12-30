@@ -45,6 +45,7 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-bad-camerabin2 \
     gstreamer1.0-plugins-good-icydemux \
     libgstphotography-1.0 \
+    gstreamer1.0-plugins-good-alaw \
 "
 
 
@@ -87,10 +88,28 @@ setup_outdoor () {
     # Set static IP for Outdoor: 192.168.10.101
     sed -i 's/iface eth0 inet dhcp/iface eth0 inet static\
     address 192.168.10.101\
+    hwaddress ether 00:01:02:03:04:45\
     netmask 255.255.255.0/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
     # Use nl80211 driver instead of wext, which is older and not support Wifi AC
     sed -i 's/wpa-driver wext/wpa-driver nl80211/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
 }
+
+# Same as above function, but on iwg21m uses eth1 instead
+setup_outdoor_iwg21m () {
+
+    # Back up first
+    cp ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces ${IMAGE_ROOTFS}/../interfaces.bk
+
+    # Set static IP for Outdoor: 192.168.10.101
+    sed -i 's/auto eth0/auto eth1/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
+    sed -i 's/iface eth0 inet dhcp/iface eth1 inet static\
+    address 192.168.10.101\
+    hwaddress ether 00:01:02:03:04:45\
+    netmask 255.255.255.0/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
+    # Use nl80211 driver instead of wext, which is older and not support Wifi AC
+    sed -i 's/wpa-driver wext/wpa-driver nl80211/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
+}
+
 
 # Create Outdoor image manually
 python create_image_outdoor () {
@@ -129,6 +148,26 @@ setup_basephone () {
     # Set static IP for Basephone: 192.168.10.100
     sed -i 's/iface eth0 inet dhcp/iface eth0 inet static\
     address 192.168.10.100\
+    hwaddress ether 00:01:02:03:04:46\
+    netmask 255.255.255.0/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
+    # Use nl80211 driver instead of wext, which is older and not support Wifi AC
+    sed -i 's/wpa-driver wext/wpa-driver nl80211/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
+
+    # Enable WLAN0
+    #echo 'auto wlan0' >> ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
+}
+
+# Same as above function, but on iwg21m use eth1 instead
+setup_basephone_iwg21m () {
+
+    # Back up first
+    cp ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces ${IMAGE_ROOTFS}/../interfaces.bk
+
+    # Set static IP for Basephone: 192.168.10.100
+    sed -i 's/auto eth0/auto eth1/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
+    sed -i 's/iface eth0 inet dhcp/iface eth1 inet static\
+    address 192.168.10.100\
+    hwaddress ether 00:01:02:03:04:46\
     netmask 255.255.255.0/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces
     # Use nl80211 driver instead of wext, which is older and not support Wifi AC
     sed -i 's/wpa-driver wext/wpa-driver nl80211/' ${IMAGE_ROOTFS}${sysconfdir}/network/interfaces

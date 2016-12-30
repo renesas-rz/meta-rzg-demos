@@ -1,0 +1,57 @@
+From bcaf46d5f0e83fa1eeabafbbad977f772659bb5b Mon Sep 17 00:00:00 2001
+From: Chuan Anh Nguyen <chuan.nguyen.jy@rvc.renesas.com>
+Date: Wed, 16 Nov 2016 21:30:07 +0700
+Subject: [PATCH] DoorPhone-iWave-change cma size and add fake button
+
+At current time, cma of iWave board is 128MB and it is not enought for DoorPhone
+run
+
+This patch file change cma size of iWave to 256MB so that DoorPhone can run
+This patch file also create a fake button on iWave board by add GPIP7_19 into
+device tree of iWave board, this fake button will make the virtual of DoorPhone
+can show to input email address in Guess Notification function
+
+---
+ arch/arm/boot/dts/r8a7744-iwg20m.dts | 12 ++++++++++++
+ arch/arm/configs/iwg20m_defconfig    |  2 +-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/r8a7744-iwg20m.dts b/arch/arm/boot/dts/r8a7744-iwg20m.dts
+index 5ca3207..64a2cd0 100644
+--- a/arch/arm/boot/dts/r8a7744-iwg20m.dts
++++ b/arch/arm/boot/dts/r8a7744-iwg20m.dts
+@@ -48,6 +48,18 @@
+ 		regulator-always-on;
+ 	};
+ 
++        gpio-keys {
++                compatible = "gpio-keys";
++
++                key-a {
++                        gpios = <&gpio7 19 GPIO_ACTIVE_LOW>;
++                        linux,code = <KEY_A>;
++                        label = "SW30";
++                        gpio-key,wakeup;
++                        debounce-interval = <20>;
++                };
++        };
++
+ 	vcc_sdhi1: reg_vcc_sdhi1 {
+ 		compatible = "regulator-fixed";
+ 
+diff --git a/arch/arm/configs/iwg20m_defconfig b/arch/arm/configs/iwg20m_defconfig
+index 4417dc5..c6163f1 100644
+--- a/arch/arm/configs/iwg20m_defconfig
++++ b/arch/arm/configs/iwg20m_defconfig
+@@ -752,7 +752,7 @@ CONFIG_DMA_CMA=y
+ #
+ # Default contiguous memory area size:
+ #
+-CONFIG_CMA_SIZE_MBYTES=128
++CONFIG_CMA_SIZE_MBYTES=256
+ CONFIG_CMA_SIZE_SEL_MBYTES=y
+ # CONFIG_CMA_SIZE_SEL_PERCENTAGE is not set
+ # CONFIG_CMA_SIZE_SEL_MIN is not set
+-- 
+1.9.1
+

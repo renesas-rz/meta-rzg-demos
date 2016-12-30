@@ -1,0 +1,40 @@
+From 403abe92f576254bff44a86461862f6a8a7476db Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Mon, 14 Nov 2016 19:30:17 +0700
+Subject: [PATCH 03/10] fix audio issue:no sound in playing MP3 and correct
+ amixer input setting for iWave G1N board
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ mmpoc-scripts/Audio-Demo.sh                       | 2 +-
+ mmpoc-scripts/Audio-Demo/bin/audio_play_record.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mmpoc-scripts/Audio-Demo.sh b/mmpoc-scripts/Audio-Demo.sh
+index 1c215d2..ab2f068 100755
+--- a/mmpoc-scripts/Audio-Demo.sh
++++ b/mmpoc-scripts/Audio-Demo.sh
+@@ -1,5 +1,5 @@
+ #!/bin/bash
+ 
+-amixer set 'DVC In' 30
++amixer set 'Capture' 12
+ 
+ /home/root/launcher-taskbar/mmpoc-scripts/Audio-Demo/bin/audio_play_record.sh
+\ No newline at end of file
+diff --git a/mmpoc-scripts/Audio-Demo/bin/audio_play_record.sh b/mmpoc-scripts/Audio-Demo/bin/audio_play_record.sh
+index 63901a9..1d7879d 100755
+--- a/mmpoc-scripts/Audio-Demo/bin/audio_play_record.sh
++++ b/mmpoc-scripts/Audio-Demo/bin/audio_play_record.sh
+@@ -21,7 +21,7 @@ function playback()
+ {
+     printf "\e[34mPlaying MP3... $1\e[0m\n"
+     /home/root/launcher-taskbar/mmpoc-scripts/Audio-Demo/bin/banner $X_POSITION $Y_POSITION "Playback mp3 audio file..." &
+-    gst-launch-1.0 filesrc location=$MP3_FILE ! mad ! alsasink &
++    gst-launch-1.0 filesrc location=$MP3_FILE ! mad ! audioconvert ! audio/x-raw,format=\(string\)S16LE ! alsasink &
+     sleep $DURATION
+     killall -9 gst-launch-1.0
+     killall -9 banner
+-- 
+1.9.1
+

@@ -1,0 +1,87 @@
+From 4517e44543e3b1cd8ddae8c799c456eedc387b63 Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Mon, 14 Nov 2016 19:40:07 +0700
+Subject: [PATCH 08/10] IPCamDemo:display full weston resolution
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ mmpoc-scripts/IPCamera-Demo/ipcam_record_replay.sh | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
+
+diff --git a/mmpoc-scripts/IPCamera-Demo/ipcam_record_replay.sh b/mmpoc-scripts/IPCamera-Demo/ipcam_record_replay.sh
+index d4944c5..4cd52bd 100755
+--- a/mmpoc-scripts/IPCamera-Demo/ipcam_record_replay.sh
++++ b/mmpoc-scripts/IPCamera-Demo/ipcam_record_replay.sh
+@@ -1,4 +1,5 @@
+ # !/bin/bash
++source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
+ 
+ DURATION=20
+ LOG_FILE_1=/home/.log1.txt
+@@ -8,8 +9,8 @@ VIDEO_FILE=/home/record.mp4
+ CAM_IP="WN3.local:554"
+ USER="admin"
+ PASSWORD="renesas"
+-X_POSITION=100
+-Y_POSITION=900
++X_POSITION=`expr 100 \* $D_WIDTH / 1920 / 32 \* 32`
++Y_POSITION=`expr 900 \* $D_HEIGHT / 1080`
+ 
+ IPCAM_PATH=$(cat /home/root/launcher-taskbar/mmpoc-scripts/IPCAM_PATH.info)
+ 
+@@ -25,7 +26,7 @@ function replay()
+ {
+     printf "\e[34mReplaying... $1\e[0m\n"
+     gst-launch-1.0 --padprobe v:sink --timer filesrc location=$VIDEO_FILE \
+-    ! qtdemux ! omxh264dec ! waylandsink name=v qos=false > $LOG_FILE_2 &
++    ! qtdemux ! omxh264dec ! waylandsink position-x=0 position-y=0 out-width=$D_WIDTH out-height=$D_HEIGHT name=v qos=false > $LOG_FILE_2 &
+     sleep 1
+     /home/root/launcher-taskbar/mmpoc-scripts/IPCamera-Demo/replay_fps_show $LOG_FILE_2 ${X_POSITION} $Y_POSITION &
+     /home/root/launcher-taskbar/mmpoc-scripts/IPCamera-Demo/banner 100 50 "Replaying..." &
+@@ -33,8 +34,8 @@ function replay()
+     sleep $DURATION
+     #sleep [$DURATION - 2]
+     killall -9 banner
+-    killall -9 replay_fps_show 
+-    sleep 2 
++    killall -9 replay_fps_show
++    sleep 2
+     killall -2 gst-launch-1.0
+     echo 3 > /proc/sys/vm/drop_caches
+ }
+@@ -48,13 +49,13 @@ function record()
+     gst-launch-1.0 -e  rtspsrc location=rtsp://$USER:$PASSWORD@$CAM_IP/profile5/media.smp \
+     ! rtph264depay !  tee name=t t. ! queue ! h264parse \
+     ! qtmux ! filesink location=$VIDEO_FILE -rp filesink0:sink t. ! queue \
+-    ! h264parse ! omxh264dec ! waylandsink qos=false max-lateness=-1  > $LOG_FILE_1 &
++    ! h264parse ! omxh264dec ! waylandsink qos=false position-x=0 position-y=0 out-width=$D_WIDTH out-height=$D_HEIGHT max-lateness=-1  > $LOG_FILE_1 &
+     else
+     echo $IPCAM_PATH
+     gst-launch-1.0 -e  rtspsrc location=$IPCAM_PATH \
+     ! rtph264depay !  tee name=t t. ! queue ! h264parse \
+     ! qtmux ! filesink location=$VIDEO_FILE -rp filesink0:sink t. ! queue \
+-    ! h264parse ! omxh264dec ! waylandsink qos=false max-lateness=-1  > $LOG_FILE_1 &
++    ! h264parse ! omxh264dec ! waylandsink qos=false position-x=0 position-y=0 out-width=$D_WIDTH out-height=$D_HEIGHT max-lateness=-1  > $LOG_FILE_1 &
+     fi
+     sleep 2
+ 
+@@ -63,12 +64,12 @@ function record()
+ 
+     sleep $DURATION
+     killall -9 banner
+-    killall -9 record_fps_show 
++    killall -9 record_fps_show
+ 
+-    sleep 1 
++    sleep 1
+     killall -2 gst-launch-1.0
+     echo 3 > /proc/sys/vm/drop_caches
+     sync
+ }
+ 
+-main
+\ No newline at end of file
++main
+-- 
+1.9.1
+

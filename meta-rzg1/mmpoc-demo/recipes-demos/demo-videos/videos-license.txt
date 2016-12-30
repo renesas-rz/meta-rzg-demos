@@ -1,0 +1,15 @@
+All below videos are Creative Commons License Attribution
+https://creativecommons.org/licenses/by/3.0/
+
+1.h264-fhd-60.mp4 :  FHD-60fps-40Mbps : Big Buck Bunny
+  (c) copyright 2008, Blender Foundation / www.bigbuckbunny.org
+2.h264-BL1.0-FHD-30P-5M-AAC-LC-Stereo-124K_48000_x264.mp4: FHD-30fps-5Mbps : Big Buck Bunny
+  (c) copyright 2008, Blender Foundation / www.bigbuckbunny.org
+3.h264-hd-30.mp4  :   HD-30fps-10Mbps : Elephants Dream
+  (c) copyright 2006, Blender Foundation / Netherlands Media Art Institute / www.elephantsdream.org
+4.h264-wvga-30.mp4: WVGA-30fps-13Mbps : Sintel
+  © copyright Blender Foundation | www.sintel.org
+5.h264-vga-24.mp4 :  VGA-24fps-10Mbps : Elephants Dream
+  (c) copyright 2006, Blender Foundation / Netherlands Media Art Institute / www.elephantsdream.org
+6.sintel_trailer-720p.mp4 : HD-24fps-1Mbps : Sintel
+  © copyright Blender Foundation | www.sintel.org

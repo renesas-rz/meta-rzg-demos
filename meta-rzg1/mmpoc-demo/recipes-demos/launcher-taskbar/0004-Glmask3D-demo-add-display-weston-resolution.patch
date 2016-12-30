@@ -1,0 +1,27 @@
+From 0e96e8ff0d89e5913da1751cbe31f4984b6a2cd7 Mon Sep 17 00:00:00 2001
+From: Long Dang <long.dang.aj@rvc.renesas.com>
+Date: Mon, 14 Nov 2016 19:31:47 +0700
+Subject: [PATCH 04/10] Glmask3D demo:add display weston resolution
+
+Signed-off-by: Long Dang <long.dang.aj@rvc.renesas.com>
+---
+ mmpoc-scripts/Glmask3D-Demo.sh | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/mmpoc-scripts/Glmask3D-Demo.sh b/mmpoc-scripts/Glmask3D-Demo.sh
+index 905d7a9..5e0ec18 100755
+--- a/mmpoc-scripts/Glmask3D-Demo.sh
++++ b/mmpoc-scripts/Glmask3D-Demo.sh
+@@ -1,6 +1,8 @@
+ #!/bin/bash
+ 
+-glmark2-es2-wayland -b :show-fps=true &
++source /home/root/.bashrc # get D_WIDTH, D_HEIGHT
++
++glmark2-es2-wayland -b :show-fps=true -s ${D_WIDTH}x${D_HEIGHT} &
+ 
+ sleep 15s
+ 
+-- 
+1.9.1
+

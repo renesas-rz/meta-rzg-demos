@@ -3,6 +3,7 @@ EXTRA_IMAGE_FEATURES = "debug-tweaks tools-debug tools-profile"
 
 IMAGE_INSTALL_append = " \
     mm-init \
+    demo-videos \
     qtwayland \
     qtwayland-plugins \
     qt5ledscreen \
@@ -20,20 +21,18 @@ IMAGE_INSTALL_append = " \
     qtdeclarative-tools \
     qtdeclarative-examples \
     qtdeclarative-qmlplugins \
+    qtquickcontrols-qmlplugins \
     qtimageformats-plugins \
     qtsvg \
     qtsvg-plugins \
     qtsensors \
     qtscript \
-    qt3d \
-    qt3d-examples \
-    qt3d-qmlplugins \
     qtserialport \
     qtwebchannel \
     qtwebchannel-qmlplugins \
-    qtwebengine \
-    qtwebengine-examples \
-    qtwebengine-qmlplugins \
+    qtwebkit \
+    qtwebkit-examples-examples \
+    qtwebkit-qmlplugins \
     qtwebsockets \
     qtwebsockets-qmlplugins \
     ca-certificates \
@@ -41,8 +40,6 @@ IMAGE_INSTALL_append = " \
     qtconnectivity \
     qtconnectivity-examples \
     qtconnectivity-qmlplugins \
-    qtlocation-plugins \
-    qtlocation-qmlplugins \
     cinematicexperience \
     qtmultimedia \
     qtmultimedia-examples \
@@ -59,7 +56,6 @@ IMAGE_INSTALL_append = " \
     connman \
     connman-client connman-tests \
     launcher-taskbar \
-    qtquickcontrols-qmlplugins \
     \
     gstreamer1.0-plugins-base-apps \
     gstreamer1.0-plugins-good-multifile \
@@ -81,8 +77,26 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-bad-camerabin2 \
     gstreamer1.0-plugins-good-icydemux \
     gstreamer1.0-plugins-base-vspmfilter \
+    \
+    gstreamer1.0-plugins-good-avi \
+    gstreamer1.0-plugins-good-audioparsers \
+    gstreamer1.0-plugins-good-id3demux \
+    libmad \
+    gstreamer1.0-plugins-ugly-mad \
+    gstreamer1.0-plugins-good-wavparse \
     libgstphotography-1.0 \
     loading-qt-app \
     qtpreload \
     wireless-firmware \
 "
+
+
+# Remove qt-framework-launcher inherited from qt-framework since we
+# do not need it here.
+# Note that IMAGE_INSTALL_remove does not work
+python () {
+
+    img_install = d.getVar('IMAGE_INSTALL', True)
+    img_install = img_install.replace("qt-framework-launcher", "")
+    d.setVar('IMAGE_INSTALL', img_install)
+}

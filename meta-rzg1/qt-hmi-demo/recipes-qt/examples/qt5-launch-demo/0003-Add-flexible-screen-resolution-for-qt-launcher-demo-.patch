@@ -1,0 +1,28 @@
+From 6a7de43aebf012f9b8b9e4d25f136b569810fdd3 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Tue, 8 Nov 2016 13:21:19 +0700
+Subject: [PATCH] Add flexible screen resolution for qt-launcher-demo low
+ version
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ main_lofi.qml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/main_lofi.qml b/main_lofi.qml
+index 8ebd802..b89b6a0 100644
+--- a/main_lofi.qml
++++ b/main_lofi.qml
+@@ -40,8 +40,8 @@
+
+ DemoMain {
+
+-    width: 854
+-    height: 480
++    property int screenWidth_demo : screenWidth
++    property int screenHeight_demo: screenHeight
+
+     useDropShadow: false;
+     useSimpleGradient: true;
+--
+1.9.1
