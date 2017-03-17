@@ -1,0 +1,40 @@
+diff --git a/meta-rzg1/doorphone/recipes-demos/doorphone-data/Test_scripts/doorphone.init b/meta-rzg1/doorphone/recipes-demos/doorphone-data/Test_scripts/doorphone.init
+index 43c6ab3..c6af41b 100755
+--- a/doorphone.init
++++ b/doorphone.init
+@@ -16,7 +16,7 @@ case "$1" in
+ 
+ 		echo "Start Doorphone"
+ 		# Auto run Doorphone demo, only on Basephone
+-		ipaddr=`ifconfig eth0 | awk '/inet addr/{print substr($2,6)}'`
++		ipaddr=`ifconfig eth1 | awk '/inet addr/{print substr($2,6)}'`
+ 		if [ $ipaddr = "192.168.10.100" ]
+ 		then
+ 			/home/root/doorphone/simpleplayer &
+@@ -30,7 +30,7 @@ case "$1" in
+ 		
+ 		if [ $ipaddr = "192.168.11.100" ]
+ 		then
+-			ifconfig eth0 192.168.10.100
++			ifconfig eth1 192.168.10.100
+ 			/home/root/doorphone/simpleplayer &
+ 		fi
+ 	;;
+@@ -38,7 +38,7 @@ case "$1" in
+ 	stop)
+ 		echo "Stopping Doorphone"
+ 		# Kill Doorphone on Basephone
+-		ipaddr=`ifconfig eth0 | awk '/inet addr/{print substr($2,6)}'`
++		ipaddr=`ifconfig eth1 | awk '/inet addr/{print substr($2,6)}'`
+ 		if [ $ipaddr = "192.168.10.100" ]
+ 		then
+ 			killall simpleplayer &> /dev/null
+@@ -53,7 +53,7 @@ case "$1" in
+ 		if [ $ipaddr = "192.168.11.100" ]
+ 		then
+ 			killall simpleplayer run_outdoor_opencv_1board.sh gst-launch-1.0 &> /dev/null
+-			ifconfig eth0 192.168.10.100
++			ifconfig eth1 192.168.10.100
+ 		fi
+ 	;;
+ 

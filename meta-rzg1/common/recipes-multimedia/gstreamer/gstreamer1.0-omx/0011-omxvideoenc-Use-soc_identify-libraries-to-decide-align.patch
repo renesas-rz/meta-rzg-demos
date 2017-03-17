@@ -1,0 +1,122 @@
+From e41f299f2e43fa5101fd9b69805a4cc651152827 Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Tue, 15 Nov 2016 02:51:38 +0700
+Subject: [PATCH] omxvideoenc: Use soc_identify libraries to decide align limitation
+
+Renesas SoCs has different align limitation when encode
+due to different hardware config.
+Use soc_identify libraries, if it is available, to check
+what SoC are running to decide correct limitation.
+
+Default align 128 is safe for all SoCs.
+
+Signed-off-by: HungTran <hung.tran.jy@rvc.renesas.com>
+---
+ configure.ac         |  6 ++++++
+ omx/gstomxvideoenc.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 54 insertions(+), 4 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 6aae527..4516472 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -245,6 +245,12 @@ AC_CHECK_LIB([mmngrbuf], [mmngr_export_start_in_user],
+              ])
+ fi
+ 
++dnl check libsocauth library to use soc identify for correct encode alignment
++AC_CHECK_LIB([socauth], [soc_auth_dev_identify],
++             [AC_DEFINE(HAVE_SOC_IDENTIFY, 1, [Define if you have libsocauth library to identify SoC])
++              GST_LIBS="$GST_LIBS -lsocauth"
++             ])
++
+ dnl check page alignment option for NV12 planes
+ AC_ARG_ENABLE([nv12-page-alignment],
+               [AS_HELP_STRING([--enable-nv12-page-alignment],
+diff --git a/omx/gstomxvideoenc.c b/omx/gstomxvideoenc.c
+index 1ea92be..96714eb 100644
+--- a/omx/gstomxvideoenc.c
++++ b/omx/gstomxvideoenc.c
+@@ -29,6 +29,10 @@
+ #include <stdio.h>
+ #include "gstomxvideoenc.h"
+ 
++#ifdef HAVE_SOC_IDENTIFY
++#include "socauth.h"
++#endif
++
+ GST_DEBUG_CATEGORY_STATIC (gst_omx_video_enc_debug_category);
+ #define GST_CAT_DEFAULT gst_omx_video_enc_debug_category
+ 
+@@ -243,7 +247,7 @@ gst_omx_video_enc_sink_query (GstPad * pad, GstObject * parent, GstQuery * query
+       }
+       GST_DEBUG_OBJECT (self,
+           "received a vspm_allocation_request query");
+-          
++
+       gst_structure_get (structure, 
+             "paddr_array", G_TYPE_ARRAY, &buf_paddr_array,
+             "vaddr_array", G_TYPE_ARRAY, &buf_vaddr_array,
+@@ -1331,6 +1335,7 @@ gst_omx_video_enc_set_format (GstVideoEncoder * encoder,
+   {
+     if (klass->cdata.hacks & GST_OMX_HACK_RENESAS_ENCMC_STRIDE_ALIGN)
+     {
++      /* Change the stride follow align requirement of Renesas OMX Encode MC */
+       switch (port_def.format.video.eColorFormat) {
+       case OMX_COLOR_FormatYUV420Planar: {
+         /*Renesas encode MC only support following strides*/
+@@ -1345,9 +1350,48 @@ gst_omx_video_enc_set_format (GstVideoEncoder * encoder,
+         break;
+       }
+       case OMX_COLOR_FormatYUV420SemiPlanar:
+-      /* Workaround: MC manual requires 128 align, but in practice
+-       * it still work with 32 align */
+-        port_def.format.video.nStride = ((info->width + 31) & ~ 31);   /* Align 32 */
++      {
++        /* In NV12, G1H, G1M and G1N need align 128, while G1E only needs 32 */
++        int fd;
++        guint align;
++
++        fd = -1;
++        align = 128;
++#ifdef HAVE_SOC_IDENTIFY
++        {
++          struct ren_soc_id soc_id;
++
++          /* Identify what SOC is running to set correct align.
++           * Use default 128 if cannot ifdentify */
++          fd = soc_auth_dev_open ("uio_prr");
++          if (fd  > -1) {
++            soc_auth_dev_identify (fd, &soc_id);
++            soc_auth_dev_close (fd);
++
++            if (soc_id.isRzg)
++              switch (soc_id.type) {
++                case RZG1E:
++                  align = 32;
++                  break;
++                case RZG1N:
++                  align = 32;
++                  break;
++                case RZG1M:
++                  align = 128;
++                  break;
++                case RZG1H:
++                  align = 128;
++                  break;
++                default:
++                  align = 128;
++                  break;
++              }
++          }
++        }
++#endif
++
++        port_def.format.video.nStride = ((info->width + (align - 1)) & ~(align - 1));
++      }
+       break;
+       default:
+         port_def.format.video.nStride = GST_ROUND_UP_4 (info->width);    /* Safe (?) default */
+-- 
+1.9.1
+

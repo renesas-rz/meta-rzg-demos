@@ -12,4 +12,7 @@ SRC_URI_append = " \
     file://0008-omxvideoenc-fix-error-w-v4l2src-I420-format.patch \
     file://0009-omxvideoenc-fix-error-with-v4l2src-by-update-p_buffers.patch \
     file://0010-omxh264enc-Workaround-issue-only-support-video-with-.patch \
+    file://0011-omxvideoenc-Use-soc_identify-libraries-to-decide-align.patch \
 "
+
+DEPENDS += " libsocauth "

@@ -5,6 +5,7 @@ PATCHTOOL_rzg1 = "git"
 SRC_URI_append += " \
     file://0001-add-wifi-bcmdhd.patch \
     file://0003-Build-driver-support-USBWifi-band-5GHz.patch \
+    file://0042-Add-uio_prr-module-for-skrzg1m-into-kernel.patch \
 "
 
 do_configure_append() {

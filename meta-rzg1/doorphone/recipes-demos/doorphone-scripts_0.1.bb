@@ -4,6 +4,9 @@ FILESEXTRAPATHS = "${THISDIR}/doorphone-data:"
 SRC_URI = "file://Test_scripts/* \
 "
 
+# Change to use eth1 for iwg21m
+SRC_URI_append_iwg21m = "file://change_eth1.patch"
+
 S = "${WORKDIR}/Test_scripts"
 
 inherit update-rc.d
