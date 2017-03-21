@@ -42,8 +42,6 @@ do_configure_append() {
     yes '' | oe_runmake oldconfig
 }
 
-
-
 do_configure_append() {
     kernel_configure_variable MAC80211 y   
     kernel_configure_variable CFG80211=y
@@ -86,4 +84,10 @@ do_configure_append() {
 
     yes '' | oe_runmake oldconfig
 }
+
+do_configure_append_iwg21m() {
+    kernel_configure_variable CMA_SIZE_MBYTES "256"
+    yes '' | oe_runmake oldconfig
+}
+
 
