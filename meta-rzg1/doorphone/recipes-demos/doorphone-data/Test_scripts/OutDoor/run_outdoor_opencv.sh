@@ -54,7 +54,11 @@ do
 
        GPID=$(ps | grep "gst-launch-1.0 -e v4l2src device=" | grep -v grep | awk '{print  $1}')
        kill ${GPID} &> /dev/null
+<<<<<<< HEAD
+       gst-launch-1.0 -e v4l2src device=${CAM_DEV} ! video/x-raw,format=UYVY,width=720,height=480 ! tee name=t t. ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=640,height=480 ! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay pt=96 config-interval=3 mtu=9000 ! udpsink host=192.168.10.255 port=1234 t. ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=736,height=480 ! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay pt=96 config-interval=3 ! udpsink host=192.168.10.101 port=5555 &> /dev/null &
+=======
        gst-launch-1.0 -e v4l2src device=${CAM_DEV} ! video/x-raw,format=UYVY,width=720,height=480 ! tee name=t t. ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=640,height=480 ! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay pt=96 config-interval=3 mtu=9000 ! udpsink host=192.168.10.255 port=1234 t. ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=640,height=480 ! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay pt=96 config-interval=3 ! udpsink host=192.168.10.101 port=5555 &> /dev/null &
+>>>>>>> master
    fi
    sleep 5
 done &
