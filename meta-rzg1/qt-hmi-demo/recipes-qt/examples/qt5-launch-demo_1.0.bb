@@ -28,6 +28,12 @@ SRC_URI_append_iwg21m += " \
     file://0002-Change-address-webpage-offline-to-show-for-customer.patch \
     file://0003-Add-flexible-screen-resolution-for-qt-launcher-demo-.patch \
 "
+
+SRC_URI_append_iwg22m += " \
+    file://0001-qt5-launch-demo-update-GUI-compatible-with-iWave.patch \
+    file://0002-Change-address-webpage-offline-to-show-for-customer.patch \
+    file://0003-Add-flexible-screen-resolution-for-qt-launcher-demo-.patch \
+"
 S = "${WORKDIR}/git"
 
 #require recipes-qt/qt5/qt5.inc
