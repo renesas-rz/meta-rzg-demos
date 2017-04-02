@@ -1,0 +1,28 @@
+From c066df2e844558c1718c08d2bb2409af3b5b7d3c Mon Sep 17 00:00:00 2001
+From: Nhan Nguyen <nhan.nguyen.yb@renesas.com>
+Date: Mon, 3 Apr 2017 06:10:09 +0700
+Subject: [PATCH] Check null pointer for vdbuf_data in gstomxvideodec.c
+
+
+diff --git a/omx/gstomxvideodec.c b/omx/gstomxvideodec.c
+index c5b69ab..11b7851 100644
+--- a/omx/gstomxvideodec.c
++++ b/omx/gstomxvideodec.c
+@@ -564,9 +564,11 @@ gst_omx_buffer_pool_free_buffer (GstBufferPool * bpool, GstBuffer * buffer)
+ #ifdef HAVE_MMNGRBUF
+   if (self->use_dmabuf) {
+     vdbuf_data = (GstOMXVideoDecBufferData *) omx_buf->private_data;
+-    for (i = 0; i < GST_VIDEO_MAX_PLANES; i++)
+-      if (vdbuf_data->id_export[i] >= 0)
+-        mmngr_export_end_in_user (vdbuf_data->id_export[i]);
++    if (vdbuf_data) {
++      for (i = 0; i < GST_VIDEO_MAX_PLANES; i++)
++        if (vdbuf_data->id_export[i] >= 0)
++          mmngr_export_end_in_user (vdbuf_data->id_export[i]);
++    }
+   }
+ #endif
+   g_slice_free (GstOMXVideoDecBufferData, omx_buf->private_data);
+-- 
+1.9.1
+
