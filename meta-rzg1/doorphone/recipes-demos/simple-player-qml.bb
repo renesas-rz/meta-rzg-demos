@@ -30,6 +30,7 @@ SRC_URI_append_iwg20m = " \
 SRC_URI_append_iwg21m = " \
   file://0012-DoorPhone-iWave-Modify-GUI-for-touch-screen.patch \
   file://0015-Doorphone-iwrzg1h-change-default-screen-to-LVDS-800x.patch \
+  file://0016-Doorphone-iwrzg1h-Change-to-eth1.patch \
 "
 
 S = "${WORKDIR}/simpleplayer"
