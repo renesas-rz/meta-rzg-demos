@@ -3,12 +3,10 @@
 case "$1" in
 	start)
 		export LD_LIBRARY_PATH="/lib:/usr/lib:/usr/local/lib:"
-		amixer set 'Headphone' 89%
-		amixer set 'PCM' 70%
-		amixer set 'Mic' 33%
-		amixer set 'Capture' 73%
-		amixer set 'Capture Attenuate Switch (-6dB)' 50%
-		amixer set 'DVC Out' 35%
+		amixer set "LINEOUT Mixer DACL" on
+		amixer set 'DVC Out' 100 
+		amixer set 'DVC In' 15 
+		amixer set 'Digital' 200,200 
 		modprobe -a mmngr mmngrbuf s3ctl uvcs_cmn vspm fdpm vsp2
 		export XDG_RUNTIME_DIR=/run/user/root
 		echo 2 > /proc/sys/kernel/printk   # Disable kernel warning, or it will appear rapidly due to network

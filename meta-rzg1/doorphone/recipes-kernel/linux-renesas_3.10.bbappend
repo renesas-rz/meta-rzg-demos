@@ -7,7 +7,3 @@ SRC_URI_append_iwg20m_r8a7743 = " \
     file://0001-DoorPhone-iwg1m-change-cma-size-and-add-fake-button.patch \
 "
 
-SRC_URI_append_iwg21m = " \ 
-    file://0001-iwg21m-increase-cma-mem-size.patch \
-"
-
