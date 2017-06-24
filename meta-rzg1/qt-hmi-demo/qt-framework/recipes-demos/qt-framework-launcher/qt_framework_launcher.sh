@@ -5,5 +5,7 @@ modprobe -a mmngr mmngrbuf s3ctl uvcs_cmn vspm fdpm
 amixer set 'DVC Out' 100%
 amixer set 'Headphone' 100%
 
+# Workaround for iwg23s
+sleep 5
 /usr/share/qt-framework-launcher-1.0/launcher &
 echo 2 > /proc/sys/kernel/printk
