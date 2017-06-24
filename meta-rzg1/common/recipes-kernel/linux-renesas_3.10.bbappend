@@ -90,4 +90,9 @@ do_configure_append_iwg21m() {
     yes '' | oe_runmake oldconfig
 }
 
+do_configure_append_iwg23s() {
+    kernel_configure_variable CMA_SIZE_MBYTES 178
+    yes '' | oe_runmake oldconfig
+}
+
 
