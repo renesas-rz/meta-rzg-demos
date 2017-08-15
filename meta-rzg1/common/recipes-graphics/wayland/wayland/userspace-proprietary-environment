@@ -1,0 +1,7 @@
+# This should be source-d by all of applications which use userspace
+# proprietaries.
+if [ -z $LD_LIBRARY_PATH ] ; then
+    export LD_LIBRARY_PATH="/usr/local/lib"
+elif [ $(echo $LD_LIBRARY_PATH | grep '/usr/local/lib' | wc -l) -eq 0 ]  ; then
+    export LD_LIBRARY_PATH="/usr/local/lib:${LD_LIBRARY_PATH}"
+fi
