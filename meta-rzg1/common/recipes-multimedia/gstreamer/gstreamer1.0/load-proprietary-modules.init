@@ -1,0 +1,1 @@
+modprobe -a mmngr mmngrbuf s3ctl uvcs_cmn fdpm
