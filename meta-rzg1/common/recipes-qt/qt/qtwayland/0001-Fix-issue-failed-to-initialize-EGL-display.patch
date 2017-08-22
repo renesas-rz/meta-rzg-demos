@@ -148,9 +148,9 @@ index b53e057..0463e34 100644
      struct wl_shm *mShm;
 +    QThread *mEventThread;
 +    QWaylandEventThread *mEventThreadObject;
-     QScopedPointer<QtWayland::wl_shell> mShell;
-     QScopedPointer<QWaylandXdgShell> mShellXdg;
      QList<QWaylandScreen *> mScreens;
+     QList<QWaylandInputDevice *> mInputDevices;
+     QList<Listener> mRegistryListeners;
 diff --git a/src/client/qwaylandeventthread.cpp b/src/client/qwaylandeventthread.cpp
 new file mode 100644
 index 0000000..e0a3edc
