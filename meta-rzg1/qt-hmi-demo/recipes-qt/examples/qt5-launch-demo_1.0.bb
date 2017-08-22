@@ -10,15 +10,17 @@ SRCREV = "c43ddf9d354761c51266ecbdc6cb90a3aac1903d"
 SRC_URI = "git://code.qt.io/{non-gerrit}/qt-labs/qt5-launch-demo.git \
            file://0001-change_video_file.patch \
            http://www.renesas.com/ja-jp/media/products/microcontrollers-microprocessors/rz/rzg/qt-videos/renesas-bigideasforeveryspace.mp4;name=video \
-           file://0002-qt5-launch-demo-update-QtWebKit-to-QtWebEngine.patch \
 		   file://0003-qt5-launch-demo-work-around-issue-cannot-play-video.patch \
 "
+# Tempory remove due to license issue with Qt webengine
+# file://0002-qt5-launch-demo-update-QtWebKit-to-QtWebEngine.patch
 
 SRC_URI[video.md5sum] = "44748e486a971d1e039fbfc3bc15b6f1"
 SRC_URI[video.sha256sum] = "148ec58a28be27700a944b66e404d38ac9d0bbb376485ce60069bdc890a0e0c6"
 
 SRC_URI_append_iwg20m += " \
     file://0001-qt5-launch-demo-update-GUI-compatible-with-iWave.patch \
+    file://0002-Change-address-webpage-offline-to-show-for-customer.patch \
 "
 
 SRC_URI_append_skrzg1e += " \

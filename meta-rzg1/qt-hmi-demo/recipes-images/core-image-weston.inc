@@ -34,8 +34,8 @@ IMAGE_INSTALL_append = " \
     qt5-launch-demo \
     qt5-qml-presentation-system \
 	qtwebsockets \
-    qtwebengine \
-    qtwebengine-examples \
-    qtwebengine-qmlplugins \
+    qtwebkit \
+    qtwebkit-examples-examples \
+    qtwebkit-qmlplugins \
 	demo-videos \
 "
