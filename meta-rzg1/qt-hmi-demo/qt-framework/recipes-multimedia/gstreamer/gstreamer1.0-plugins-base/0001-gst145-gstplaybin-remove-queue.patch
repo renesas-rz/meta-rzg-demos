@@ -1,0 +1,32 @@
+From cad2a932f03f2654f245913d699073430f9f3052 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Tue, 13 Sep 2016 19:58:49 +0700
+Subject: [PATCH] gstplaybin-remove-queue
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ gst/playback/gstplaysink.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/gst/playback/gstplaysink.c b/gst/playback/gstplaysink.c
+index 37636a9..662d061 100755
+--- a/gst/playback/gstplaysink.c
++++ b/gst/playback/gstplaysink.c
+@@ -1856,6 +1856,7 @@ gen_video_chain (GstPlaySink * playsink, gboolean raw, gboolean async)
+    * decoder can continue while the sink blocks for synchronisation. We don't
+    * need a lot of buffers as this consumes a lot of memory and we don't want
+    * too little because else we would be context switching too quickly. */
++/*
+   chain->queue = gst_element_factory_make ("queue", "vqueue");
+   if (chain->queue == NULL) {
+     post_missing_element_message (playsink, "queue");
+@@ -1875,6 +1876,7 @@ gen_video_chain (GstPlaySink * playsink, gboolean raw, gboolean async)
+     }
+     prev = chain->queue;
+   }
++*/
+
+   GST_OBJECT_LOCK (playsink);
+   if (playsink->colorbalance_element) {
+--
+1.9.1

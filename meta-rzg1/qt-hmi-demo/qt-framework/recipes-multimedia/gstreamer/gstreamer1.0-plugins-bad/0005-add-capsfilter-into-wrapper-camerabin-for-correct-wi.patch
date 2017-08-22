@@ -1,0 +1,44 @@
+From cc6028d52109707fecc75fcf03b316b74ae31257 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Fri, 23 Dec 2016 15:25:24 +0700
+Subject: [PATCH 2/3] add capsfilter into wrapper camerabin for correct with
+ pipeline
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ gst/camerabin2/gstwrappercamerabinsrc.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/gst/camerabin2/gstwrappercamerabinsrc.c b/gst/camerabin2/gstwrappercamerabinsrc.c
+index 2e3dda6..4ce2b02 100644
+--- a/gst/camerabin2/gstwrappercamerabinsrc.c
++++ b/gst/camerabin2/gstwrappercamerabinsrc.c
+@@ -475,15 +475,23 @@ check_and_replace_src (GstWrapperCameraBinSrc * self)
+     self->src_vid_src = NULL;
+     return FALSE;
+   } else {
+-    GstElement *videoconvert;
++    GstElement *videoconvert, *v4l2src_capsfilter;
++    GstCaps *m_v4l2src_caps;
+     if (!gst_bin_add (cbin, self->src_vid_src)) {
+       return FALSE;
+     }
+ 
++      v4l2src_capsfilter = gst_element_factory_make("capsfilter", "v4l2src_cap");
++      m_v4l2src_caps  = gst_caps_new_simple ("video/x-raw", "format", G_TYPE_STRING, "UYVY", NULL);
++      g_object_set (G_OBJECT (v4l2src_capsfilter), "caps", m_v4l2src_caps, NULL);
++      gst_caps_unref (m_v4l2src_caps);
++      gst_bin_add_many ((GstBin *) cbin,v4l2src_capsfilter, NULL);
++      gst_element_link_many (self->src_vid_src, v4l2src_capsfilter, NULL);
++
+     /* check if we already have the next element to link to */
+     videoconvert = gst_bin_get_by_name (cbin, "src-videoconvert");
+     if (videoconvert) {
+-      if (!gst_element_link_pads (self->src_vid_src, "src", videoconvert,
++      if (!gst_element_link_pads (v4l2src_capsfilter, "src", videoconvert,
+               "sink")) {
+         return FALSE;
+       }
+-- 
+1.9.1
+

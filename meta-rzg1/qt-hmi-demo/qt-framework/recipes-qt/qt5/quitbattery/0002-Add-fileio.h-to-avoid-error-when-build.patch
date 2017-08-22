@@ -1,0 +1,48 @@
+From 9df5ff02e9159d68c5d34bd573eb28d852647721 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Sat, 5 Nov 2016 11:33:22 +0700
+Subject: [PATCH] Add fileio.h to avoid error when build
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ fileio.h | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+ create mode 100644 fileio.h
+
+diff --git a/fileio.h b/fileio.h
+new file mode 100644
+index 0000000..37b9b7b
+--- /dev/null
++++ b/fileio.h
+@@ -0,0 +1,29 @@
++#ifndef FILEIO_H
++#define FILEIO_H
++
++#include <QObject>
++#include <QFile>
++#include <QTextStream>
++
++class FileIO : public QObject
++{
++    Q_OBJECT
++
++public slots:
++    bool write(const QString& source, const QString& data)
++    {
++        QFile file(source);
++        if (!file.open(QFile::WriteOnly | QFile::Truncate))
++            return false;
++
++        QTextStream out(&file);
++        out << data << endl;
++        file.close();
++        return true;
++    }
++
++public:
++    FileIO() {}
++};
++
++#endif // FILEIO_H
+--
+1.9.1

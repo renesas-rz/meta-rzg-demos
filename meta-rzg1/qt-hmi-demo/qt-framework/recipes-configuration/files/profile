@@ -1,0 +1,13 @@
+export LD_LIBRARY_PATH="/usr/lib/gstreamer-1.0:/lib:/usr/lib:/usr/local/lib"
+export XDG_RUNTIME_DIR=/run/user/root
+export PATH=/home/root/RZ_scripts:$PATH
+export LD_PRELOAD=/usr/lib/libEGL.so
+
+amixer set 'PCM' 70%
+amixer set 'Headphone' 100%
+
+modprobe -a mmngr mmngrbuf s3ctl uvcs_cmn vspm fdpm
+
+alias ls='ls --color=auto'
+alias ll='ls -l'
+alias la='ls -la'

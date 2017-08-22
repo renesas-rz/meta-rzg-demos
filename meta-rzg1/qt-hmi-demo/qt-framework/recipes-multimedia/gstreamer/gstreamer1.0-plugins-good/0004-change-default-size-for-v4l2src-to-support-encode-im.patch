@@ -1,0 +1,28 @@
+From 8b4c6fcf0728d8c4327275ba8072e3e3b76732b7 Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Fri, 23 Dec 2016 14:49:47 +0700
+Subject: [PATCH] change default size for v4l2src to support encode image
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ sys/v4l2/gstv4l2src.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/sys/v4l2/gstv4l2src.c b/sys/v4l2/gstv4l2src.c
+index 6288d60..7f98b6b 100644
+--- a/sys/v4l2/gstv4l2src.c
++++ b/sys/v4l2/gstv4l2src.c
+@@ -325,8 +325,8 @@ gst_v4l2src_fixate (GstBaseSrc * basesrc, GstCaps * caps)
+ 
+     /* We are fixating to a resonable 320x200 resolution
+        and the maximum framerate resolution for that size */
+-    gst_structure_fixate_field_nearest_int (structure, "width", 320);
+-    gst_structure_fixate_field_nearest_int (structure, "height", 200);
++    gst_structure_fixate_field_nearest_int (structure, "width", 720);
++    gst_structure_fixate_field_nearest_int (structure, "height", 480);
+     gst_structure_fixate_field_nearest_fraction (structure, "framerate",
+         G_MAXINT, 1);
+     gst_structure_fixate_field (structure, "format");
+-- 
+1.9.1
+
