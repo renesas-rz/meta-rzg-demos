@@ -31,6 +31,8 @@ IMAGE_INSTALL_append = " \
     faac \
     gstreamer1.0-plugins-bad-faac \
     qtbase-fonts \
+    cinematicexperience \
+    qt5everywheredemo \
     qt5-launch-demo \
     qt5-qml-presentation-system \
 	qtwebsockets \
