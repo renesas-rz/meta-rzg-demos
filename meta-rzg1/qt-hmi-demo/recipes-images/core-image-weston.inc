@@ -3,6 +3,7 @@
 
 IMAGE_INSTALL_append = " \
     packagegroup-qt5-examples \
+    qtquickcontrols-qmlplugins \
     wireless-firmware \
     libegl \
 	\
