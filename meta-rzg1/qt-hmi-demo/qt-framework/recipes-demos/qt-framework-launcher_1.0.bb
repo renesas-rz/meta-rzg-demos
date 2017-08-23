@@ -14,6 +14,7 @@ SRC_URI = "file://launcher.tar.gz \
 	   file://0003-Remove-unecessary-application.patch \
 	   file://0004-Add-omxh26enc-to-qt-framework-launcher.patch \
 	   file://0005-Fix-issue-can-not-open-client-server-app-at-the-same.patch \
+	   file://0006-Make-text-flexible-with-resolution-screen.patch \
 "
 
 SRC_URI[md5sum] = "99AD3F57FE016B99DCE4AA83FEE545CB"

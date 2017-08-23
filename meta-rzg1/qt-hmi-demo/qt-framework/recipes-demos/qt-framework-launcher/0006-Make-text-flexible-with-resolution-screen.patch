@@ -1,0 +1,164 @@
+From a544a55c88c2ea18e7a8dc3495eacc36a801514f Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+Date: Wed, 16 Aug 2017 16:30:08 +0700
+Subject: [PATCH] Make text flexible with resolution screen
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+---
+ content/Data_Storage_Delegate.qml   |  2 +-
+ content/Graphics_Delegate.qml       |  2 +-
+ content/Module_Delegate.qml         |  4 ++--
+ content/Multimedia_Delegate.qml     |  2 +-
+ content/Networking_Delegate.qml     |  2 +-
+ content/User_Interface_Delegate.qml |  2 +-
+ launcher.qml                        | 12 ++++++------
+ 7 files changed, 13 insertions(+), 13 deletions(-)
+
+diff --git a/content/Data_Storage_Delegate.qml b/content/Data_Storage_Delegate.qml
+index 9c6c1ae..3a0b7c6 100644
+--- a/content/Data_Storage_Delegate.qml
++++ b/content/Data_Storage_Delegate.qml
+@@ -29,7 +29,7 @@ Rectangle {
+ 		width: parent.width / 2
+ 		wrapMode: Text.Wrap
+ 		horizontalAlignment: Text.AlignHCenter
+-		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
++		font.pointSize: (fontSize > 10) ? 10 : (fontSize < 5) ? 5 : fontSize
+ 		font.bold: selected ? true : false
+ 		color: selected ? "yellow" : "white"
+ 		Behavior on color { ColorAnimation { duration: 100 } }
+diff --git a/content/Graphics_Delegate.qml b/content/Graphics_Delegate.qml
+index 9ee7067..a90ec71 100644
+--- a/content/Graphics_Delegate.qml
++++ b/content/Graphics_Delegate.qml
+@@ -29,7 +29,7 @@ Rectangle {
+ 		width: parent.width / 2
+ 		wrapMode: Text.Wrap
+ 		horizontalAlignment: Text.AlignHCenter
+-		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
++		font.pointSize: (fontSize > 10) ? 10 : (fontSize < 5) ? 5 : fontSize
+ 		font.bold: selected ? true : false
+ 		color: selected ? "yellow" : "white"
+ 		Behavior on color { ColorAnimation { duration: 100 } }
+diff --git a/content/Module_Delegate.qml b/content/Module_Delegate.qml
+index 38ba2a2..2509118 100644
+--- a/content/Module_Delegate.qml
++++ b/content/Module_Delegate.qml
+@@ -10,7 +10,7 @@ Rectangle {
+ 	width: itemSize
+ 	height: itemSize + 10
+ 
+-	property int fontSize: itemSize * 12 / 100
++	property int fontSize: itemSize * 1 / 12
+ 
+ 	color: "transparent"
+ 
+@@ -27,7 +27,7 @@ Rectangle {
+ 
+ 		anchors { top: icon.bottom; topMargin: 5; horizontalCenter: parent.horizontalCenter }
+ 		text: name
+-		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
++		font.pointSize: (fontSize > 10) ? 10 : (fontSize < 5) ? 5 : fontSize
+ 		font.bold: selected ? true : false
+ 		color: selected ? "yellow" : "white"
+ 		Behavior on color { ColorAnimation { duration: 100 } }
+diff --git a/content/Multimedia_Delegate.qml b/content/Multimedia_Delegate.qml
+index 826219a..befa476 100644
+--- a/content/Multimedia_Delegate.qml
++++ b/content/Multimedia_Delegate.qml
+@@ -29,7 +29,7 @@ Rectangle {
+ 		width: parent.width / 2
+ 		wrapMode: Text.Wrap
+ 		horizontalAlignment: Text.AlignHCenter
+-		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
++		font.pointSize: (fontSize > 10) ? 10 : (fontSize < 5) ? 5 : fontSize
+ 		font.bold: selected ? true : false
+ 		color: selected ? "yellow" : "white"
+ 		Behavior on color { ColorAnimation { duration: 100 } }
+diff --git a/content/Networking_Delegate.qml b/content/Networking_Delegate.qml
+index 3c1cd57..3ae3f77 100644
+--- a/content/Networking_Delegate.qml
++++ b/content/Networking_Delegate.qml
+@@ -29,7 +29,7 @@ Rectangle {
+ 		width: parent.width / 2
+ 		wrapMode: Text.Wrap
+ 		horizontalAlignment: Text.AlignHCenter
+-		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
++		font.pointSize: (fontSize > 10) ? 10 : (fontSize < 5) ? 5 : fontSize
+ 		font.bold: selected ? true : false
+ 		color: selected ? "yellow" : "white"
+ 		Behavior on color { ColorAnimation { duration: 100 } }
+diff --git a/content/User_Interface_Delegate.qml b/content/User_Interface_Delegate.qml
+index 80aa109..9fc4637 100644
+--- a/content/User_Interface_Delegate.qml
++++ b/content/User_Interface_Delegate.qml
+@@ -29,7 +29,7 @@ Rectangle {
+ 		width: parent.width / 2
+ 		wrapMode: Text.Wrap
+ 		horizontalAlignment: Text.AlignHCenter
+-		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
++		font.pointSize: (fontSize > 10) ? 10 : (fontSize < 5) ? 5 : fontSize
+ 		font.bold: selected ? true : false
+ 		color: selected ? "yellow" : "white"
+ 		Behavior on color { ColorAnimation { duration: 100 } }
+diff --git a/launcher.qml b/launcher.qml
+index bcd21fc..555f2a2 100644
+--- a/launcher.qml
++++ b/launcher.qml
+@@ -11,7 +11,7 @@ Rectangle {
+ 	//width: 1920 / 2
+ 	//height: width * 9/16 // 9:16 is full HD ratio
+ 
+-	property real iDfontSize: width * 1.2 / 100
++	property real iDfontSize: width * 1 / (7 * 16)
+ 
+ 	Image {
+ 		id: launcher_wallpaper
+@@ -113,7 +113,7 @@ Rectangle {
+ 			Text {
+ 				anchors { left: parent.left; leftMargin: 10; top:parent.top; topMargin: 10}
+ 				text: user_interface_window_big.currentAppDetail
+-				font.pointSize: (iDfontSize > 15) ? 15 : ((iDfontSize < 10) ? 10 : iDfontSize)
++				font.pointSize: (iDfontSize > 9) ? 9 : ((iDfontSize < 5) ? 5 : iDfontSize)
+ 				color: "yellow"
+ 			}
+ 		}
+@@ -202,7 +202,7 @@ Rectangle {
+ 			Text {
+ 				anchors { left: parent.left; leftMargin: 10; top:parent.top; topMargin: 10}
+ 				text: data_storage_window_big.currentAppDetail
+-                font.pointSize: (iDfontSize > 15) ? 15 : ((iDfontSize < 10) ? 10 : iDfontSize)
++				font.pointSize: (iDfontSize > 9) ? 9 : ((iDfontSize < 5) ? 5 : iDfontSize)
+ 				color: "yellow"
+ 			}
+ 		}
+@@ -291,7 +291,7 @@ Rectangle {
+ 			Text {
+ 				anchors { left: parent.left; leftMargin: 10; top:parent.top; topMargin: 10}
+ 				text: multimedia_window_big.currentAppDetail
+-				font.pointSize: (iDfontSize > 15) ? 15 : ((iDfontSize < 10) ? 10 : iDfontSize)
++				font.pointSize: (iDfontSize > 9) ? 9 : ((iDfontSize < 5) ? 5 : iDfontSize)
+ 				color: "yellow"
+ 			}
+ 		}
+@@ -380,7 +380,7 @@ Rectangle {
+ 			Text {
+ 				anchors { left: parent.left; leftMargin: 10; top:parent.top; topMargin: 10}
+ 				text: networking_window_big.currentAppDetail
+-				font.pointSize: (iDfontSize > 15) ? 15 : ((iDfontSize < 10) ? 10 : iDfontSize)
++				font.pointSize: (iDfontSize > 9) ? 9 : ((iDfontSize < 5) ? 5 : iDfontSize)
+ 				color: "yellow"
+ 			}
+ 		}
+@@ -469,7 +469,7 @@ Rectangle {
+ 			Text {
+ 				anchors { left: parent.left; leftMargin: 10; top:parent.top; topMargin: 10}
+ 				text: graphics_window_big.currentAppDetail
+-				font.pointSize: (iDfontSize > 15) ? 15 : ((iDfontSize < 10) ? 10 : iDfontSize)
++				font.pointSize: (iDfontSize > 9) ? 9 : ((iDfontSize < 5) ? 5 : iDfontSize)
+ 				color: "yellow"
+ 			}
+ 		}
+-- 
+1.9.1
+
