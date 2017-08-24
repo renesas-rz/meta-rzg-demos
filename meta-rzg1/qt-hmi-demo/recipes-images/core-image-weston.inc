@@ -33,6 +33,7 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-bad-faac \
     qtbase-fonts \
     cinematicexperience \
+    qtsmarthome \
     qt5everywheredemo \
     qt5-launch-demo \
     qt5-qml-presentation-system \
