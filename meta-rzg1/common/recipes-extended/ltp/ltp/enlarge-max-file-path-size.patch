@@ -1,0 +1,81 @@
+From 45863c0584a97447858bc3118a682dc6e7da5a60 Mon Sep 17 00:00:00 2001
+From: Noriyuki Shiota <noriyuki.shiota@miraclelinux.com>
+Date: Tue, 15 Mar 2016 16:28:11 +0900
+Subject: Enlarge max file path size
+
+---
+ testcases/kernel/fs/doio/doio.h                           | 2 +-
+ testcases/kernel/security/prot_hsymlinks/prot_hsymlinks.c | 2 +-
+ testcases/kernel/syscalls/chdir/chdir03.c                 | 2 +-
+ testcases/kernel/syscalls/fchdir/fchdir03.c               | 2 +-
+ testcases/kernel/syscalls/pread/pread03.c                 | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/testcases/kernel/fs/doio/doio.h b/testcases/kernel/fs/doio/doio.h
+index 28c4feb..dbce804 100644
+--- a/testcases/kernel/fs/doio/doio.h
++++ b/testcases/kernel/fs/doio/doio.h
+@@ -129,7 +129,7 @@
+  *		This is an allowed assumption in C.
+  */
+ 
+-#define MAX_FNAME_LENGTH    128
++#define MAX_FNAME_LENGTH    256
+ 
+ struct read_req {
+     char    r_file[MAX_FNAME_LENGTH];
+diff --git a/testcases/kernel/security/prot_hsymlinks/prot_hsymlinks.c b/testcases/kernel/security/prot_hsymlinks/prot_hsymlinks.c
+index e9948e3..c6f9a41 100644
+--- a/testcases/kernel/security/prot_hsymlinks/prot_hsymlinks.c
++++ b/testcases/kernel/security/prot_hsymlinks/prot_hsymlinks.c
+@@ -52,7 +52,7 @@ int TST_TOTAL = 396;
+ 
+ /* create 3 files and 1 dir in each base dir */
+ #define MAX_FILES_CREATED	4
+-#define MAX_PATH		128
++#define MAX_PATH		256
+ #define MAX_CMD_LEN		64
+ #define MAX_USER_NAME		16
+ 
+diff --git a/testcases/kernel/syscalls/chdir/chdir03.c b/testcases/kernel/syscalls/chdir/chdir03.c
+index a33b4f3..5e54310 100644
+--- a/testcases/kernel/syscalls/chdir/chdir03.c
++++ b/testcases/kernel/syscalls/chdir/chdir03.c
+@@ -71,7 +71,7 @@ char user2name[] = "bin";
+ 
+ int exp_enos[] = { EACCES, 0 };
+ 
+-char good_dir[100];
++char good_dir[256];
+ 
+ struct passwd *ltpuser1, *ltpuser2;
+ 
+diff --git a/testcases/kernel/syscalls/fchdir/fchdir03.c b/testcases/kernel/syscalls/fchdir/fchdir03.c
+index d23407f..29c839a 100644
+--- a/testcases/kernel/syscalls/fchdir/fchdir03.c
++++ b/testcases/kernel/syscalls/fchdir/fchdir03.c
+@@ -73,7 +73,7 @@ char user1name[] = "nobody";
+ 
+ int exp_enos[] = { EACCES, 0 };
+ 
+-char good_dir[100];
++char good_dir[256];
+ int fd;
+ 
+ struct passwd *ltpuser1;
+diff --git a/testcases/kernel/syscalls/pread/pread03.c b/testcases/kernel/syscalls/pread/pread03.c
+index cc8ac5d..ec34205 100644
+--- a/testcases/kernel/syscalls/pread/pread03.c
++++ b/testcases/kernel/syscalls/pread/pread03.c
+@@ -89,7 +89,7 @@ char *TCID = "pread03";
+ int TST_TOTAL = 1;
+ 
+ char *read_buf[NBUFS];		/* buffer to hold data read from file */
+-char test_dir[100];
++char test_dir[256];
+ int fd1;			/* file descriptor of temporary file */
+ int exp_enos[] = { EISDIR, 0 };
+ 
+-- 
+1.9.1
+
