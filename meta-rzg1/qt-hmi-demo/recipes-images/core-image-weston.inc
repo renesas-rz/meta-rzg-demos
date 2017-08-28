@@ -21,7 +21,6 @@ IMAGE_INSTALL_append = " \
     qtdeclarative-tools \
     qtdeclarative-examples \
     qtdeclarative-qmlplugins \
-    qtquickcontrols-qmlplugins \
     qtimageformats-plugins \
     qtsvg \
     qtsvg-plugins \
