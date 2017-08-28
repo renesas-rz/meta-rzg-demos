@@ -18,7 +18,12 @@ toolchain_create_sdk_env_script_append() {
 
 # Add below modules to support self-compile for GStreamer app
 include core-image-weston.inc
+
 IMAGE_INSTALL_append = " \
-	gstreamer1.0-plugins-base-app \
-	gstreamer1.0-rtsp-server \
+    glmark2 \
+    configuration \
+    demos \
+    launcher-taskbar \
+    wireless-firmware \
+    demo-videos \
 "

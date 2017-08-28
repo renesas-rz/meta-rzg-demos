@@ -1,8 +1,7 @@
-
 EXTRA_IMAGE_FEATURES = "debug-tweaks tools-debug tools-profile"
 
-
-IMAGE_INSTALL_append = " \
+# Common lib,app
+IMAGE_INSTALL_append_rzg1 = " \
     mm-init \
     cairo \
     gstreamer1.0-plugins-base-vspmfilter \
@@ -22,10 +21,8 @@ IMAGE_INSTALL_append = " \
     gstreamer1.0-plugins-bad-camerabin2 \
     gstreamer1.0-plugins-good-icydemux \
     libgstphotography-1.0 \
-    glmark2 \
-    configuration \
-    demos \
-    launcher-taskbar \
-    wireless-firmware \
-    demo-videos \
+    faac \
+    gstreamer1.0-plugins-bad-faac \
+    gstreamer1.0-plugins-bad-faad \
+    gstreamer1.0-plugins-good-isomp4 \
 "
