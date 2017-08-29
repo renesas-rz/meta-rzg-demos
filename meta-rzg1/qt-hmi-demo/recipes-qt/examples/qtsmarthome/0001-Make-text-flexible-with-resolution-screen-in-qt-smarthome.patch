@@ -1,0 +1,310 @@
+From 2b01347eb36f49c325a804f42d3b24853a980106 Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+Date: Sat, 26 Aug 2017 16:46:21 +0700
+Subject: [PATCH] qt-hmi-demo: Fix text flexible in qtsmarthome app
+
+Make text flexible with resolution screen in qtsmarthome app
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+---
+ components/qml/components/tabwidget/TabPage.qml |  9 +++++----
+ qml/smarthome/components/FanStack.qml           |  2 +-
+ qml/smarthome/components/ForeCastView.qml       |  7 ++++---
+ qml/smarthome/components/TemperatureView.qml    |  5 +++--
+ qml/smarthome/components/Titlebar.qml           |  5 +++--
+ qml/smarthome/components/WeatherGod.qml         |  3 ++-
+ qml/smarthome/components/settings/TabPage.qml   |  9 +++++----
+ qml/smarthome/components/tabwidget/VTabBar.qml  |  2 +-
+ qml/smarthome/smarthome.qml                     |  2 +-
+ src/main.cpp                                    | 14 +++++++++++++-
+ 10 files changed, 38 insertions(+), 20 deletions(-)
+
+diff --git a/components/qml/components/tabwidget/TabPage.qml b/components/qml/components/tabwidget/TabPage.qml
+index 251f57d..7f98d74 100644
+--- a/components/qml/components/tabwidget/TabPage.qml
++++ b/components/qml/components/tabwidget/TabPage.qml
+@@ -32,6 +32,7 @@
+ 
+ import QtQuick 2.0
+ import "../"
++import QtQuick.Window 2.1
+ 
+ /**
+  * This item represents a generic page for the tabs. A page has properties
+@@ -78,7 +79,7 @@ Item {
+         anchors.leftMargin: 20
+         font {
+             family: "Arial"
+-            pointSize: 19
++            pointSize: Screen.desktopAvailableWidth < 1920 ? 12 : 19
+             bold: true
+         }
+         color: "white"
+@@ -119,7 +120,7 @@ Item {
+         color: "white"
+         font {
+             family: "Arial"
+-            pointSize: 18
++            pointSize: Screen.desktopAvailableWidth < 1920 ? 11 : 18
+             bold: false
+         }
+         anchors.left: icon.right
+@@ -144,7 +145,7 @@ Item {
+         color: "white"
+         font {
+             family: "Arial"
+-            pointSize: 18
++            pointSize: Screen.desktopAvailableWidth < 1920 ? 11 : 18
+             bold: false
+         }
+ 
+@@ -166,7 +167,7 @@ Item {
+         color: "white"
+         font {
+             family: "Arial"
+-            pointSize: 18
++            pointSize: Screen.desktopAvailableWidth < 1920 ? 11 : 18
+             bold: false
+         }
+ 
+diff --git a/qml/smarthome/components/FanStack.qml b/qml/smarthome/components/FanStack.qml
+index 605d95f..e2b136d 100644
+--- a/qml/smarthome/components/FanStack.qml
++++ b/qml/smarthome/components/FanStack.qml
+@@ -192,7 +192,7 @@ Rectangle {
+                     id: itemText
+                     text: name
+                     color: "white"
+-                    font.pointSize: 14
++                    font.pointSize: 9
+                     font.bold: false
+                     x: (parent.width - width) / 2
+                     y: 3
+diff --git a/qml/smarthome/components/ForeCastView.qml b/qml/smarthome/components/ForeCastView.qml
+index 044370c..091e4ff 100644
+--- a/qml/smarthome/components/ForeCastView.qml
++++ b/qml/smarthome/components/ForeCastView.qml
+@@ -31,6 +31,7 @@
+ */
+ 
+ import QtQuick 2.0
++import QtQuick.Window 2.1
+ 
+ /**
+ * This item shows information about the forecast
+@@ -84,7 +85,7 @@ Item {
+         */
+         SHText {
+             id: windDescription
+-            font.pointSize: 21
++            font.pointSize: Screen.desktopAvailableWidth < 1920 ? 13 : 21
+             height: storm.height
+         }
+         /**
+@@ -99,7 +100,7 @@ Item {
+         */
+         SHText {
+             id: rainPropabilityText
+-            font.pointSize: 21
++            font.pointSize: Screen.desktopAvailableWidth < 1920 ? 13 : 21
+             height: rainPropability.height
+         }
+         /**
+@@ -114,7 +115,7 @@ Item {
+         */
+         SHText {
+             id: rainAmountText
+-            font.pointSize: 21
++            font.pointSize: Screen.desktopAvailableWidth < 1920 ? 13 : 21
+             height: rainAmount.height
+         }
+     }
+diff --git a/qml/smarthome/components/TemperatureView.qml b/qml/smarthome/components/TemperatureView.qml
+index f391609..02c63f9 100644
+--- a/qml/smarthome/components/TemperatureView.qml
++++ b/qml/smarthome/components/TemperatureView.qml
+@@ -31,6 +31,7 @@
+ */
+ 
+ import QtQuick 2.0
++import QtQuick.Window 2.1
+ /**
+ * This Item shows information about the temperature mainly as texts.
+ */
+@@ -66,7 +67,7 @@ Item {
+ 
+             SHText {
+                 text: trailingZero(Math.floor(current * 10) / 10)
+-                font.pointSize: 70
++                font.pointSize: Screen.desktopAvailableWidth < 1920 ? 45 : 70
+                 color: temperatureView.textColor
+             }
+ 
+@@ -76,7 +77,7 @@ Item {
+             SHText {
+                 id: cText
+                 text: "°C"
+-                font.pointSize: 40
++                font.pointSize: Screen.desktopAvailableWidth < 1920 ? 25 : 40
+                 color: temperatureView.textColor
+             }
+         }
+diff --git a/qml/smarthome/components/Titlebar.qml b/qml/smarthome/components/Titlebar.qml
+index 0ec4d97..bc422f6 100644
+--- a/qml/smarthome/components/Titlebar.qml
++++ b/qml/smarthome/components/Titlebar.qml
+@@ -31,6 +31,7 @@
+  */
+ 
+ import QtQuick 2.0
++import QtQuick.Window 2.1
+ 
+ /**
+  * The titleBar shows the date, time, label and the god button
+@@ -70,7 +71,7 @@ Image {
+             anchors.centerIn: parent
+             color: "white"
+             font {
+-                pointSize: titleBar.width > 840 ? 14 : 11
++                pointSize: titleBar.width > 840 ? 14 : (Screen.desktopAvailableWidth < 1920 ? 7 : 11)
+             }
+         }
+     }
+@@ -112,7 +113,7 @@ Image {
+         anchors.leftMargin: 8
+         anchors.verticalCenter: parent.verticalCenter
+         color: "white"
+-        font { pointSize: 21; bold: true }
++        font { pointSize: Screen.desktopAvailableWidth < 1920 ? 13 : 21; bold: true }
+     }
+ 
+     BorderImage {
+diff --git a/qml/smarthome/components/WeatherGod.qml b/qml/smarthome/components/WeatherGod.qml
+index 29ac6f5..9eb768e 100644
+--- a/qml/smarthome/components/WeatherGod.qml
++++ b/qml/smarthome/components/WeatherGod.qml
+@@ -31,6 +31,7 @@
+  */
+ 
+ import QtQuick 2.0
++import QtQuick.Window 2.1
+ 
+ /**
+ * Why doing a rain dance or pray for sun.
+@@ -50,7 +51,7 @@ Item {
+         id: lord
+         x: conditionSlider.x
+         text: "CHOOSE YOUR WEATHER"
+-        font.pointSize: 20
++        font.pointSize: Screen.desktopAvailableWidth < 1920 ? 12 : 20
+     }
+ 
+     /**
+diff --git a/qml/smarthome/components/settings/TabPage.qml b/qml/smarthome/components/settings/TabPage.qml
+index cc80a47..0fbea22 100644
+--- a/qml/smarthome/components/settings/TabPage.qml
++++ b/qml/smarthome/components/settings/TabPage.qml
+@@ -32,6 +32,7 @@
+ 
+ import QtQuick 2.0
+ import "../"
++import QtQuick.Window 2.1
+ 
+ /**
+  * This item represents a generic page for the tabs. A page has properties
+@@ -74,7 +75,7 @@ Item {
+         anchors.left: parent.left
+         anchors.leftMargin: 20        
+         font {
+-            pointSize: 19
++            pointSize: Screen.desktopAvailableWidth < 1920 ? 12 : 19
+             bold: true
+         }
+         color: "white"
+@@ -108,7 +109,7 @@ Item {
+         id: closeText
+         color: "white"
+         font {
+-            pointSize: 18
++            pointSize: Screen.desktopAvailableWidth < 1920 ? 11 : 18
+             bold: false
+         }
+         anchors.left: icon.right
+@@ -127,7 +128,7 @@ Item {
+         anchors.leftMargin: 20
+         color: "white"
+         font {
+-            pointSize: 18
++            pointSize: Screen.desktopAvailableWidth < 1920 ? 11 : 18
+             bold: false
+         }
+     }
+@@ -140,7 +141,7 @@ Item {
+         anchors.leftMargin: 20
+         color: "white"
+         font {
+-            pointSize: 18
++            pointSize: Screen.desktopAvailableWidth < 1920 ? 11 : 18
+             bold: false
+         }
+     }
+diff --git a/qml/smarthome/components/tabwidget/VTabBar.qml b/qml/smarthome/components/tabwidget/VTabBar.qml
+index 9da5d36..808cb50 100644
+--- a/qml/smarthome/components/tabwidget/VTabBar.qml
++++ b/qml/smarthome/components/tabwidget/VTabBar.qml
+@@ -121,7 +121,7 @@ Rectangle {
+                     x: parent.width/2 - width/2
+                     text: tabBar.tabs[index]
+                     font.family: "Arial"
+-                    font.pointSize: 12
++                    font.pointSize: 9
+                     font.bold: tabBar.currentIndex == index
+                 }
+ 
+diff --git a/qml/smarthome/smarthome.qml b/qml/smarthome/smarthome.qml
+index 42dd4da..b7e48d0 100644
+--- a/qml/smarthome/smarthome.qml
++++ b/qml/smarthome/smarthome.qml
+@@ -50,7 +50,7 @@ elements. The screen switch logic is implemented using QML States and QML Transi
+ Item {
+     id: smartHome
+     width: 800
+-    height: 480
++    height: 400
+     smooth: false
+ 
+     property int parentOpacity: (parent == null) ? 1 : parent.opacity
+diff --git a/src/main.cpp b/src/main.cpp
+index dad6f66..cc25373 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -1,5 +1,7 @@
+ #include <QtQuick/QQuickView>
+ #include <QGuiApplication>
++#include <QtGui/QScreen>
++#include <QtQuick/QQuickItem>
+ 
+ #include "myquickview.h"
+ 
+@@ -14,7 +16,17 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
+ 
+     QObject::connect((QObject*)viewer.engine(), SIGNAL(quit()), &app, SLOT(quit()));
+ 
+-    viewer.resize(800, 480);
++    // Classify width and height for screens
++    foreach (QScreen *screen, QGuiApplication::screens()) {
++    // Get screen has coordinates 0 and 0
++        if((screen->geometry().y() == 0) && (screen->geometry().x() == 0)) {
++            viewer.resize(screen->availableSize().width() < 1920 ? 800 : 1280, screen->availableSize().height() < 1080 ? 400 : 800);
++            qDebug() << "Information for screen:" << screen->name();
++            qDebug() << "  Available geometry:" << screen->availableGeometry().x() << screen->availableGeometry().y() << screen->availableGeometry().width() << "x" << screen->availableGeometry().height();
++            qDebug() << "  Available size:" << screen->availableSize().width() << "x" << screen->availableSize().height();
++        }
++    }
++
+     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
+ 
+     viewer.show();
+-- 
+1.9.1
+
