@@ -21,6 +21,7 @@ SRC_URI[video.sha256sum] = "148ec58a28be27700a944b66e404d38ac9d0bbb376485ce60069
 SRC_URI_append_iwg20m += " \
     file://0001-qt5-launch-demo-update-GUI-compatible-with-iWave.patch \
     file://0002-Change-address-webpage-offline-to-show-for-customer.patch \
+    file://0003-Add-flexible-screen-resolution-for-qt-launcher-demo-.patch \
 "
 
 SRC_URI_append_skrzg1e += " \
