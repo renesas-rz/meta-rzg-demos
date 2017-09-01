@@ -2,8 +2,12 @@ export LD_LIBRARY_PATH="/usr/lib/gstreamer-1.0:/lib:/usr/lib:/usr/local/lib"
 export XDG_RUNTIME_DIR=/run/user/root
 export PATH=/home/root/RZ_scripts:$PATH
 
-amixer set 'DVC Out' 10
-amixer set 'LINEOUT Mixer DACL' on
+# Set Audio out
+amixer set 'PCM' 70%
+amixer set 'Headphone' 70%
+
+# Set Mic
+amixer set 'Mic' 70%
     
 modprobe -a mmngr mmngrbuf s3ctl uvcs_cmn vspm fdpm
     
