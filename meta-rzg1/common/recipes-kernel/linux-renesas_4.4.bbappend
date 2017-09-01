@@ -71,6 +71,9 @@ do_configure_append() {
     kernel_configure_variable RTL8192CU m
     kernel_configure_variable RTL8812AU_8821AU y
 
+# Enable PCIe specific driver
+    kernel_configure_variable R8169 y
+
     yes '' | oe_runmake oldconfig
 }
 
