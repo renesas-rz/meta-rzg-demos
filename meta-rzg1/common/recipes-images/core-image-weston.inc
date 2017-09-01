@@ -26,3 +26,27 @@ IMAGE_INSTALL_append_rzg1 = " \
     gstreamer1.0-plugins-bad-faad \
     gstreamer1.0-plugins-good-isomp4 \
 "
+
+# Common apps
+IMAGE_INSTALL_append_rzg1 = " \
+    dosfstools \
+    evtest \
+    e2fsprogs-mke2fs \
+    i2c-tools \
+    iproute2 \
+    memtester \
+    python-subprocess \
+    python-datetime \
+    python-json \
+    ethtool \
+    mtd-utils \
+    mtd-utils-ubifs \
+    iperf \
+    can-utils \
+    pciutils \
+    libsocketcan \
+    minicom \
+    lttng-tools \
+    lttng-modules \
+    lttng-ust \
+"
