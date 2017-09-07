@@ -7,6 +7,7 @@ SRC_URI = " \
  file://RZ_scripts.tar.xz  \
  file://ATT93936.bashrc \
  file://0001-Add-CAM_DEV-variable-to-camera-encoding-script.patch \
+ file://0002-HMI-fix-issue-video-file-encoded-too-fast.patch \
 "
 
 do_install () {
