@@ -19,13 +19,13 @@ target-bitrate=10485760 num-p-frames=0 ! h264parse ! video/x-h264,stream-format=
 rtph264pay pt=96 config-interval=3 mtu=9000 ! udpsink host=127.255.255.255 port=1234 &
 
 while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga1.h264 ! video/x-h264,framerate=30/1 ! \
-h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=127.255.255.255 port=1235 &> /dev/null; \
+queue ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=127.255.255.255 port=1235 &> /dev/null; \
 done &
 while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga2.h264 ! video/x-h264,framerate=30/1 ! \
-h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=127.255.255.255 port=1236 &> /dev/null; \
+queue ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=127.255.255.255 port=1236 &> /dev/null; \
 done &
 while true; do  gst-launch-1.0 filesrc location=$VIDEOLOCATION/vga3.h264 ! video/x-h264,framerate=30/1 ! \
-h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=127.255.255.255 port=1237 &> /dev/null; \
+queue ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay config-interval=3 pt=96 mtu=9000 ! udpsink host=127.255.255.255 port=1237 &> /dev/null; \
 done &
 
 # Detect and re-streaming if CAM_DEV is changed
