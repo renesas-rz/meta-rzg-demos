@@ -1,0 +1,254 @@
+From 4ad977f563609c6ae2fc8732ef9fdeec5308139c Mon Sep 17 00:00:00 2001
+From: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+Date: Fri, 10 Jun 2016 08:34:36 +0700
+Subject: [PATCH] DoorPhone-Fix qtmultimedia issues on Qt5.6
+
+There are 3 issues when DoorPhone updates Qt framwork from 5.5 to 5.6:
+Issue1: There are some warnings relate to state of gstreamer pipeline
+Issue2: display of DoorPhone is wrong, lack of background frame
+Issue3: DoorPhone is corrupt (can not display anything of DoorPhone) after show welcome screen
+
+The reason of these issues is flexible display function sets new video pipeline when DoorPhone starts
+This patch file fix these issues by making DoorPhone not set video pipeline when DoorPhone starts,
+setting new video pipeline by flexible display function will be handle by a timer
+
+Signed-off-by: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+---
+ .../qgstreamerH264Streamingsession.cpp             | 126 ++++++++++++---------
+ 1 file changed, 71 insertions(+), 55 deletions(-)
+
+diff --git a/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp b/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp
+index 52b8eac..dc7d2df 100755
+--- a/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp
++++ b/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingsession.cpp
+@@ -76,6 +76,19 @@ GTimeVal diff_time;
+ 
+ gulong count=0;
+ gulong past_count=0;
++
++user_data_t *userData1;
++user_data_t *userData2;
++user_data_t *userData3;
++user_data_t *userData4;
++
++int change_count = 2;
++bool change_new = false;
++
++int count_check = 0;        
++int check_match = 0;       
++int change_times = 0;       
++
+ struct itimerval val;
+ 
+ QByteArray FPS_env;
+@@ -111,10 +124,30 @@ alarm_handler(int)
+ {
+ 	guint framesinsec = count-past_count;
+ 	past_count = count;
+-
+-	qDebug() << "FPS:"
+-			 << (float)(framesinsec/val.it_interval.tv_sec)
+-			 << "fps";
++	
++	// check set new properties for video pipeline or not
++	if(count_check == change_count && change_new == true){
++		check_match = check_match + 1;
++	}
++	else
++		count_check = change_count;
++    // check 3 times whether setting new properties stopped
++	if(check_match == 3 && change_times == 0){
++		change_times = 1;
++		check_match = 0;
++		change_new = false;
++	}
++	// not setting new pipeline when DoorPhone starts
++	if(check_match == 3 && change_times == 1){
++		printf("SET NEW PIPELINE \n");
++		gst_pad_add_probe (userData1->blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, userData1, NULL);
++		gst_pad_add_probe (userData2->blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, userData2, NULL);
++		gst_pad_add_probe (userData3->blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, userData3, NULL);
++		gst_pad_add_probe (userData4->blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, userData4, NULL);
++		change_count = 0;
++		change_new = false;
++		check_match = 0;
++	}
+ }
+ 
+ static gboolean
+@@ -270,7 +303,7 @@ QGstreamerH264StreamingSession::QGstreamerH264StreamingSession(QObject *parent)
+     tee = gst_element_factory_make ("tee", "video-tee");
+     decoder1 = gst_element_factory_make ("omxh264dec","decoder1");
+ 
+-    g_object_set (G_OBJECT (pay), "pt", 96, NULL);
++    g_object_set (G_OBJECT (pay), "pt", 96, NULL);  // 96
+     g_object_set (G_OBJECT (pay), "config-interval", 3, NULL);
+     g_object_set (G_OBJECT (pay), "mtu", 9000, NULL);
+     filtercaps_depay = gst_caps_new_simple ("video/x-h264",
+@@ -290,6 +323,7 @@ QGstreamerH264StreamingSession::QGstreamerH264StreamingSession(QObject *parent)
+     m_bus = gst_element_get_bus(userData.m_playbin);
+     m_busHelper = new QGstreamerBusHelper(m_bus, this);
+     m_busHelper->installMessageFilter(this);
++
+ }
+ 
+ QGstreamerH264StreamingSession::~QGstreamerH264StreamingSession()
+@@ -438,88 +472,52 @@ void QGstreamerH264StreamingSession::setWlsMaxLateness(qint64 wlsmaxlateness)
+ 
+ void QGstreamerH264StreamingSession::setWlsQos(bool wlsqos)
+ {
++	change_count ++;
++	change_new = true;
+     //g_print("QGstreamerH264StreamingSession::setWlsQos (%d) \n", userData.counter);
+     userData.m_wls_qos = wlsqos;
+     g_object_set (G_OBJECT (userData.videosink), "qos", userData.m_wls_qos, NULL);
+ 
+-    /* Wait for application finish setting up all 5 properties */
+-    userData.counter = userData.counter + 1;
+-    if(userData.counter == 5){
+-        userData.counter = 0;
+-        if(!isFirstChange)
+-            gst_pad_add_probe (userData.blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, &userData, NULL);
+-        else
+-            isFirstChange = false;
+-    }
+-
+ }
+ 
+ void QGstreamerH264StreamingSession::setWlsPositionX(int wlspositionx)
+ {
++	change_count ++;
++	change_new = true;
+     //g_print("QGstreamerH264StreamingSession::setwlspositionX (%d) - (%d)\n", wlspositionx, userData.counter);
+     userData.m_wls_position_x = wlspositionx;
+     g_object_set (G_OBJECT (userData.videosink), "position_x", userData.m_wls_position_x, NULL);
+ 
+-    /* Wait for application finish setting up all 5 properties */
+-    userData.counter = userData.counter + 1;
+-    if(userData.counter == 5){
+-        userData.counter = 0;
+-        if(!isFirstChange)
+-            gst_pad_add_probe (userData.blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, &userData, NULL);
+-        else
+-            isFirstChange = false;
+-    }
+ }
+ 
+ void QGstreamerH264StreamingSession::setWlsPositionY(int wlspositiony)
+ {
++	change_count ++;
++	change_new = true;
+     //g_print("QGstreamerH264StreamingSession::setWlspositionY (%d) - (%d)\n", wlspositiony, userData.counter);
+     userData.m_wls_position_y = wlspositiony;
+     g_object_set (G_OBJECT (userData.videosink), "position_y", userData.m_wls_position_y, NULL);
+-
+-    /* Wait for application finish setting up all 5 properties */
+-    userData.counter = userData.counter + 1;
+-    if(userData.counter == 5){
+-        userData.counter = 0;
+-        if(!isFirstChange)
+-            gst_pad_add_probe (userData.blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, &userData, NULL);
+-        else
+-            isFirstChange = false;
+-    }
++    
+ }
+ 
+ void QGstreamerH264StreamingSession::setWlsOutWidth(int wlsoutwidth)
+ {
++	change_count ++;
++	change_new = true;
+     //g_print("QGstreamerH264StreamingSession::setWlsOutWidth (%d) - (%d)\n", wlsoutwidth, userData.counter);
+     userData.m_wls_out_width = wlsoutwidth;
+     g_object_set (G_OBJECT (userData.videosink), "out_width", userData.m_wls_out_width, NULL);
+ 
+-    /* Wait for application finish setting up all 5 properties */
+-    userData.counter = userData.counter + 1;
+-    if(userData.counter == 5){
+-        userData.counter = 0;
+-        if(!isFirstChange)
+-            gst_pad_add_probe (userData.blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, &userData, NULL);
+-        else
+-            isFirstChange = false;
+-    }
+ }
+ 
+ void QGstreamerH264StreamingSession::setWlsOutHeight(int wlsoutheight)
+ {
++	change_count ++;
++	change_new = true;
+     //g_print("QGstreamerH264StreamingSession::setWlsOutHeight (%d) - (%d)\n", wlsoutheight, userData.counter);
+     userData.m_wls_out_height = wlsoutheight;
+     g_object_set (G_OBJECT (userData.videosink), "out_height", userData.m_wls_out_height, NULL);
+ 
+-    /* Wait for application finish setting up all 5 properties */
+-    userData.counter = userData.counter + 1;
+-    if(userData.counter == 5){
+-        userData.counter = 0;
+-        if(!isFirstChange)
+-            gst_pad_add_probe (userData.blockpad, GST_PAD_PROBE_TYPE_BLOCK_DOWNSTREAM, QGstreamerH264StreamingSession::pad_probe_cb, &userData, NULL);
+-        else
+-            isFirstChange = false;
+-    }
+ }
+ 
+ GstPadProbeReturn QGstreamerH264StreamingSession::event_probe_cb (GstPad * pad, GstPadProbeInfo * info, gpointer user_data)
+@@ -597,6 +595,20 @@ void QGstreamerH264StreamingSession::componentComplete()
+ 
+     id++;
+ 
++	if(id == 1)
++		userData1 = &userData;
++	if(id == 2)
++		userData2 = &userData;
++	if(id == 3)
++		userData3 = &userData;
++	if(id == 4)
++		userData4 = &userData;
++	
++    val.it_interval.tv_sec = 0; /* ie. every second */
++    val.it_interval.tv_usec = 100000;
++    val.it_value.tv_sec = 1; /* initialise counter */
++    val.it_value.tv_usec = 0;
++    		
+     FPS_env = qgetenv("QT_SHOW_FPS");
+     if (FPS_env.isEmpty() == false && id == atoi (FPS_env))
+     {
+@@ -611,6 +623,7 @@ void QGstreamerH264StreamingSession::componentComplete()
+     	}
+     	if (FPS_env != "0")
+     	{
++			printf("GO TO SET TIMER\n");
+     		val.it_interval.tv_sec = 1; /* ie. every second */
+     		val.it_interval.tv_usec = 0;
+     		val.it_value.tv_sec = 1; /* initialise counter */
+@@ -1230,12 +1243,12 @@ bool QGstreamerH264StreamingSession::processBusMessage1(const QGstreamerMessage
+ 		{
+ 			GstState oldSt, newSt, targetSt;
+ 			gst_message_parse_state_changed (msg, &oldSt, &newSt, &targetSt);
+-			/*g_print("[Player][Event] %s: %s %s => %s (target:%s)\n",
++			g_print("[Player][Event] %s: %s %s => %s (target:%s)\n",
+ 			GST_MESSAGE_TYPE_NAME(msg),
+ 			GST_OBJECT_NAME(msg->src),
+ 			gst_element_state_get_name(oldSt),
+ 			gst_element_state_get_name(newSt),
+-			gst_element_state_get_name(targetSt));*/
++			gst_element_state_get_name(targetSt));
+ 			
+ 			if ((oldSt == GST_STATE_PLAYING) && (newSt == GST_STATE_PAUSED) && isTeePadAdd) {
+ 				rtspDisConnected();
+@@ -1292,7 +1305,10 @@ bool QGstreamerH264StreamingSession::processBusMessage1(const QGstreamerMessage
+ 
+ 		/* Other message */
+ 		default:
+-			g_print("[Player][Event] %s\n", GST_MESSAGE_TYPE_NAME(msg));
++			g_print("[Player][Event] ERROR ** %d\n", GST_MESSAGE_TYPE(msg));
++			const GstStructure *s = gst_message_get_structure (msg);
++			const gchar *name = gst_structure_get_name (s);
++			printf("ELEMENT NAME %s \n",name);
+ 		break;
+ 	}
+ 
+-- 
+1.9.1
+

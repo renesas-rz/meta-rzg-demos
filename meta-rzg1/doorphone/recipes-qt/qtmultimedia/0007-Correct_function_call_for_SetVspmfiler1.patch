@@ -1,0 +1,26 @@
+From 9f3549aabe7f76295cba5e4f99b35a417461c63d Mon Sep 17 00:00:00 2001
+From: khoahvd <khoahvd@fsoft.com.vn>
+Date: Mon, 28 Dec 2015 14:51:08 +0700
+Subject: [PATCH 7/8] Correct_function_call_for_SetVspmfiler1
+
+Signed-off-by: khoahvd <khoahvd@fsoft.com.vn>
+---
+ src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingcontrol.cpp | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingcontrol.cpp b/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingcontrol.cpp
+index 193f33d..4ccbb83 100644
+--- a/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingcontrol.cpp
++++ b/src/plugins/gstreamer/H264Streaming/qgstreamerH264Streamingcontrol.cpp
+@@ -155,7 +155,7 @@ void QGstreamerH264StreamingControl::setVspmWidth(int vspmwidth)
+ 
+ void QGstreamerH264StreamingControl::setVspmWidth1(int vspmwidth1)
+ {
+-    m_session->setVspmWidth(vspmwidth1);
++    m_session->setVspmWidth1(vspmwidth1);
+ }
+ 
+ void QGstreamerH264StreamingControl::setVspmHeight(int vspmheight)
+-- 
+1.9.1
+

@@ -1,0 +1,13 @@
+diff --git a/src/client/qwaylandwindow.cpp b/src/client/qwaylandwindow.cpp
+index 6c4a339..b4b1b43 100644
+--- a/src/client/qwaylandwindow.cpp
++++ b/src/client/qwaylandwindow.cpp
+@@ -557,6 +557,8 @@ bool QWaylandWindow::createDecoration()
+ 
+ QWaylandAbstractDecoration *QWaylandWindow::decoration() const
+ {
++    //re-activate wayland shell surface
++    mShellSurface->setTopLevel();
+     return mWindowDecoration;
+ }
+ 

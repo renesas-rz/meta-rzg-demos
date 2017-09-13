@@ -1,0 +1,121 @@
+From 92a7f455fa97077713a6c969394872346ae37bd5 Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Fri, 15 Jan 2016 20:15:18 +0700
+Subject: [PATCH] Workaround error sometimes touch button has no effect, such
+ as after touch cancel button on play list panel
+
+This error does not happen if using mouse instead of touch
+The reason is with touch screen, event onEntered and onExited
+does not work correctly.
+
+With mouse, onEntered occurs when move mouse over button, and
+onExited when move mouse out
+But with touch, only onEntered occurs when touch button at first time
+onExited will never occur. At second touch, onEnterd also not happen
+as it does not exit
+
+Due to this issue, a state change in button not work correctly.
+This patch just work-around it (by accept both states).
+
+Signed-off-by: HungTran <hung.tran.jy@rvc.renesas.com>
+---
+ qml/simpleplayer/main.qml | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/qml/simpleplayer/main.qml b/qml/simpleplayer/main.qml
+index 487e3e6..398b0ab 100755
+--- a/qml/simpleplayer/main.qml
++++ b/qml/simpleplayer/main.qml
+@@ -1905,7 +1905,7 @@ Rectangle {
+                             //change icons normal <=> pressed
+                             //execute function id
+ 			    if (pathv.model == list_icon_red) {
+-			        if (pathv.model.get(index).state == icon_normal_bright_state) {
++			        if (pathv.model.get(index).state == icon_normal_bright_state || pathv.model.get(index).state == icon_normal_state) {
+                                     //change icon
+                                     pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_pressed_bright)
+                                     pathv.model.setProperty(index, "state", icon_pressed_bright_state)
+@@ -2024,7 +2024,7 @@ Rectangle {
+                                         }
+ 
+                                     }
+-                                } else if (pathv.model.get(index).state == icon_pressed_bright_state) {
++                                } else if (pathv.model.get(index).state == icon_pressed_bright_state || pathv.model.get(index).state == icon_pressed_state) {
+                                     //change icon
+                                     pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_bright)
+                                     pathv.model.setProperty(index, "state", icon_normal_bright_state)
+@@ -2100,7 +2100,7 @@ Rectangle {
+                                 }
+ 			    }
+ 			    else if (pathv.model == list_icon_blue) {
+-			        if (pathv.model.get(index).state == icon_normal_bright_state) {
++			        if (pathv.model.get(index).state == icon_normal_bright_state || pathv.model.get(index).state == icon_normal_state) {
+                                     //change icon
+                                     pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_pressed_bright)
+                                     pathv.model.setProperty(index, "state", icon_pressed_bright_state)
+@@ -2219,7 +2219,7 @@ Rectangle {
+                                         }
+ 
+                                     }
+-                                } else if (pathv.model.get(index).state == icon_pressed_bright_state) {
++                                } else if (pathv.model.get(index).state == icon_pressed_bright_state || pathv.model.get(index).state == icon_pressed_state) {
+                                     //change icon
+                                     pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_bright)
+                                     pathv.model.setProperty(index, "state", icon_normal_bright_state)
+@@ -2295,7 +2295,7 @@ Rectangle {
+                                 }
+ 			    }
+ 			    else if (pathv.model == list_icon_green) {
+-			        if (pathv.model.get(index).state == icon_normal_bright_state) {
++			        if (pathv.model.get(index).state == icon_normal_bright_state || pathv.model.get(index).state == icon_normal_state) {
+                                     //change icon
+                                     pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_pressed_bright)
+                                     pathv.model.setProperty(index, "state", icon_pressed_bright_state)
+@@ -2414,7 +2414,7 @@ Rectangle {
+                                         }
+ 
+                                     }
+-                                } else if (pathv.model.get(index).state == icon_pressed_bright_state) {
++                                } else if (pathv.model.get(index).state == icon_pressed_bright_state || pathv.model.get(index).state == icon_pressed_state) {
+                                     //change icon
+                                     pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_bright)
+                                     pathv.model.setProperty(index, "state", icon_normal_bright_state)
+@@ -2490,7 +2490,7 @@ Rectangle {
+                                 }
+ 			    }
+ 			    else if (pathv.model == list_icon_orange) {
+-			        if (pathv.model.get(index).state == icon_normal_bright_state) {
++			        if (pathv.model.get(index).state == icon_normal_bright_state || pathv.model.get(index).state == icon_normal_state) {
+                                     //change icon
+                                     pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_pressed_bright)
+                                     pathv.model.setProperty(index, "state", icon_pressed_bright_state)
+@@ -2609,7 +2609,7 @@ Rectangle {
+                                         }
+ 
+                                     }
+-                                } else if (pathv.model.get(index).state == icon_pressed_bright_state) {
++                                } else if (pathv.model.get(index).state == icon_pressed_bright_state || pathv.model.get(index).state == icon_pressed_state) {
+                                     //change icon
+                                     pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_bright)
+                                     pathv.model.setProperty(index, "state", icon_normal_bright_state)
+@@ -2685,7 +2685,7 @@ Rectangle {
+                                 }
+ 			    }
+ 			    else if (pathv.model == list_icon_yellow) {
+-			        if (pathv.model.get(index).state == icon_normal_bright_state) {
++			        if (pathv.model.get(index).state == icon_normal_bright_state || pathv.model.get(index).state == icon_normal_state) {
+                                     //change icon
+                                     pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_pressed_bright)
+                                     pathv.model.setProperty(index, "state", icon_pressed_bright_state)
+@@ -2804,7 +2804,7 @@ Rectangle {
+                                         }
+ 
+                                     }
+-                                } else if (pathv.model.get(index).state == icon_pressed_bright_state) {
++                                } else if (pathv.model.get(index).state == icon_pressed_bright_state || pathv.model.get(index).state == icon_pressed_state) {
+                                     //change icon
+                                     pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_bright)
+                                     pathv.model.setProperty(index, "state", icon_normal_bright_state)
+-- 
+1.9.1
+

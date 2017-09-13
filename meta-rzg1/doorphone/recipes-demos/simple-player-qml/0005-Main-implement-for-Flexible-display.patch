@@ -1,0 +1,2613 @@
+From 779b97a41b5872ad69464b140a6e8d2d194c6703 Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Thu, 4 Feb 2016 21:56:05 +0700
+Subject: [PATCH 5/6] Main implement for Flexible display
+
+Description:
+- Define new button for get ratio input from user
+- Arrange items follow ratio with root window
+- Define timer for call handler when timeout to change property of videos and GUI
+
+Signed-off-by: khoahvd <khoahvd@fsoft.com.vn>
+---
+ qml/simpleplayer/main.qml | 1981 +++++++++++++++++++++++++++------------------
+ 1 file changed, 1212 insertions(+), 769 deletions(-)
+
+diff --git a/qml/simpleplayer/main.qml b/qml/simpleplayer/main.qml
+index 398b0ab..5f6b476 100755
+--- a/qml/simpleplayer/main.qml
++++ b/qml/simpleplayer/main.qml
+@@ -33,15 +33,17 @@
+ 
+ import QtQuick 2.0
+ import QtQuick.Dialogs 1.1
+-import QtQuick.Controls 1.3
++import QtQuick.Controls 1.4
+ import QtQuick.Layouts 1.0
+ import QtMultimedia 5.0
+ import Qt.labs.folderlistmodel 2.1
++import QtQuick.Controls.Styles 1.4
++
+ 
+ Rectangle {
+-    id: root
++    id: container
+     x:0; y:0
+-    width: 1280; height: 720
++    width: screenWidth; height: screenHeight
+     color: "transparent"
+ 
+     /*Welcome slide*/
+@@ -240,6 +242,14 @@ Rectangle {
+     property string selected_file: ""
+     property bool isShowRecList: false
+ 
++    property bool isF: true;
++    property var cpu_component: Qt.createComponent("CPUMonitorComponent.qml");
++    property var mem_component: Qt.createComponent("MEMMonitorComponent.qml");
++    property var cpu_object
++    property var mem_object
++    property bool btn_state_on: false
++    property double screenratio: 1
++
+     /*icon images source*/
+     /*state 0: normal; 1: normal bright; 2: inactive; 3: pressed; 4: pressed bright*/
+     ListModel {
+@@ -778,12 +788,260 @@ Rectangle {
+         }
+     }
+ 
++    Rectangle {
++        id: root
++        x:0; y:0
++        width: container.width
++        height: container.height
++        color: "transparent"
++
++
++        /* change resolution button */
++             Rectangle {
++                 id: btn_show
++                 x: (root.width)/(1280/10) + micro.width + (root.width)/(1280/20)
++                 y: (root.height)/(720/480)
++                 z: 10
++                 width: 60
++                 height: 60
++                 color: "transparent"
++                 Image {
++                     id: screen_icon
++                     source: "pics/screen_icon.png"
++                     anchors.fill: parent
++                 }
++                 MouseArea {
++                     id: btn_show_mouse_area
++                     anchors.fill: parent;
++                     onClicked: toggle()
++                     onPressed: {
++                         screen_icon.scale = 0.9
++                     }
++
++                     onReleased: {
++                         screen_icon.scale = 1.0
++                     }
++
++                 }
++             }
++
++             Rectangle{
++                 id: btn_4_3
++                 x: btn_show.x
++                 y: btn_show.y
++                 width: 60
++                 height: 60
++                 color: "transparent"
++                 z: 5
++
++                 Image {
++                     id: icon_4_3
++                     source: "pics/4_3_icon.png"
++                     anchors.fill: parent
++                 }
++
++                 MouseArea {
++                     id: btn_4_3_mouse_area
++                     anchors.fill: parent
++                     onClicked:{
++                         if(screenratio == 5/4)
++                            icon_5_4.source = "pics/5_4_icon.png"
++                         else if(screenratio == 16/10)
++                             icon_16_10.source = "pics/16_10_icon.png"
++                         else if(screenratio == 1)
++                             icon_full_screen.source = "pics/full_screen_icon.png"
++
++                         screenratio = 4/3
++                         scale_UI(screenratio)
++                         icon_4_3.source = "pics/4_3_icon_active.png"
++
++                     }
++                     onPressed: {
++                         icon_4_3.scale = 0.9
++                     }
++
++                     onReleased: {
++                         icon_4_3.scale = 1.0
++                     }
++                 }
++             }
++
++             Rectangle{
++                 id: btn_5_4
++                 x: btn_show.x
++                 y: btn_show.y
++                 width: 60
++                 height: 60
++                 color: "transparent"
++                 z: 5
++                 Image {
++                     id: icon_5_4
++                     source: "pics/5_4_icon.png"
++                     anchors.fill: parent
++                 }
++
++                 MouseArea {
++                     id: btn_5_4_mouse_area
++                     anchors.fill: parent
++                     onClicked: {
++                         if(screenratio == 4/3)
++                            icon_4_3.source = "pics/4_3_icon.png"
++                         else if(screenratio == 16/10)
++                             icon_16_10.source = "pics/16_10_icon.png"
++                         else if(screenratio == 1)
++                             icon_full_screen.source = "pics/full_screen_icon.png"
++
++                         screenratio = 5/4
++                         scale_UI(screenratio)
++                         icon_5_4.source = "pics/5_4_icon_active.png"
++                     }
++                     onPressed: {
++                         icon_5_4.scale = 0.9
++                     }
++
++                     onReleased: {
++                         icon_5_4.scale = 1.0
++                     }
++                 }
++             }
++
++             Rectangle{
++                 id: btn_16_10
++                 x: btn_show.x
++                 y: btn_show.y
++                 width: 60
++                 height: 60
++                 color: "transparent"
++                 z: 5
++                 Image {
++                     id: icon_16_10
++                     source: "pics/16_10_icon.png"
++                     anchors.fill: parent
++                 }
++
++                 MouseArea {
++                     id: btn_16_10_mouse_area
++                     anchors.fill: parent
++                     onClicked:{
++                         if(screenratio == 5/4)
++                            icon_5_4.source = "pics/5_4_icon.png"
++                         else if(screenratio == 4/3)
++                             icon_4_3.source = "pics/4_3_icon.png"
++                         else if(screenratio == 1)
++                             icon_full_screen.source = "pics/full_screen_icon.png"
++
++                         screenratio = 16/10
++                         scale_UI(screenratio)
++                         icon_16_10.source = "pics/16_10_icon_active.png"
++                     }
++                     onPressed: {
++                         icon_16_10.scale = 0.9
++                     }
++
++                     onReleased: {
++                         icon_16_10.scale = 1.0
++                     }
++                 }
++             }
++
++             Rectangle{
++                 id: btn_full_screen
++                 x: btn_show.x
++                 y: btn_show.y
++                 width: 60
++                 height: 60
++                 color: "transparent"
++                 z: 5
++                 enabled: false
++                 Image {
++                     id: icon_full_screen
++                     source: "pics/full_screen_icon_active.png"
++                     anchors.fill: parent
++                 }
++
++                 MouseArea {
++                     id: btn_full_screen_mouse_area
++                     anchors.fill: parent
++                     onClicked: {
++                         if(screenratio == 5/4)
++                            icon_5_4.source = "pics/5_4_icon.png"
++                         else if(screenratio == 4/3)
++                             icon_4_3.source = "pics/4_3_icon.png"
++                         else if(screenratio == 16/10)
++                             icon_16_10.source = "pics/16_10_icon.png"
++
++                         screenratio = 1
++                         scale_UI(screenratio)
++                         icon_full_screen.source = "pics/full_screen_icon_active.png"
++
++                     }
++                     onPressed: {
++                         icon_full_screen.scale = 0.9
++                     }
++
++                     onReleased: {
++                         icon_full_screen.scale = 1.0
++                     }
++                 }
++
++
++             }
++
++             states: [
++                     State {
++                         name: "on"
++                         PropertyChanges { target: btn_4_3; x: btn_show.x + 75 }
++                         PropertyChanges { target: btn_5_4; x: btn_4_3.x + 75 }
++                         PropertyChanges { target: btn_16_10; x: btn_5_4.x + 75 }
++                         PropertyChanges { target: btn_full_screen; x: btn_16_10.x + 75 }
++                         PropertyChanges { target: container; btn_state_on: true }
++                     },
++                     State {
++                         name: "off"
++                         PropertyChanges { target: btn_4_3; x: btn_show.x }
++                         PropertyChanges { target: btn_5_4; x: btn_show.x }
++                         PropertyChanges { target: btn_16_10; x: btn_show.x }
++                         PropertyChanges { target: btn_full_screen; x: btn_show.x }
++                         PropertyChanges { target: container; btn_state_on: false }
++                     }
++                 ]
++
++             transitions: Transition {
++                 NumberAnimation { properties: "x"; easing.type: Easing.InOutQuad; duration: 200 }
++             }
++
++             /* btn timmer */
++             Timer{
++                 id: btn_timer
++                 interval: 5000
++                 onTriggered: {
++                     btn_4_3.enabled = true;
++                     btn_5_4.enabled = true;
++                     btn_16_10.enabled = true;
++                     btn_full_screen.enabled = true;
++                     if(screenratio == 4/3){
++                         btn_4_3.enabled = false;
++                     }
++                     if(screenratio == 5/4){
++                         btn_5_4.enabled = false;
++                     }
++                     if(screenratio == 16/10){
++                         btn_16_10.enabled = false;
++                     }
++                     if(screenratio == 1){
++                         btn_full_screen.enabled = false;
++                     }
++                 }
++             }
++
++
+     /*Load camera title image on display 1*/
+     Rectangle {
+         id: title_display1
+         color: "#00000000"
+         visible: false
+-        x: 850; y: 10
++        x: root.width - title_image1.width - (root.width)/(1280/320) - (root.width)/(1280/20)
++        y: (root.height)/(720/10)
+         Image {
+            id: title_image1
+            source: "pics/Title_Cam1.png"
+@@ -795,7 +1053,7 @@ Rectangle {
+         id: title_display2
+         color: "#00000000"
+         visible: false
+-        x: title_display1.x + 125; y: title_display1.y
++            x: title_display1.x + (root.width)/(1280/110); y: title_display1.y
+         Image {
+             id: title_image2
+             source: "pics/Title_Cam2.png"
+@@ -807,7 +1065,7 @@ Rectangle {
+         id: title_display3
+         color: "#00000000"
+         visible: false
+-        x: title_display2.x; y: title_display2.y + 236
++            x: title_display2.x; y: title_display2.y + (root.height)/(720/236)
+         Image {
+             id: title_image3
+             source: "pics/Title_Cam3.png"
+@@ -819,7 +1077,7 @@ Rectangle {
+         id: title_display4
+         color: "#00000000"
+         visible: false
+-        x: title_display3.x; y: title_display3.y + 237
++            x: title_display3.x; y: title_display3.y + (root.height)/(720/237)
+         Image {
+             id: title_image4
+             source: "pics/Title_Cam4.png"
+@@ -831,10 +1089,11 @@ Rectangle {
+        id: background
+        color: "transparent"
+        x: 0; y: 0
+-       width: 1280; height: 720
++           width: root.width; height: root.height
+        Image{
+            id: background_image
+            source: "pics/background_normal.png"
++               anchors.fill: parent
+        }
+     }
+ 
+@@ -843,12 +1102,13 @@ Rectangle {
+         id: micro
+         color: "transparent"
+         width: 60; height: 60
+-        x: 10
+-        y: 480
++            x: (root.width)/(1280/10)
++            y: (root.height)/(720/480)
+         z: 1
+         Image{
+             id: micro_image
+             source: image_micro_mute
++                anchors.fill: parent
+         }
+         MouseArea {
+             anchors.fill: parent
+@@ -898,8 +1158,8 @@ Rectangle {
+         id: arrow
+         color: "transparent"
+         width: 50; height: 50
+-        x: 10
+-        y: 480
++        x: (root.width)/(1280/10)
++        y: (root.height)/(720/480)
+         visible: false
+         Image{
+             id: arrow_image
+@@ -969,8 +1229,8 @@ Rectangle {
+          id: play
+          color: "transparent"
+          width: 50; height: 50
+-         x:15
+-         y:180
++         x: (root.width)/(1280/15)
++         y: (root.height)/(720/180)
+          visible: false
+          Image{
+              id: play_image
+@@ -1035,8 +1295,8 @@ Rectangle {
+          id: stop
+          color: "transparent"
+          width: 50; height: 50
+-         x:15
+-         y:230
++         x: (root.width)/(1280/15)
++         y: (root.height)/(720/230)
+          visible: false
+          Image{
+              id: stop_image
+@@ -1082,8 +1342,8 @@ Rectangle {
+         id: rec
+         color: "transparent"
+         width: 50; height: 50
+-        x:15
+-        y:280
++        x: (root.width)/(1280/15)
++        y: (root.height)/(720/280)
+         visible: false
+         Image{
+             id: rec_image
+@@ -1141,8 +1401,8 @@ Rectangle {
+         id: rec1
+         color: "transparent"
+         width: 50; height: 50
+-        x:70
+-        y:205
++        x: (root.width)/(1280/70)
++        y: (root.height)/(720/205)
+         visible: false
+         Image{
+             id: rec1_image
+@@ -1211,8 +1471,8 @@ Rectangle {
+         id: rec2
+         color: "transparent"
+         width: 50; height: 50
+-        x:70
+-        y:255
++        x: (root.width)/(1280/70)
++        y: (root.height)/(720/255)
+         visible: false
+         Image{
+             id: rec2_image
+@@ -1281,8 +1541,8 @@ Rectangle {
+         id: rec3
+         color: "transparent"
+         width: 50; height: 50
+-        x:70
+-        y:305
++        x: (root.width)/(1280/70)
++        y: (root.height)/(720/305)
+         visible: false
+         Image{
+            id: rec3_image
+@@ -1351,8 +1611,8 @@ Rectangle {
+         id: rec4
+         color: "transparent"
+         width: 50; height: 50
+-        x:70
+-        y:355
++        x: (root.width)/(1280/70)
++        y: (root.height)/(720/355)
+         visible: false
+         Image{
+             id: rec4_image
+@@ -1421,10 +1681,11 @@ Rectangle {
+         id: view
+         color: "transparent"
+         width: 50; height: 50
+-        x:30
+-        y:120
++        x:(root.width)/(1280/30)
++        y:(root.height)/(720/120)
+         z:1
+         visible: false
++        property var mode: 1
+         Image{
+             id: view_image
+             source: list_icon_red_01.get(2).icon_normal
+@@ -1433,18 +1694,19 @@ Rectangle {
+             anchors.fill: parent
+             hoverEnabled: true
+             onClicked: { 
+-            if (view.x == 30) {
++                if (view.mode == 1) {
++                    view.mode = 2
+                     menu.visible = false
+                     temp_status.visible = false
+                     micro.visible = false
+-                    micro.x = 15
+-                    micro.y = 430
++                    micro.x = (root.width)/(1280/15)
++                    micro.y = (root.height)/(720/430)
+                     view.visible = false
+-                    view.x = 70
+-                    view.y = 305
++                    view.x = (root.width)/(1280/70)
++                    view.y = (root.height)/(720/305)
+                     mail.visible = false
+-                    mail.x = 70
+-                    mail.y = 355
++                    mail.x = (root.width)/(1280/70)
++                    mail.y = (root.height)/(720/355)
+                     arrow_state = arrow_state_normal
+                     arrow_image.source = image_arrow
+                     arrow.visible = true
+@@ -1473,31 +1735,32 @@ Rectangle {
+                     set_to_active_all_list()
+                     set_state = set_state_normal
+                 }
+-                else if (view.x == 70) {
++                else if (view.mode == 2) {
++                    view.mode = 1
+                     menu.visible = true
+                     pathv.visible = true
+                     temp_status.visible = true
+                     micro.visible = true
+-                    micro.x = 10
+-                    micro.y = 480
+-                    view.x = 30
+-                    view.y = 120
+-                    mail.x = 80
+-                    mail.y = 120
++                    micro.x = (root.width)/(1280/10)
++                    micro.y = (root.height)/(720/480)
++                    view.x = (root.width)/(1280/30)
++                    view.y = (root.height)/(720/120)
++                    mail.x = (root.width)/(1280/80)
++                    mail.y = (root.height)/(720/120)
+                     set_to_hide_ball_list()
+                     arrow.visible = false
+                     set_state = set_state_normal
+                     if (display2_state == camera1_state) {
+-                        micro.x = 970
+-                        micro.y = 180
++                    micro.x = (root.width)/(1280/970)
++                    micro.y = (root.height)/(720/180)
+                     }
+                     if (display3_state == camera1_state) {
+-                        micro.x = 970
+-                        micro.y = 420
++                    micro.x = (root.width)/(1280/970)
++                    micro.y = (root.height)/(720/420)
+                     }
+                     if (display4_state == camera1_state) {
+-                        micro.x = 970
+-                        micro.y = 655
++                    micro.x = (root.width)/(1280/970)
++                    micro.y = (root.height)/(720/655)
+                     }
+                     set_ball_normal_list_01(list_state,view_image,2)
+                     switch (list_state) {
+@@ -1530,18 +1793,18 @@ Rectangle {
+                 }
+             }
+             onEntered: {
+-                if (view.x == 30) {
++                if (view.mode == 1) {
+                     set_ball_bright_list_02(pathv.model,view_image,2)
+                 }
+-                else if (view.x == 70) {
++                else if (view.mode == 2) {
+                     set_ball_bright_list_01(list_state,view_image,3)
+                 }
+             }
+             onExited: {
+-                if (view.x == 30) {
++                if (view.mode == 1) {
+                     set_ball_normal_list_02(pathv.model,view_image,2)
+                 }
+-                else if (view.x == 70) {
++                else if (view.mode == 2) {
+                     set_ball_normal_list_01(list_state,view_image,3)
+                 }
+             }
+@@ -1559,8 +1822,8 @@ Rectangle {
+           id: mail
+           color: "transparent"
+           width: 50; height: 50
+-          x:80
+-          y:120
++          x:(root.width)/(1280/80)
++          y:(root.height)/(720/120)
+           z:1
+           visible: false
+           Image{
+@@ -1580,18 +1843,18 @@ Rectangle {
+                   mail_input.visible = true
+              }
+               onEntered: {
+-                  if (view.x == 30) {
++                  if (view.mode == 1) {
+                       set_ball_bright_list_02(pathv.model,mail_image,4)
+                   }
+-                  else if (view.x == 70) {
++                  else if (view.mode == 2) {
+                       set_ball_bright_list_01(list_state,mail_image,4)
+                   }
+               }
+               onExited: {
+-                  if (view.x == 30) {
++                  if (view.mode == 1) {
+                       set_ball_normal_list_02(pathv.model,mail_image,4)
+                   }
+-                  else if (view.x == 70) {
++                  else if (view.mode == 2) {
+                       set_ball_normal_list_01(list_state,mail_image,4)
+                   }
+               }
+@@ -1609,8 +1872,8 @@ Rectangle {
+          id: set
+          color: "transparent"
+          width: 50; height: 50
+-         x:15
+-         y:330
++         x: (root.width)/(1280/15)
++         y: (root.height)/(720/330)
+          visible: false
+          Image{
+              id: set_image
+@@ -1665,8 +1928,8 @@ Rectangle {
+         id: color
+         color: "transparent"
+         width: 50; height: 50
+-        x:15
+-        y:380
++        x: (root.width)/(1280/15)
++        y: (root.height)/(720/380)
+         visible: false
+         Image{
+             id: color_image
+@@ -1750,8 +2013,8 @@ Rectangle {
+         id: temp_status
+         color: "transparent"
+         width: 90; height: 90
+-        x:25
+-        y:10
++        x: (root.width)/(1280/25)
++        y: (root.height)/(720/10)
+         z:9
+         visible: true
+         MouseArea {
+@@ -1793,8 +2056,8 @@ Rectangle {
+         id: menu
+         color: "transparent"
+         width: 160; height: 160
+-        x: 10
+-        y: 10
++        x: (root.width)/(1280/10)
++        y: (root.height)/(720/10)
+         visible: true
+         //Status ball
+         Image{
+@@ -2906,8 +3169,12 @@ Rectangle {
+ 
+     /*Control widow for display 2*/
+     Rectangle {
++            id: display2_window
+         color: "transparent"
+-        x: 970; y: 10; width: 300; height: 220
++            x: (root.width/(1280/970));
++            y: (root.height/(720/10));
++            width: (root.width/(1280/300));
++            height: (root.height/(720/220))
+         property bool reset: false
+ 
+         MouseArea {
+@@ -2925,12 +3192,12 @@ Rectangle {
+ 
+                 if (arrow.visible == false) {
+                     if (display2_state == camera1_state) {
+-                        micro.x = 970
+-                        micro.y = 180
++                            micro.x = (root.width/(1280/970))
++                            micro.y = (root.height/(720/180))
+                     }
+                     if (display1_state == camera1_state) {
+-                        micro.x = 10
+-                        micro.y = 480
++                            micro.x = (root.width)/(1280/10)
++                            micro.y = (root.height/(720/480))
+                     }
+                 }
+ 
+@@ -2964,8 +3231,12 @@ Rectangle {
+ 
+     /*Control widow for display 3*/
+     Rectangle {
++        id: display3_window
+         color: "transparent"
+-        x: 970; y: 250; width: 300; height: 220
++        x: (root.width/(1280/970));
++        y: (root.height/(720/250));
++        width: (root.width/(1280/300));
++        height: (root.height/(720/220))
+         property bool reset: false
+ 
+         MouseArea {
+@@ -2984,12 +3255,12 @@ Rectangle {
+ 
+                 if (arrow.visible == false) {
+                     if (display3_state == camera1_state) {
+-                        micro.x = 970
+-                        micro.y = 420
++                            micro.x = (root.width/(1280/970))
++                            micro.y = (root.height/(720/420))
+                     }
+                     if (display1_state == camera1_state) {
+-                        micro.x = 10
+-                        micro.y = 480
++                            micro.x = (root.width)/(1280/10)
++                            micro.y = (root.height/(720/480))
+                     }
+                 }
+ 
+@@ -3023,8 +3294,12 @@ Rectangle {
+ 
+     /*Control widow for display 4*/
+     Rectangle {
++            id: display4_window
+         color: "transparent"
+-        x: 970; y: 486; width: 300; height: 220
++            x: (root.width/(1280/970));
++            y: (root.height/(720/486));
++            width: (root.width/(1280/300));
++            height: (root.height/(720/220))
+         property bool reset: false
+ 
+         MouseArea {
+@@ -3042,12 +3317,12 @@ Rectangle {
+ 
+                 if (arrow.visible == false) {
+                     if (display4_state == camera1_state) {
+-                        micro.x = 970
+-                        micro.y = 655
++                            micro.x = (root.width/(1280/970))
++                            micro.y = (root.height/(720/655))
+                     }
+                     if (display1_state == camera1_state) {
+-                        micro.x = 10
+-                        micro.y = 480
++                            micro.x = (root.width)/(1280/10)
++                            micro.y = (root.height/(720/480))
+                     }
+                 }
+ 
+@@ -3079,633 +3354,321 @@ Rectangle {
+         }
+     }
+ 
+-    /*set icon at index to inactive state*/
+-    function set_to_inactive(index) {
+-        pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_inactive)
+-        pathv.model.setProperty(index, "state", icon_inactive_state)
+-    }
+ 
+-    /*set icon at index to active state*/
+-    function set_to_active(index) {
+-        pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_normal)
+-        pathv.model.setProperty(index, "state", icon_normal_state)
+-    }
++    /*Email text input*/
++    Rectangle {
++        id: mail_input
++        color: "transparent"
++        width: 330; height: 70
++        x: (root.width)/(1280/3)
++        y: (root.height)/(720/18)
++        visible: false
+ 
+-    /*set all icons (except the icon at index) to inactive state*/
+-    function set_to_inactive_all(index) {
+-        var i = 0;
+-        while(i < max_id) {
+-            if(i != index) {
+-                set_to_inactive(i)
++        MouseArea {
++            anchors.fill: parent
++            hoverEnabled: true
++            TextField {
++                id: textfield
++                anchors.horizontalCenter: parent.horizontalCenter
++                width: 300
++                height: 40
++                text: ""
++                onAccepted: focus = false
++                Keys.onEscapePressed: undo()
++            }
++            Row {
++                id: keyRow1
++                anchors.horizontalCenter: parent.horizontalCenter
++                anchors.top: textfield.bottom
++                anchors.topMargin: 20
++                Button {
++                    text: qsTr("OK")
++                    onClicked:
++                    {
++                        fileio.write("/mail_list.txt", textfield.text);
++                        set_to_hide_mail_input()
++                    }
++                }
++                Button {
++                    text: qsTr("Cancel")
++                    onClicked:
++                    {
++                        set_to_hide_mail_input()
++                    }
++                }
+             }
+-            i++
+         }
+     }
+ 
+-    /*set all icons (except the icon at index) to active state*/
+-    function set_to_active_all(index) {
+-        var i = 0;
+-        while(i < max_id) {
+-            if(i != index) {
+-                set_to_active(i)
++    /*Media service definition*/
++
++    /*display camera1*/
++    H264Streaming{
++        id: camera1
++        transmit: true //Camera1 Receiver & Transmitter
++        vspmWidth1: 1280
++        vspmHeight1: 720
++        vspmFormat: "BGRA"
++        encBitrate: 10485760
++        numPframes: 0
++        wlsOutWidth: (root.width)/(1280/960)
++        wlsOutHeight: (root.height)/(720/540)
++        wlsPositionX: 0
++        wlsPositionY: 0
++        wlsMaxLateness: -1
++        wlsQos: false
++        udpPort: "1234"
++        udpHost: "192.168.10.30"
++
++        onStatusChanged: {
++            if(camera1.playbackState == H264Streaming.VideoPlaying){
++                title_display1.visible = true
+             }
+-            i++
+         }
++
+     }
+ 
+-    /*set all rec icons (list view) to active state*/
+-    function set_to_active_all_rec_list() {
+-        rec_state = rec_state_pressed
+-        rec1_state = rec1_state_normal
+-        rec2_state = rec2_state_normal
+-        rec3_state = rec3_state_normal
+-        rec4_state = rec4_state_normal
+-        switch (list_state) {
+-            case list_state_red: {
+-                rec_image.source = list_icon_red_01.get(0).icon_normal
+-                rec1_image.source = list_icon_red.get(6).icon_normal
+-                rec2_image.source = list_icon_red.get(0).icon_normal
+-                rec3_image.source = list_icon_red.get(1).icon_normal
+-                rec4_image.source = list_icon_red.get(2).icon_normal
+-                break
+-            }
+-            case list_state_blue: {
+-                rec_image.source = list_icon_blue_01.get(0).icon_normal
+-                rec1_image.source = list_icon_blue.get(6).icon_normal
+-                rec2_image.source = list_icon_blue.get(0).icon_normal
+-                rec3_image.source = list_icon_blue.get(1).icon_normal
+-                rec4_image.source = list_icon_blue.get(2).icon_normal
+-                break
+-            }
+-            case list_state_green: {
+-                rec_image.source = list_icon_green_01.get(0).icon_normal
+-                rec1_image.source = list_icon_green.get(6).icon_normal
+-                rec2_image.source = list_icon_green.get(0).icon_normal
+-                rec3_image.source = list_icon_green.get(1).icon_normal
+-                rec4_image.source = list_icon_green.get(2).icon_normal
+-                break
+-            }
+-            case list_state_orange: {
+-                rec_image.source = list_icon_orange_01.get(0).icon_normal
+-                rec1_image.source = list_icon_orange.get(6).icon_normal
+-                rec2_image.source = list_icon_orange.get(0).icon_normal
+-                rec3_image.source = list_icon_orange.get(1).icon_normal
+-                rec4_image.source = list_icon_orange.get(2).icon_normal
+-                break
+-            }
+-            case list_state_yellow: {
+-                rec_image.source = list_icon_yellow_01.get(0).icon_normal
+-                rec1_image.source = list_icon_yellow.get(6).icon_normal
+-                rec2_image.source = list_icon_yellow.get(0).icon_normal
+-                rec3_image.source = list_icon_yellow.get(1).icon_normal
+-                rec4_image.source = list_icon_yellow.get(2).icon_normal
+-                break
++
++
++    /*display camera2*/
++    H264Streaming {
++        id: camera2
++        transmit: false//Camera 2: Receiver
++        wlsOutWidth: (root.width)/(1280/320)
++        wlsOutHeight: (root.height)/(720/240)
++        wlsPositionX: 1440
++        wlsPositionY: 5
++        wlsMaxLateness: -1
++        wlsQos: false
++        udpPort: "1235"
++
++        onStatusChanged: {
++            if(camera2.playbackState == H264Streaming.VideoPlaying){
++                title_display2.visible = true
+             }
+         }
+     }
+ 
+-    /*set all icons (list view) to active state*/
+-    function set_to_active_all_list() {
+-        play_state = play_state_normal
+-        stop_state = stop_state_normal
+-        rec_state = rec_state_normal
+-        set_state = set_state_normal
+-        color_state = color_state_normal 
+-        color_image.source = list_icon_red.get(3).icon_normal
+-        switch (list_state) {
+-            case list_state_red: {
+-                play_image.source = list_icon_red.get(5).icon_normal
+-                stop_image.source = list_icon_red.get(4).icon_normal
+-                rec_image.source = list_icon_red_01.get(0).icon_normal
+-                set_image.source = list_icon_red_01.get(1).icon_normal
+-                break
++    /*display camera3*/
++    H264Streaming {
++        id: camera3
++        transmit: false//Camera 3: Receiver
++            wlsOutWidth: (root.width)/(1280/320)
++            wlsOutHeight: (root.height)/(720/240)
++            wlsPositionX: 1440
++            wlsPositionY: (root.height)/(720/240)
++        wlsMaxLateness: -1
++        wlsQos: false
++        udpPort: "1236"
++
++        onStatusChanged: {
++            if(camera3.playbackState == H264Streaming.VideoPlaying){
++                title_display3.visible = true
+             }
+-            case list_state_blue: {
+-                play_image.source = list_icon_blue.get(5).icon_normal
+-                stop_image.source = list_icon_blue.get(4).icon_normal
+-                rec_image.source = list_icon_blue_01.get(0).icon_normal
+-                set_image.source = list_icon_blue_01.get(1).icon_normal
+-                break
+-            }
+-            case list_state_green: {
+-                play_image.source = list_icon_green.get(5).icon_normal
+-                stop_image.source = list_icon_green.get(4).icon_normal
+-                rec_image.source = list_icon_green_01.get(0).icon_normal
+-                set_image.source = list_icon_green_01.get(1).icon_normal
+-                break
+-            }
+-            case list_state_orange: {
+-                play_image.source = list_icon_orange.get(5).icon_normal
+-                stop_image.source = list_icon_orange.get(4).icon_normal
+-                rec_image.source = list_icon_orange_01.get(0).icon_normal
+-                set_image.source = list_icon_orange_01.get(1).icon_normal
+-                break
+-            }
+-            case list_state_yellow: {
+-                play_image.source = list_icon_yellow.get(5).icon_normal
+-                stop_image.source = list_icon_yellow.get(4).icon_normal
+-                rec_image.source = list_icon_yellow_01.get(0).icon_normal
+-                set_image.source = list_icon_yellow_01.get(1).icon_normal
+-                break
++        }
++    }
++
++    /*display camera4*/
++    H264Streaming {
++        id: camera4
++        transmit: false//Camera 4: Receiver
++            wlsOutWidth: (root.width)/(1280/320)
++            wlsOutHeight: (root.height)/(720/240)
++            wlsPositionX: 1440
++            wlsPositionY: ((root.height)/(720/240))*2
++        wlsMaxLateness: -1
++        wlsQos: false
++        udpPort: "1237"
++
++        onStatusChanged: {
++            if(camera4.playbackState == H264Streaming.VideoPlaying){
++                title_display4.visible = true
+             }
+         }
+     }
+ 
+-    /*set icon to active icon (list view)*/
+-    function set_rec_ball_inactive_list() {
+-        rec_image.source = rec_ball_inactive
+-        rec_state = rec_state_inactive
+-    }
+-    function set_set_ball_inactive_list() {
+-        set_image.source = set_ball_inactive
+-        set_state = set_state_inactive
+-    }
+-    function set_color_ball_inactive_list() {
+-        color_image.source = list_icon_red.get(3).icon_inactive
+-        color_state = color_state_inactive
+-    }
+-
+-    /*set to hide main icon (list view)*/
+-    function set_to_hide_ball_list() {
+-        play.visible = false
+-        stop.visible = false
+-        rec.visible = false
+-        rec1.visible = false
+-        rec2.visible = false
+-        rec3.visible = false
+-        rec4.visible = false
+-        set.visible = false
+-        view.visible = false
+-        color.visible = false
+-        mail.visible = false
+-    }
++    /*send audio*/
++    AudioStreaming {
++        id: austream_send
++        type: "Send"
++        audioPlugin: "Alsa GST"
++        usinkHost: "192.168.10.101"
++        usinkPort: 2001
++        usinkSync: false
+ 
+-    /*set to hide mail text input*/
+-    function set_to_hide_mail_input() {
+-        mail_input.visible = false
+-        set_state = set_state_normal
+-        if (view.x == 30) {
+-            menu.visible = true
+-            pathv.visible = true
+-            temp_status.visible = true
+-            micro.visible = true
+-            arrow.visible = false
++        onStatusChanged: {
+ 
+         }
+-        else if (view.x == 70) {
+-            menu.visible = false
+-            temp_status.visible = false
+-            arrow_state = arrow_state_normal
+-            arrow_image.source = image_arrow
+-            arrow.visible = true
+-            set_to_active_all_list()
+-        }
+-    }
+ 
+-    function set_ball_normal_list(list_state,name_image,number) {
+-        switch (list_state) {
+-            case list_state_red: {
+-                name_image.source = list_icon_red.get(number).icon_normal
+-                break
+-            }
+-            case list_state_blue: {
+-                name_image.source = list_icon_blue.get(number).icon_normal
+-                break
+-            }
+-            case list_state_green: {
+-                name_image.source = list_icon_green.get(number).icon_normal
+-                break
+-            }
+-            case list_state_orange: {
+-                name_image.source = list_icon_orange.get(number).icon_normal
+-                break
+-            }
+-            case list_state_yellow: {
+-                name_image.source = list_icon_yellow.get(number).icon_normal
+-                break
+-            }
+-        }
+-    }
++        onStateChanged: {
+ 
+-    function set_ball_bright_list(list_state,name_image,number) {
+-        switch (list_state) {
+-            case list_state_red: {
+-                name_image.source = list_icon_red.get(number).icon_bright
+-                break
+-            }
+-            case list_state_blue: {
+-                name_image.source = list_icon_blue.get(number).icon_bright
+-                break
+-            }
+-            case list_state_green: {
+-                name_image.source = list_icon_green.get(number).icon_bright
+-                break
+-            }
+-            case list_state_orange: {
+-                name_image.source = list_icon_orange.get(number).icon_bright
+-                break
+-            }
+-            case list_state_yellow: {
+-                name_image.source = list_icon_yellow.get(number).icon_bright
+-                break
+-            }
+         }
+     }
+ 
+-    function set_ball_normal_list_01(list_state,name_image,number) {
+-        switch (list_state) {
+-            case list_state_red: {
+-                name_image.source = list_icon_red_01.get(number).icon_normal
+-                break
+-            }
+-            case list_state_blue: {
+-                name_image.source = list_icon_blue_01.get(number).icon_normal
+-                break
+-            }
+-            case list_state_green: {
+-                name_image.source = list_icon_green_01.get(number).icon_normal
+-                break
+-            }
+-            case list_state_orange: {
+-                name_image.source = list_icon_orange_01.get(number).icon_normal
+-                break
+-            }
+-            case list_state_yellow: {
+-                name_image.source = list_icon_yellow_01.get(number).icon_normal
+-                break
+-            }
++    /*receive audio*/
++    AudioStreaming {
++        id: austream_receive
++        type: "Receive"
++        audioPlugin: "Alsa GST"
++        usrcPort: 2000
++
++        onStatusChanged: {
++
+         }
+-    }
+ 
+-    function set_ball_bright_list_01(list_state,name_image,number) {
+-        switch (list_state) {
+-            case list_state_red: {
+-                name_image.source = list_icon_red_01.get(number).icon_bright
+-                break
+-            }
+-            case list_state_blue: {
+-                name_image.source = list_icon_blue_01.get(number).icon_bright
+-                break
+-            }
+-            case list_state_green: {
+-                name_image.source = list_icon_green_01.get(number).icon_bright
+-                break
+-            }
+-            case list_state_orange: {
+-                name_image.source = list_icon_orange_01.get(number).icon_bright
+-                break
+-            }
+-            case list_state_yellow: {
+-                name_image.source = list_icon_yellow_01.get(number).icon_bright
+-                break
+-            }
++        onStateChanged: {
++
+         }
+     }
+ 
+-    function set_ball_normal_list_02(pathview,name_image,number) {
+-        switch (pathview) {
+-            case list_icon_red: {
+-                name_image.source = list_icon_red_01.get(number).icon_normal
+-                break
+-            }
+-            case list_icon_blue: {
+-                name_image.source = list_icon_blue_01.get(number).icon_normal
+-                break
+-            }
+-            case list_icon_green: {
+-                name_image.source = list_icon_green_01.get(number).icon_normal
+-                break
+-            }
+-            case list_icon_orange: {
+-                name_image.source = list_icon_orange_01.get(number).icon_normal
+-                break
+-            }
+-            case list_icon_yellow: {
+-                name_image.source = list_icon_yellow_01.get(number).icon_normal
+-                break
+-            }
++    /*record camera*/
++    MP4Recorder {
++        id: mp4_recorder
++        usrcPort: 1234
++        fSinkLocation: "/record.mp4"
++
++        onStatusChanged: {
+         }
+     }
+ 
+-    function set_ball_bright_list_02(pathview,name_image,number) {
+-        switch (pathview) {
+-            case list_icon_red: {
+-                name_image.source = list_icon_red_01.get(number).icon_bright
+-                break
+-            }
+-            case list_icon_blue: {
+-                name_image.source = list_icon_blue_01.get(number).icon_bright
+-                break
+-            }
+-            case list_icon_green: {
+-                name_image.source = list_icon_green_01.get(number).icon_bright
+-                break
++    /*play recorded video*/
++    MP4Playback {
++        id: mediaplayer
++        loop: true
++        source: "/record.mp4"
++
++        onStateChanged: {
++            if(mediaplayer.state == MP4Playback.PlayingState){
++                title_display1.opacity = 0
++                onplayback = true
+             }
+-            case list_icon_orange: {
+-                name_image.source = list_icon_orange_01.get(number).icon_bright
+-                break
++            else if(mediaplayer.state == MP4Playback.StoppedState){
++                onplayback = false
++                if(mediaplayer.status == MP4Playback.NoMedia){
++                    title_display1.opacity = 1
++                }
+             }
+-            case list_icon_yellow: {
+-                name_image.source = list_icon_yellow_01.get(number).icon_bright
+-                break
++            else if((mediaplayer.state == MP4Playback.PausedState) || (mediaplayer.state == MP4Playback.ReadyState)){
++				onplayback = true
+             }
+         }
+     }
+ 
+-    /*Email text input*/
+-    Rectangle {
+-        id: mail_input
+-        color: "transparent"
+-        width: 330; height: 70
+-        x:3
+-        y:18
+-        visible: false
+-
+-        MouseArea {
+-            anchors.fill: parent
+-            hoverEnabled: true
+-            TextField {
+-                id: textfield
+-                anchors.horizontalCenter: parent.horizontalCenter
+-                width: 300
+-                height: 40
+-                text: ""
+-                onAccepted: focus = false
+-                Keys.onEscapePressed: undo()
+-            }
+-            Row {
+-                id: keyRow1
+-                anchors.horizontalCenter: parent.horizontalCenter
+-                anchors.top: textfield.bottom
+-                anchors.topMargin: 20
+-                Button {
+-                    text: qsTr("OK")
+-                    onClicked:
+-                    {
+-                        fileio.write("/mail_list.txt", textfield.text);
+-                        set_to_hide_mail_input()
+-                    }
+-                }
+-                Button {
+-                    text: qsTr("Cancel")
+-                    onClicked:
+-                    {
+-                        set_to_hide_mail_input()
+-                    }
+-                }
+-            }
+-        }
+-    }
+-
+-    /*Media service definition*/
+-
+-    /*display camera1*/
+-    H264Streaming{
+-        id: camera1
+-        transmit: true //Camera1 Receiver & Transmitter
+-        vspmWidth: 960
+-        vspmHeight: 540
+-        vspmWidth1: 1280
+-        vspmHeight1: 720
+-        vspmFormat: "BGRA"
+-        encBitrate: 10485760
+-        numPframes: 0
+-        wlsPositionX: 0
+-        wlsPositionY: 0
+-        wlsMaxLateness: -1
+-        wlsQos: false
+-        udpPort: "1234"
+-        udpHost: "192.168.10.30"
+-
+-        onStatusChanged: {
+-            if(camera1.playbackState == H264Streaming.VideoPlaying){
+-                title_display1.visible = true
+-            }
+-        }
+-
+-    }
+-
+-    /*display camera2*/
+-    H264Streaming {
+-        id: camera2
+-        transmit: false//Camera 2: Receiver
+-        wlsOutWidth: 320
+-        wlsOutHeight: 240
+-        wlsPositionX: 960
+-        wlsPositionY: 5
+-        wlsMaxLateness: -1
+-        wlsQos: false
+-        udpPort: "1235"
+-
+-        onStatusChanged: {
+-            if(camera2.playbackState == H264Streaming.VideoPlaying){
+-                title_display2.visible = true
+-            }
+-        }
+-    }
+-
+-    /*display camera3*/
+-    H264Streaming {
+-        id: camera3
+-        transmit: false//Camera 3: Receiver
+-        wlsOutWidth: 320
+-        wlsOutHeight: 240
+-        wlsPositionX: 960
+-        wlsPositionY: 240
+-        wlsMaxLateness: -1
+-        wlsQos: false
+-        udpPort: "1236"
+-
+-        onStatusChanged: {
+-            if(camera3.playbackState == H264Streaming.VideoPlaying){
+-                title_display3.visible = true
+-            }
+-        }
+-    }
+-
+-    /*display camera4*/
+-    H264Streaming {
+-        id: camera4
+-        transmit: false//Camera 4: Receiver
+-        wlsOutWidth: 320
+-        wlsOutHeight: 240
+-        wlsPositionX: 960
+-        wlsPositionY: 480
+-        wlsMaxLateness: -1
+-        wlsQos: false
+-        udpPort: "1237"
+-
+-        onStatusChanged: {
+-            if(camera4.playbackState == H264Streaming.VideoPlaying){
+-                title_display4.visible = true
+-            }
+-        }
+-    }
+-
+-    /*send audio*/
+-    AudioStreaming {
+-        id: austream_send
+-        type: "Send"
+-        audioPlugin: "Alsa GST"
+-        usinkHost: "192.168.10.101"
+-        usinkPort: 2001
+-        usinkSync: false
+-
+-        onStatusChanged: {
+-
+-        }
+-
+-        onStateChanged: {
+-
+-        }
+-    }
+-
+-    /*receive audio*/
+-    AudioStreaming {
+-        id: austream_receive
+-        type: "Receive"
+-        audioPlugin: "Alsa GST"
+-        usrcPort: 2000
+-
+-        onStatusChanged: {
+-
+-        }
+-
+-        onStateChanged: {
+-
+-        }
+-    }
+-
+-    /*record camera*/
+-    MP4Recorder {
+-        id: mp4_recorder
+-        usrcPort: 1234
+-        fSinkLocation: "/record.mp4"
+-
+-        onStatusChanged: {
+-        }
+-    }
+-
+-    /*play recorded video*/
+-    MP4Playback {
+-        id: mediaplayer
+-        loop: true
+-        source: "/record.mp4"
+-
+-        onStateChanged: {
+-            if(mediaplayer.state == MP4Playback.PlayingState){
+-                title_display1.opacity = 0
+-                onplayback = true
+-            }
+-            else if(mediaplayer.state == MP4Playback.StoppedState){
+-                onplayback = false
+-                if(mediaplayer.status == MP4Playback.NoMedia){
+-                    title_display1.opacity = 1
+-                }
+-            }
+-            else if((mediaplayer.state == MP4Playback.PausedState) || (mediaplayer.state == MP4Playback.ReadyState)){
+-				onplayback = true
+-            }
+-        }
+-    }
+-
+-    /*MEM/CPU measurement*/
++    /*MEM/CPU measurement*/
+ 
+     /*CPU monitor*/
+     CpuMonitor{
+         id: cpu
+-        height: 120
+-        width: 444
+-        x: 19
+-        y: 572
++            height: (root.height)/(720/120)
++            width: (root.width)/(1280/444)
++            x: (root.width)/(1280/19)
++            y: (root.height)/(720/572)
+         //Adjust the gap between each CPU core display
+         m_offset: 2
++        }
+         
++        /*MEM monitor*/
++        MemMonitor {
++            id: mem
++            height: (root.height)/(720/120)
++            width: (root.width)/(1280/256)
++            x: (root.width)/(1280/476)
++            y: (root.height)/(720/572)
++            //Adjust the gap between each display
++            m_offset: 5
++            //Adjust the height of memory usage bar
++            barHeight: (root.height)/(720/110)
++            //Adjust the width of the memory history
++            graphWidthOffset: 1
++        }
++
++        /* PulseSignal Display */
++        PulseSignal {
++            id: bus_graphic
++            x: (root.width)/(1280/742)
++            y: (root.height)/(720/586)
++            z:5
++            width: (root.width)/(1280/195)//190 - 30
++            height: (root.height)/(720/95)
++            displaynumber: false
++            fontSize: 10
++            maxValue: 2000
++        }
++
++        /* CPU Monitor Text */
+         Text {
+-            x:  6
+-            y: -25
++              id: t_cpu
++              x: (root.width)/(1280/30)
++              y: (root.height)/(720/545)
+             text: "CPU"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+-
+         }
+         Text {
+-            x:  2
+-            y: -15
++              id: t_cpu_usage
++              x: (root.width)/(1280/25)
++              y: t_cpu.y + (root.height)/(720/10)
+             text: "Usage"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+-
+         }
+         
+         Text {
+-            x:  125
+-            y: -25
++              id: t_cpu1
++              x: (root.width)/(1280/150)
++              y: t_cpu.y
+             text: "CPU1"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+-
+         }
+         Text {
+-            x:  115
+-            y: -15
++              id: t_cpu1_history
++              x: (root.width)/(1280/145)
++              y: t_cpu_usage.y
+             text: "History"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+-
+         }
+         
+         Text {
+-            x:  325
+-            y: -25
++              id: t_cpu2
++              x: (root.width)/(1280/348)
++              y: t_cpu.y
+             text: "CPU2"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+             
+         }
+-        
+         Text {
+-            x:  315
+-            y: -15
++              id: t_cpu2_history
++              x: (root.width)/(1280/343)
++              y: t_cpu_usage.y
+             text: "History"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+-
+         }
+-    }
+-    
+-    /*MEM monitor*/
+-    MemMonitor {
+-        id: mem
+-        height: cpu.height
+-        width: 256
+-        x: cpu.x + cpu.width + 13
+-        y: cpu.y
+-        //Adjust the gap between each display
+-        m_offset: 5
+-        //Adjust the height of memory usage bar
+-        barHeight: 110
+-        //Adjust the width of the memory history
+-        graphWidthOffset: 1
+ 
++          /* MEM Monitor Text */
+         Text {
+             id: mem_usage_text
+-            x:  0
+-            y: mem.height - 10
++              x: (root.width)/(1280/480)
++              y: bus_reading.y
+             text: "0.0"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+ 
+         }
++
+         Text {
+-            x: mem_usage_text.x + 25
++              id: mem_usage_text_unit
++              x: mem_usage_text.x + (root.width)/(1280/24)
+             y: mem_usage_text.y
+             text: "GB"
+             font.family: "Comic Sans MS"
+@@ -3715,136 +3678,168 @@ Rectangle {
+         }
+ 
+         Text {
+-            x:  6
+-            y: -25
++              id: t_mem
++              x: (root.width)/(1280/485)
++              y: t_cpu.y
+             text: "MEM"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+-
+         }
+         Text {
+-            x:  2
+-            y: -15
++              id: t_mem_usage
++              x: (root.width)/(1280/482)
++              y: t_cpu_usage.y
+             text: "Usage"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+-
+         }
+         
+         Text {
+-            x:  148
+-            y: -25
++              id: t_mem1
++              x: (root.width)/(1280/618)
++              y: t_cpu.y
+             text: "MEM"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+-
+         }
+         Text {
+-            x:  135
+-            y: -15
++              id: t_mem1_history
++              x: (root.width)/(1280/613)
++              y: t_cpu_usage.y
+             text: "History"
+             font.family: "Comic Sans MS"
+             font.pointSize: 9
+             color: "White"
+-
+-        }
+     }
+ 
+-    /*BUS Load Measurement*/
+-    
+-    /*Text indicator*/
+-    Text {
+-        x:bus_graphic.x - 32; y:bus_graphic.y - 2; z:5
+-        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
+-        text: "1800"
+-    }
+-    Text {
+-        x:bus_graphic.x - 32; y:bus_graphic.y + 8; z:5
+-        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
+-        text: "1600"
+-    }
+-    Text {
+-        x:bus_graphic.x - 32; y:bus_graphic.y + 18; z:5
+-        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
+-        text: "1400"
+-    }
+-    Text {
+-        x:bus_graphic.x - 32; y:bus_graphic.y + 28; z:5
+-        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
+-        text: "1200"
+-    }
+-    Text {
+-        x:bus_graphic.x - 32; y:bus_graphic.y + 38; z:5
+-        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
+-        text: "1000"
+-    }
+-    Text {
+-        x:bus_graphic.x - 32; y:bus_graphic.y + 47; z:5
+-        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
+-        text: " 800"
+-    }
+-    Text {
+-        x:bus_graphic.x - 32; y:bus_graphic.y + 57; z:5
+-        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
+-        text: " 600"
+-    }
++          /* PulseSignal Monitor Text */
+     Text {
+-        x:bus_graphic.x - 32; y:bus_graphic.y + 66; z:5
+-        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
+-        text: " 400"
++              id: t_bus
++              x: (root.width)/(1280/823)
++              y: t_cpu.y
++              text: "BUS"
++              font.family: "Comic Sans MS"
++              font.pointSize: 9
++              color: "White"
+     }
+     Text {
+-        x:bus_graphic.x - 32; y:bus_graphic.y + 75; z:5
+-        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
+-        text: " 200"
++              id: t_bus_usage
++              x: (root.width)/(1280/818)
++              y: t_cpu_usage.y
++              text: "Usage"
++              font.family: "Comic Sans MS"
++              font.pointSize: 9
++              color: "White"
+     }
++
+     Text {
+-        x:bus_graphic.x - 32; y:bus_graphic.y + 84; z:5
+-        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
+-        text: "   0"
++              id: bus_monitor_text
++              x: (root.width)/(1280/10)
++              y: (root.height)/(720/480)
++              text: ""
++              font.family: "Comic Sans MS"
++              font.pointSize: 9
++              color: "White"
++
+     }
+ 
+     /*Text indicate BUS Read value*/
+     Text {
+         id: bus_reading
+-        x:bus_graphic.x - 32
+-        y:bus_graphic.y + bus_graphic.height + 2
++              x:bus_graphic.x + (root.width)/(1280/10)
++              y:bus_graphic.y + bus_graphic.height + (root.height)/(720/-1)
+         z:5
+         text: "READ: "
+         color: "green"
+         font.family: "Comic Sans MS"
+-        font.pointSize: 8
++              font.pointSize: 7
+ 
+     }
+ 
+     /*Text indicate BUS Read value*/
+     Text {
+         id: bus_writing
+-        x: bus_reading.x + bus_graphic.width/2 + 17
++              x: bus_reading.x + bus_graphic.width/2 + (root.width)/(1280/15)
+         y: bus_reading.y
+         z:5
+         text: "WRITE: "
+         color: "red"
+         font.family: "Comic Sans MS"
+-        font.pointSize: 8
++              font.pointSize: 7
+ 
+     }
+ 
++        /*BUS Load Measurement*/
++
++    //    /*Text indicator*/
++    //    Text {
++    //        x:bus_graphic.x - (root.width)/(1280/32); y:bus_graphic.y - (root.height)/(720/1); z:5
++    //        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
++    //        text: "1800"
++    //    }
++    //    Text {
++    //        x:bus_graphic.x - (root.width)/(1280/32); y:bus_graphic.y + (root.height)/(720/10); z:5
++    //        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
++    //        text: "1600"
++    //    }
++    //    Text {
++    //        x:bus_graphic.x - (root.width)/(1280/32); y:bus_graphic.y + (root.height)/(720/20); z:5
++    //        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
++    //        text: "1400"
++    //    }
++    //    Text {
++    //        x:bus_graphic.x - (root.width)/(1280/32); y:bus_graphic.y + (root.height)/(720/30); z:5
++    //        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
++    //        text: "1200"
++    //    }
++    //    Text {
++    //        x:bus_graphic.x - (root.width)/(1280/32); y:bus_graphic.y + (root.height)/(720/40); z:5
++    //        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
++    //        text: "1000"
++    //    }
++    //    Text {
++    //        x:bus_graphic.x - (root.width)/(1280/32); y:bus_graphic.y + (root.height)/(720/49); z:5
++    //        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
++    //        text: " 800"
++    //    }
++    //    Text {
++    //        x:bus_graphic.x - (root.width)/(1280/32); y:bus_graphic.y + (root.height)/(720/59); z:5
++    //        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
++    //        text: " 600"
++    //    }
++    //    Text {
++    //        x:bus_graphic.x - (root.width)/(1280/32); y:bus_graphic.y + (root.height)/(720/68); z:5
++    //        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
++    //        text: " 400"
++    //    }
++    //    Text {
++    //        x:bus_graphic.x - (root.width)/(1280/32); y:bus_graphic.y + (root.height)/(720/77); z:5
++    //        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
++    //        text: " 200"
++    //    }
++    //    Text {
++    //        x:bus_graphic.x - (root.width)/(1280/32); y:bus_graphic.y + (root.height)/(720/86); z:5
++    //        color: "white"; font.family: "Comic Sans MS"; font.pointSize: 8
++    //        text: "   0"
++    //    }
++
++
+     /*Control DDR BUS measurement*/
+-    Button {
++        Rectangle {
+         id: ddrBt
+-        x: bus_graphic.x +  bus_graphic.width - 55
+-        y: bus_graphic.y - 29
+-        z:5
+-        //bgColor: "#757575"
+-        //bgColorSelected: "#212121"
+-        //textColorSelected: "white"
+-        width: 35
+-        height: 12
+-        text: "DDR"
++            x: bus_graphic.x - 1
++            y: bus_graphic.y - (root.height)/(720/15)
++            z:6
++            height: (root.height)/(720/11)
++            width: (root.width)/(1280/35)
++            color: "transparent"
++            border.width: 1
++            border.color: "#a5efec"
++            MouseArea {
++                anchors.fill: parent
+         onClicked: {
+             if(measuretype != "Memory"){
+                 if(measuretype != "none"){ //active
+@@ -3853,23 +3848,35 @@ Rectangle {
+                 measuretype = "Memory"
+                 bus_graphic.resetData()
+                 axist.active()
+-                bus_monitor_text.text = "DDR Monitoring"
+             }
++                    ddrBt.color = "transparent"
++                    cpuBt.color = "blue"
++                    gpuBt.color = "blue"
++                }
++            }
++            Text {
++                text: "DDR"
++                color: "orange"
++                anchors.horizontalCenter: ddrBt.horizontalCenter
++                anchors.verticalCenter: ddrBt.verticalCenter
++                font.family: "Comic Sans MS"
++                font.pointSize: 8
+         }
+     }
+ 
+     /*Control CPU BUS measurement*/
+-    Button {
++        Rectangle {
+         id: cpuBt
+-        x: ddrBt.x - 20
+-        y: ddrBt.y + 15
+-        z:5
+-        //bgColor: "#757575"
+-        //bgColorSelected: "#212121"
+-        //textColorSelected: "white"
+-        width: ddrBt.width
+-        height: ddrBt.height
+-        text: "CPU"
++            x: ddrBt.x + ddrBt.width + 2
++            y: ddrBt.y
++            z:6
++            height: (root.height)/(720/11)
++            width: (root.width)/(1280/35)
++            color: "blue"
++            border.width: 1
++            border.color: "#a5efec"
++            MouseArea {
++                anchors.fill: parent
+         onClicked: {
+             if(measuretype != "CPU"){
+                 axist.filter = 2
+@@ -3879,23 +3886,35 @@ Rectangle {
+                 measuretype = "CPU"
+                 bus_graphic.resetData()
+                 axist.active()
+-                bus_monitor_text.text = "CPU Monitoring"
+             }
++                    cpuBt.color = "transparent"
++                    ddrBt.color = "blue"
++                    gpuBt.color = "blue"
++                }
++            }
++            Text {
++                text: "CPU"
++                color: "orange"
++                anchors.horizontalCenter: cpuBt.horizontalCenter
++                anchors.verticalCenter: cpuBt.verticalCenter
++                font.family: "Comic Sans MS"
++                font.pointSize: 8
+         }
+     }
+ 
+     /*Control GPU BUS measurement*/
+-    Button {
++        Rectangle {
+         id: gpuBt
+         x: cpuBt.x + cpuBt.width + 2
+         y: cpuBt.y
+-        z:5
+-        //bgColor: "#757575"
+-        //bgColorSelected: "#212121"
+-        //textColorSelected: "white"
+-        width: cpuBt.width
+-        height: cpuBt.height
+-        text: "GPU"
++            z:6
++            height: (root.height)/(720/11)
++            width: (root.width)/(1280/35)
++            color: "blue"
++            border.width: 1
++            border.color: "#a5efec"
++            MouseArea {
++                anchors.fill: parent
+         onClicked: {
+             if(measuretype != "GPU"){
+                 if(measuretype != "none"){ //active
+@@ -3905,54 +3924,35 @@ Rectangle {
+                 measuretype = "GPU"
+                 bus_graphic.resetData()
+                 axist.active()
+-                bus_monitor_text.text = "GPU Monitoring"
+             }
++                    gpuBt.color = "transparent"
++                    cpuBt.color = "blue"
++                    ddrBt.color = "blue"
+         }
+     }
+-
+-    /*Draw BUS Graphic*/
+-    PulseSignal {
+-        id: bus_graphic
+-        x: mem.x + mem.width + 13 + 30
+-        y: mem.y + 14
+-        z:5
+-        width: 190 - 30
+-        height: cpu.height - 25
+-        displaynumber: false
+-        fontSize: 10
+-        maxValue: 2000
+-
+         Text {
+-            x:  bus_graphic.width/2 - 30
+-            y: -40
+-            text: "BUS"
++                text: "GPU"
++                color: "orange"
++                anchors.horizontalCenter: gpuBt.horizontalCenter
++                anchors.verticalCenter: gpuBt.verticalCenter
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
+-            color: "White"
+-
++                font.pointSize: 8
+         }
+-        Text {
+-            x:  bus_graphic.width/2 - 37
+-            y: -30
+-            text: "Usage"
+-            font.family: "Comic Sans MS"
+-            font.pointSize: 9
+-            color: "White"
+-
+         }
+ 
+-        Text {
+-            id: bus_monitor_text
+-            x: -30
+-            y: -15
+-            text: "DDR Monitoring"
+-            font.family: "Comic Sans MS"
+-            font.pointSize: 9
+-            color: "White"
+-
+-        }
++        Rectangle {
++            id: border
++            x: ddrBt.x
++            y: ddrBt.y + ddrBt.height - 1
++            z:6
++            width: (root.width)/(1280/195)//190 - 30
++            height: cpu.height - (root.height)/(720/10)
++            color: "transparent"
++            border.width: 0.5
++            border.color: "#a5efec"
+     }
+ 
++
+     /*BUS Monitor*/
+     Axistat {
+         id: axist
+@@ -4021,7 +4021,7 @@ Rectangle {
+             measuretype = "Memory"
+             bus_graphic.resetData()
+             axist.active()
+-            bus_monitor_text.text = "DDR Monitoring" 
++                //bus_monitor_text.text = "DDR Monitoring"
+ 
+             //prevent this block is called again
+             timer_counter = 1 + timer_counter
+@@ -4029,17 +4029,18 @@ Rectangle {
+             //turn off welcome slide
+             welcome.visible = false
+ 
++                streamurl.text = "rtsp://" + ip_string + ":8554/rtsp"
++
++                // prevent this block is called again
++                timer_counter = 1 + timer_counter
++              }else if(timer_counter == 7){
+             // start video streaming
+             camera1.play()
+             camera2.play()
+             camera3.play()
+             camera4.play()
+-
+-            streamurl.text = "rtsp://" + ip_string + ":8554/rtsp"
+-
+-            //prevent this block is called again
+-            timer_counter = 1 + timer_counter
+-          } else if(timer_counter < 5){
++                  timer.stop()
++              }else if(timer_counter < 7){
+             timer_counter = 1 + timer_counter
+           }
+         }
+@@ -4047,8 +4048,8 @@ Rectangle {
+ 
+     Text {
+         id: time
+-        x:  710
+-        y:  510
++        x:  root.width - time.width - (root.width)/(1280/320) - (root.width)/(1280/10)
++        y:  (root.height)/(720/510)
+         font.family: "Comic Sans MS"
+         font.pointSize: 9
+         color: "Yellow"
+@@ -4057,8 +4058,8 @@ Rectangle {
+ 
+     Text {
+         id: streamurl
+-        x:  750
+-        y:  50
++        x:  root.width - streamurl.width - (root.width)/(1280/320) - (root.width)/(1280/10)
++        y:  (root.height)/(720/35)
+         font.family: "Comic Sans MS"
+         font.pointSize: 9
+         color: "Orange"
+@@ -4069,14 +4070,15 @@ Rectangle {
+     Rectangle {
+         id: welcome
+         color: "Black"
+-        x: 0; y: 0; z: 10; width: 1280; height: 720
++            x: 0; y: 0; z: 10; width: root.width; height: root.height
+ 
+         Image {
+           id: sun
+           source: "pics/Sun.png"
+-          x: -280
+-          y: -450
++              x:  (root.width)/(1280/(-100))
++              y:  (root.height)/(720/(-260))
+           opacity: 0.0
++
+           //scale: 0.2
+ 
+           states: State {
+@@ -4101,6 +4103,7 @@ Rectangle {
+         Image {
+           id: welcome_image
+           source: "pics/Welcome_transparent.png"
++              anchors.fill: parent
+         }
+         
+     }
+@@ -4113,7 +4116,7 @@ Rectangle {
+ 		border.color: "grey"
+ 		border.width: 1
+ 		radius: 20
+-		x: -330; y: 190; z: 10;
++		x: (root.width)/(1280/(-330)); y: (root.height)/(720/190); z: 10;
+ 		visible: false
+ 		gradient: Gradient {
+ 			GradientStop { position: 0.0; color: "grey" }
+@@ -4149,7 +4152,7 @@ Rectangle {
+ 			id: listView
+ 			width: 315
+ 			height: 185
+-			x: 10; y: 20;
++			x: (root.width)/(1280/10); y: (root.height)/(720/20);
+ 			highlight: Rectangle { color: "red"; radius: 3 ; opacity: 0.7 }
+ 			highlightFollowsCurrentItem: true
+ 			highlightMoveVelocity: 900 //Speed of movement highlightItem
+@@ -4181,7 +4184,7 @@ Rectangle {
+ 						id: fName
+ 						color: "#FFFFFF"
+ 						text: fileName
+-						x: 30
++						x: (root.width)/(1280/30)
+ 					}
+ 					
+ 					// Highlight selected item
+@@ -4208,7 +4211,7 @@ Rectangle {
+ 		
+ 		Rectangle {
+ 			//id: titleRlRect
+-			y: -10
++			y: (root.height)/(720/(-10))
+ 			width: 330
+ 			height: 30
+ 			border.color: "grey"
+@@ -4216,8 +4219,8 @@ Rectangle {
+ 			radius: 20
+ 			
+ 			Text {
+-				x: 50
+-				y: 5
++				x: (root.width)/(1280/50)
++				y: (root.height)/(720/5)
+ 				text: "Please slelect recorded file to play" 
+ 			}
+ 			
+@@ -4231,7 +4234,7 @@ Rectangle {
+ 		Rectangle {
+ 			id: cancelRlBt
+ 			//x: 10
+-			y: 220
++			y: (root.height)/(720/220)
+ 			width: 150
+ 			height: 30
+ 			color: "transparent"
+@@ -4277,8 +4280,8 @@ Rectangle {
+ 		/*Recording list OK Button*/
+ 		Rectangle {
+ 			id: okRlBt
+-			x: 175
+-			y: 220
++			x: (root.width)/(1280/175)
++			y: (root.height)/(720/220)
+ 			color: "transparent"
+ 			width: 150
+ 			height: 30
+@@ -4372,8 +4375,8 @@ Rectangle {
+ 			id: face_detect
+ 			color: "transparent"
+ 			width: 60; height: 60
+-			x: 678
+-			y: 10
++			x: (root.width)/(1280/678)
++			y: (root.height)/(720/10)
+ 			Image{
+ 				id: face_icon
+ 				source: "pics/facedetect.png"
+@@ -4419,4 +4422,444 @@ Rectangle {
+ 			}
+ 
+ 		}
++        Timer {
++            id: timeout
++            interval: 100
++            running: false
++            repeat: false
++            onTriggered: {
++
++                    // change position and resolution for main-displays
++                    camera1.wlsOutWidth = root.width * 3/4
++                    camera1.wlsOutHeight = root.height * 3/4
++                    camera1.wlsQos = false
++                    camera1.wlsPositionX = root.x
++                    camera1.wlsPositionY = root.y
++
++                    // change position and resolution for sub-displays
++                    camera2.wlsOutWidth = root.width / 4
++                    camera2.wlsOutHeight = root.height / 3
++                    camera2.wlsQos = false
++                    camera2.wlsPositionX = root.x + (root.width * 3/4)
++                    camera2.wlsPositionY = root.y
++
++                    camera3.wlsOutWidth = root.width / 4
++                    camera3.wlsOutHeight = root.height / 3
++                    camera3.wlsQos = false
++                    camera3.wlsPositionX = root.x + (root.width * 3/4)
++                    camera3.wlsPositionY = root.y + (root.height / 3)
++
++                    camera4.wlsOutWidth = root.width / 4
++                    camera4.wlsOutHeight = root.height / 3
++                    camera4.wlsQos = false
++                    camera4.wlsPositionX = root.x + (root.width * 3/4)
++                    camera4.wlsPositionY = root.y + (root.height * 2/3)
++            }
++        }
++
++    }
++
++
++    function toggle() {
++            if (root.state == "on")
++                root.state = "off";
++            else
++                root.state = "on";
++    }
++
++    function scale_UI(screenratio){
++        if(screenratio == 1){
++            if(!isF){
++                // reverse to full screen
++                root.width = container.width
++                root.height = container.height
++                root.x = (container.width - root.width)/2
++                root.y = (container.height - root.height)/2
++                cpu_object.destroy();
++                mem_object.destroy();
++                cpu_object = cpu_component.createObject(root);
++                mem_object = mem_component.createObject(root);
++                timeout.start()
++            }
++        }else {
++
++            if(isF){
++                cpu.destroy();
++                mem.destroy();
++                isF = false;
++                // keep root height change root width
++                root.width = root.height * screenratio
++                root.x = (container.width - root.width)/2
++                root.y = (container.height - root.height)/2
++                cpu_object = cpu_component.createObject(root);
++                mem_object = mem_component.createObject(root);
++                timeout.start()
++            }else{
++                // keep root height change root width
++                root.width = root.height * screenratio
++                root.x = (container.width - root.width)/2
++                root.y = (container.height - root.height)/2
++                cpu_object.destroy();
++                mem_object.destroy();
++                cpu_object = cpu_component.createObject(root);
++                mem_object = mem_component.createObject(root);
++            }
++        }
++        if (arrow.visible == false) {
++              if (display1_state == camera1_state) {
++                      micro.x = (root.width)/(1280/10)
++                      micro.y = (root.height/(720/480))
++              }else if (display2_state == camera1_state) {
++                      micro.x = (root.width/(1280/970))
++                      micro.y = (root.height/(720/180))
++              }else if (display3_state == camera1_state) {
++                      micro.x = (root.width/(1280/970))
++                      micro.y = (root.height/(720/420))
++              }else if (display4_state == camera1_state) {
++                      micro.x = (root.width/(1280/970))
++                      micro.y = (root.height/(720/655))
++              }
++         }
++        btn_4_3.enabled = false
++        btn_5_4.enabled = false
++        btn_16_10.enabled = false
++        btn_full_screen.enabled = false
++        btn_timer.start()
++        timeout.start()
++    }
++
++    /*set icon at index to inactive state*/
++    function set_to_inactive(index) {
++        pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_inactive)
++        pathv.model.setProperty(index, "state", icon_inactive_state)
++    }
++
++    /*set icon at index to active state*/
++    function set_to_active(index) {
++        pathv.model.setProperty(index, "icon", pathv.model.get(index).icon_normal)
++        pathv.model.setProperty(index, "state", icon_normal_state)
++    }
++
++    /*set all icons (except the icon at index) to inactive state*/
++    function set_to_inactive_all(index) {
++        var i = 0;
++        while(i < max_id) {
++            if(i != index) {
++                set_to_inactive(i)
++            }
++            i++
++        }
++    }
++
++    /*set all icons (except the icon at index) to active state*/
++    function set_to_active_all(index) {
++        var i = 0;
++        while(i < max_id) {
++            if(i != index) {
++                set_to_active(i)
++            }
++            i++
++        }
++    }
++
++    /*set all rec icons (list view) to active state*/
++    function set_to_active_all_rec_list() {
++        rec_state = rec_state_pressed
++        rec1_state = rec1_state_normal
++        rec2_state = rec2_state_normal
++        rec3_state = rec3_state_normal
++        rec4_state = rec4_state_normal
++        switch (list_state) {
++            case list_state_red: {
++                rec_image.source = list_icon_red_01.get(0).icon_normal
++                rec1_image.source = list_icon_red.get(6).icon_normal
++                rec2_image.source = list_icon_red.get(0).icon_normal
++                rec3_image.source = list_icon_red.get(1).icon_normal
++                rec4_image.source = list_icon_red.get(2).icon_normal
++                break
++            }
++            case list_state_blue: {
++                rec_image.source = list_icon_blue_01.get(0).icon_normal
++                rec1_image.source = list_icon_blue.get(6).icon_normal
++                rec2_image.source = list_icon_blue.get(0).icon_normal
++                rec3_image.source = list_icon_blue.get(1).icon_normal
++                rec4_image.source = list_icon_blue.get(2).icon_normal
++                break
++            }
++            case list_state_green: {
++                rec_image.source = list_icon_green_01.get(0).icon_normal
++                rec1_image.source = list_icon_green.get(6).icon_normal
++                rec2_image.source = list_icon_green.get(0).icon_normal
++                rec3_image.source = list_icon_green.get(1).icon_normal
++                rec4_image.source = list_icon_green.get(2).icon_normal
++                break
++            }
++            case list_state_orange: {
++                rec_image.source = list_icon_orange_01.get(0).icon_normal
++                rec1_image.source = list_icon_orange.get(6).icon_normal
++                rec2_image.source = list_icon_orange.get(0).icon_normal
++                rec3_image.source = list_icon_orange.get(1).icon_normal
++                rec4_image.source = list_icon_orange.get(2).icon_normal
++                break
++            }
++            case list_state_yellow: {
++                rec_image.source = list_icon_yellow_01.get(0).icon_normal
++                rec1_image.source = list_icon_yellow.get(6).icon_normal
++                rec2_image.source = list_icon_yellow.get(0).icon_normal
++                rec3_image.source = list_icon_yellow.get(1).icon_normal
++                rec4_image.source = list_icon_yellow.get(2).icon_normal
++                break
++            }
++        }
++    }
++
++    /*set all icons (list view) to active state*/
++    function set_to_active_all_list() {
++        play_state = play_state_normal
++        stop_state = stop_state_normal
++        rec_state = rec_state_normal
++        set_state = set_state_normal
++        color_state = color_state_normal
++        color_image.source = list_icon_red.get(3).icon_normal
++        switch (list_state) {
++            case list_state_red: {
++                play_image.source = list_icon_red.get(5).icon_normal
++                stop_image.source = list_icon_red.get(4).icon_normal
++                rec_image.source = list_icon_red_01.get(0).icon_normal
++                set_image.source = list_icon_red_01.get(1).icon_normal
++                break
++            }
++            case list_state_blue: {
++                play_image.source = list_icon_blue.get(5).icon_normal
++                stop_image.source = list_icon_blue.get(4).icon_normal
++                rec_image.source = list_icon_blue_01.get(0).icon_normal
++                set_image.source = list_icon_blue_01.get(1).icon_normal
++                break
++            }
++            case list_state_green: {
++                play_image.source = list_icon_green.get(5).icon_normal
++                stop_image.source = list_icon_green.get(4).icon_normal
++                rec_image.source = list_icon_green_01.get(0).icon_normal
++                set_image.source = list_icon_green_01.get(1).icon_normal
++                break
++            }
++            case list_state_orange: {
++                play_image.source = list_icon_orange.get(5).icon_normal
++                stop_image.source = list_icon_orange.get(4).icon_normal
++                rec_image.source = list_icon_orange_01.get(0).icon_normal
++                set_image.source = list_icon_orange_01.get(1).icon_normal
++                break
++            }
++            case list_state_yellow: {
++                play_image.source = list_icon_yellow.get(5).icon_normal
++                stop_image.source = list_icon_yellow.get(4).icon_normal
++                rec_image.source = list_icon_yellow_01.get(0).icon_normal
++                set_image.source = list_icon_yellow_01.get(1).icon_normal
++                break
++            }
++        }
++    }
++
++    /*set icon to active icon (list view)*/
++    function set_rec_ball_inactive_list() {
++        rec_image.source = rec_ball_inactive
++        rec_state = rec_state_inactive
++    }
++    function set_set_ball_inactive_list() {
++        set_image.source = set_ball_inactive
++        set_state = set_state_inactive
++    }
++    function set_color_ball_inactive_list() {
++        color_image.source = list_icon_red.get(3).icon_inactive
++        color_state = color_state_inactive
++    }
++
++    /*set to hide main icon (list view)*/
++    function set_to_hide_ball_list() {
++        play.visible = false
++        stop.visible = false
++        rec.visible = false
++        rec1.visible = false
++        rec2.visible = false
++        rec3.visible = false
++        rec4.visible = false
++        set.visible = false
++        view.visible = false
++        color.visible = false
++        mail.visible = false
++    }
++
++    /*set to hide mail text input*/
++    function set_to_hide_mail_input() {
++        mail_input.visible = false
++        set_state = set_state_normal
++        if (view.mode == 1) {
++            menu.visible = true
++            pathv.visible = true
++            temp_status.visible = true
++            micro.visible = true
++            arrow.visible = false
++
++        }
++        else if (view.mode == 2) {
++            menu.visible = false
++            temp_status.visible = false
++            arrow_state = arrow_state_normal
++            arrow_image.source = image_arrow
++            arrow.visible = true
++            set_to_active_all_list()
++        }
++    }
++
++    function set_ball_normal_list(list_state,name_image,number) {
++        switch (list_state) {
++            case list_state_red: {
++                name_image.source = list_icon_red.get(number).icon_normal
++                break
++            }
++            case list_state_blue: {
++                name_image.source = list_icon_blue.get(number).icon_normal
++                break
++            }
++            case list_state_green: {
++                name_image.source = list_icon_green.get(number).icon_normal
++                break
++            }
++            case list_state_orange: {
++                name_image.source = list_icon_orange.get(number).icon_normal
++                break
++            }
++            case list_state_yellow: {
++                name_image.source = list_icon_yellow.get(number).icon_normal
++                break
++            }
++        }
++    }
++
++    function set_ball_bright_list(list_state,name_image,number) {
++        switch (list_state) {
++            case list_state_red: {
++                name_image.source = list_icon_red.get(number).icon_bright
++                break
++            }
++            case list_state_blue: {
++                name_image.source = list_icon_blue.get(number).icon_bright
++                break
++            }
++            case list_state_green: {
++                name_image.source = list_icon_green.get(number).icon_bright
++                break
++            }
++            case list_state_orange: {
++                name_image.source = list_icon_orange.get(number).icon_bright
++                break
++            }
++            case list_state_yellow: {
++                name_image.source = list_icon_yellow.get(number).icon_bright
++                break
++            }
++        }
++    }
++
++    function set_ball_normal_list_01(list_state,name_image,number) {
++        switch (list_state) {
++            case list_state_red: {
++                name_image.source = list_icon_red_01.get(number).icon_normal
++                break
++            }
++            case list_state_blue: {
++                name_image.source = list_icon_blue_01.get(number).icon_normal
++                break
++            }
++            case list_state_green: {
++                name_image.source = list_icon_green_01.get(number).icon_normal
++                break
++            }
++            case list_state_orange: {
++                name_image.source = list_icon_orange_01.get(number).icon_normal
++                break
++            }
++            case list_state_yellow: {
++                name_image.source = list_icon_yellow_01.get(number).icon_normal
++                break
++            }
++        }
++    }
++
++    function set_ball_bright_list_01(list_state,name_image,number) {
++        switch (list_state) {
++            case list_state_red: {
++                name_image.source = list_icon_red_01.get(number).icon_bright
++                break
++            }
++            case list_state_blue: {
++                name_image.source = list_icon_blue_01.get(number).icon_bright
++                break
++            }
++            case list_state_green: {
++                name_image.source = list_icon_green_01.get(number).icon_bright
++                break
++            }
++            case list_state_orange: {
++                name_image.source = list_icon_orange_01.get(number).icon_bright
++                break
++            }
++            case list_state_yellow: {
++                name_image.source = list_icon_yellow_01.get(number).icon_bright
++                break
++            }
++        }
++    }
++
++    function set_ball_normal_list_02(pathview,name_image,number) {
++        switch (pathview) {
++            case list_icon_red: {
++                name_image.source = list_icon_red_01.get(number).icon_normal
++                break
++            }
++            case list_icon_blue: {
++                name_image.source = list_icon_blue_01.get(number).icon_normal
++                break
++            }
++            case list_icon_green: {
++                name_image.source = list_icon_green_01.get(number).icon_normal
++                break
++            }
++            case list_icon_orange: {
++                name_image.source = list_icon_orange_01.get(number).icon_normal
++                break
++            }
++            case list_icon_yellow: {
++                name_image.source = list_icon_yellow_01.get(number).icon_normal
++                break
++            }
++        }
++    }
++
++    function set_ball_bright_list_02(pathview,name_image,number) {
++        switch (pathview) {
++            case list_icon_red: {
++                name_image.source = list_icon_red_01.get(number).icon_bright
++                break
++            }
++            case list_icon_blue: {
++                name_image.source = list_icon_blue_01.get(number).icon_bright
++                break
++            }
++            case list_icon_green: {
++                name_image.source = list_icon_green_01.get(number).icon_bright
++                break
++            }
++            case list_icon_orange: {
++                name_image.source = list_icon_orange_01.get(number).icon_bright
++                break
++            }
++            case list_icon_yellow: {
++                name_image.source = list_icon_yellow_01.get(number).icon_bright
++                break
++            }
++        }
++    }
++
++
+ }
+-- 
+1.9.1
+

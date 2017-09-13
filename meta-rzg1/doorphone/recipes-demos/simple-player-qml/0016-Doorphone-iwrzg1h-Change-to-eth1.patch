@@ -1,0 +1,38 @@
+From c969806a259884a578ac933aed56d38e69092ea8 Mon Sep 17 00:00:00 2001
+From: HungTran <hung.tran.jy@rvc.renesas.com>
+Date: Sat, 8 Apr 2017 01:01:50 +0700
+Subject: [PATCH] Change to eth1 for iWave G1H board
+
+On iWave G1H, the network interface is eth1, instead of eth0.
+So only on iWave G1H board we need to change to eth1
+
+Signed-off-by: HungTran <hung.tran.jy@rvc.renesas.com>
+---
+ qml/simpleplayer/main.qml | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/qml/simpleplayer/main.qml b/qml/simpleplayer/main.qml
+index 44251a4..1390eae 100755
+--- a/qml/simpleplayer/main.qml
++++ b/qml/simpleplayer/main.qml
+@@ -863,7 +863,7 @@ Rectangle {
+ 								ScriptLauncher.launchScript()
+ 								ScriptLauncher.appName = "rm -f /tmp/vga1.h264 /tmp/vga2.h264 /tmp/vga3.h264 "
+ 								ScriptLauncher.launchScript()
+-								ScriptLauncher.appName = "ifconfig eth0 192.168.10.100"
++								ScriptLauncher.appName = "ifconfig eth1 192.168.10.100"
+ 								ScriptLauncher.launchScript()
+ 								
+ 								austream_send.usinkHost = "192.168.10.101"
+@@ -887,7 +887,7 @@ Rectangle {
+ 						if (checked) {
+ 							if (is1boardSelect == false) {
+ 								is1boardSelect = true
+-								ScriptLauncher.appName = "ifconfig eth0 192.168.11.100"
++								ScriptLauncher.appName = "ifconfig eth1 192.168.11.100"
+ 								ScriptLauncher.launchScript()
+ 								ScriptLauncher.appName = "/home/root/doorphone/run_outdoor_opencv_1board.sh"
+ 								ScriptLauncher.launchScript()
+-- 
+1.9.1
+

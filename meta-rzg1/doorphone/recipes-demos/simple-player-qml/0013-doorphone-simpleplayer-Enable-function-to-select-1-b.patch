@@ -1,0 +1,287 @@
+From 055f7511b6baf3f121c219f527f0cff4758a34a9 Mon Sep 17 00:00:00 2001
+From: Chuan Anh Nguyen <chuan.nguyen.jy@rvc.renesas.com>
+Date: Thu, 24 Nov 2016 14:08:10 +0700
+Subject: [PATCH] Doorphone simpleplayer: Enable function to select 1 board and
+  2 boards
+
+---
+ main.cpp                  |   4 ++
+ qml/simpleplayer/main.qml | 135 +++++++++++++++++++++++++++++++++++++++++++++-
+ scriptlauncher.cpp        |  23 ++++++++
+ scriptlauncher.h          |  26 +++++++++
+ simpleplayer.pro          |   6 ++-
+ 5 files changed, 190 insertions(+), 4 deletions(-)
+ create mode 100644 scriptlauncher.cpp
+ create mode 100644 scriptlauncher.h
+
+diff --git a/main.cpp b/main.cpp
+index b1d7f72..01de818 100755
+--- a/main.cpp
++++ b/main.cpp
+@@ -45,6 +45,7 @@
+ #include <signal.h>
+ #include "memory.h"
+ #include "fileio.h"
++#include "scriptlauncher.h"
+ 
+ #include <unistd.h>
+ #include <sys/types.h>
+@@ -116,6 +117,9 @@ int main(int argc, char *argv[])
+ 
+ 		viewer.rootContext()->setContextProperty("ip_string", Ip_string);
+ 	}
++	
++	ScriptLauncher  launcher;
++	viewer.rootContext()->setContextProperty("ScriptLauncher", &launcher);
+ 
+ 	
+     viewer.setFlags(Qt::FramelessWindowHint);
+diff --git a/qml/simpleplayer/main.qml b/qml/simpleplayer/main.qml
+index 03c2af4..b7c5f15 100755
+--- a/qml/simpleplayer/main.qml
++++ b/qml/simpleplayer/main.qml
+@@ -241,6 +241,10 @@ Rectangle {
+     /*Recording List*/
+     property string selected_file: ""
+     property bool isShowRecList: false
++    
++    /* Mode Selective between 1 board & 2 boards mode*/
++    property bool isShowModeSelect: false
++    property bool is1boardSelect: false
+ 
+     property bool isF: true;
+     property var cpu_component: Qt.createComponent("CPUMonitorComponent.qml");
+@@ -796,6 +800,135 @@ Rectangle {
+         color: "transparent"
+         property double scalew: (width / 1280)    // Default width is 1280
+         property double scaleh: (height / 720)    // Default height is 720
++        
++        Rectangle {
++			id: modeSelectRect
++			width: (250 * root.scalew > 300) ? 300 : 250 * root.scalew
++			height: (50 * root.scaleh > 50) ? 50 : 50 * root.scaleh
++			border.color: "grey"
++			border.width: 1
++			radius: 0
++			x: parent.width / 2 - width / 2
++			y: -height
++			gradient: Gradient {
++				GradientStop { position: 0.0; color: "grey" }
++				GradientStop { position: 0.1; color: "#3d3c42" }
++			}
++			opacity: 0.9
++
++			states: [
++				State {
++					name: "stage1"; when: isShowModeSelect == true
++					PropertyChanges { target: modeSelectRect; y: 0}//; visible: true }
++				},
++				State {
++					name: "stage2"; when: isShowModeSelect == false
++					PropertyChanges { target: modeSelectRect; y: (-height)}//; visible: false}
++				}
++			]
++
++			transitions: [
++				Transition {
++					from: "stage2"; to: "stage1"
++					PropertyAnimation { property: "visible"}
++					PropertyAnimation { property: "y"; duration: 800 }
++				},
++				Transition {
++					from: "stage1"; to: "stage2"
++					PropertyAnimation { property: "y"; duration: 600 }
++					PropertyAnimation { property: "visible"; duration: 600 }
++				}
++			]
++
++			RowLayout {
++				anchors.bottom: parent.bottom
++				ExclusiveGroup { id: tabPositionGroup }
++				RadioButton {
++					text: "2 Boards"
++					checked: true
++					exclusiveGroup: tabPositionGroup
++					style: RadioButtonStyle {
++						label: Text {
++							font.pointSize: 9 * root.scalew
++							color: "red"
++							text: control.text
++							font.bold: true
++						}
++					}
++					onClicked: {
++						if(checked) {
++							if (is1boardSelect == false) {
++								is1boardSelect = true
++								ScriptLauncher.appName = "killall run_outdoor_opencv_1board.sh gst-launch-1.0"
++								ScriptLauncher.launchScript()
++								ScriptLauncher.appName = "rm -f /tmp/vga1.h264 /tmp/vga2.h264 /tmp/vga3.h264 "
++								ScriptLauncher.launchScript()
++								ScriptLauncher.appName = "sync"
++								ScriptLauncher.launchScript()
++								ScriptLauncher.appName = "ifconfig eth0 192.168.10.100"
++								ScriptLauncher.launchScript()
++							}
++						}
++					}
++				}
++				RadioButton {
++					text: "1 Board"
++					exclusiveGroup: tabPositionGroup
++					style: RadioButtonStyle {
++						label: Text {
++							font.pointSize: 9 * root.scalew
++							color: "red"
++							text: control.text
++							font.bold: true
++						}
++					}
++					onClicked: {
++						if (checked) {
++							if (is1boardSelect == true) {
++								is1boardSelect = false
++								ScriptLauncher.appName = "ifconfig eth0 192.168.11.100"
++								ScriptLauncher.launchScript()
++								ScriptLauncher.appName = "/home/root/doorphone/run_outdoor_opencv_1board.sh"
++								ScriptLauncher.launchScript()
++							}
++						}
++					}
++				}
++			}
++
++			Rectangle {
++				//id: titleRlRect
++				anchors.top: parent.bottom
++				width: parent.width
++				height: (40 * root.scalew > 50) ? 50 : 40 * root.scalew
++				border.color: "grey"
++				border.width: 1
++				radius: 5
++
++				Text {
++					width: parent.width
++					anchors.centerIn: parent.Center
++					anchors.bottom: parent.bottom
++					horizontalAlignment: Text.AlignHCenter
++					text: "Mode Selection"
++					color: "red"
++					font.pointSize: (15 * root.scalew > 20) ? 20 : 15 * root.scalew
++				}
++
++				gradient: Gradient {
++					GradientStop { position: 0.0; color: "lightsteelblue" }
++					GradientStop { position: 1.0; color: "#3d3c42" }
++				}
++
++				MouseArea {
++					anchors.fill: parent
++					//hoverEnabled: true
++					onClicked: {
++						isShowModeSelect = (isShowModeSelect == false) ? true : false;
++					}
++				}
++			}
++		}
+ 
+         /* change resolution button */
+         Rectangle {
+@@ -4532,7 +4665,6 @@ Rectangle {
+             running: false
+             repeat: false
+             onTriggered: {
+-
+                 // change position and resolution for main-displays
+                 camera1.wlsOutWidth = root.width * 3/4
+                 camera1.wlsOutHeight = root.height * 3/4
+@@ -4560,7 +4692,6 @@ Rectangle {
+                 camera4.wlsPositionY = root.y + (root.height * 2/3)
+             }
+         }
+-
+     }
+ 
+ 
+diff --git a/scriptlauncher.cpp b/scriptlauncher.cpp
+new file mode 100644
+index 0000000..0e30230
+--- /dev/null
++++ b/scriptlauncher.cpp
+@@ -0,0 +1,23 @@
++#include "scriptlauncher.h"
++#include <QProcess>
++#include <QDebug>
++
++ScriptLauncher::ScriptLauncher(QObject *parent) : QObject(parent), m_process(new QProcess(this))
++{
++}
++
++QString ScriptLauncher::appName() const
++{
++    return m_AppName;
++}
++
++void ScriptLauncher::setAppName(const QString &appName)
++{
++    m_AppName = appName;
++}
++
++void ScriptLauncher::launchScript()
++{
++    // You can use start() if you want to start a external application
++    m_process->execute(m_AppName);
++}
+diff --git a/scriptlauncher.h b/scriptlauncher.h
+new file mode 100644
+index 0000000..9a3e965
+--- /dev/null
++++ b/scriptlauncher.h
+@@ -0,0 +1,26 @@
++#ifndef SCRIPTLAUNCHER_H
++#define SCRIPTLAUNCHER_H
++
++#include <QObject>
++#include <QProcess>
++
++class ScriptLauncher : public QObject
++{
++    Q_OBJECT
++
++    public:
++    explicit ScriptLauncher(QObject *parent = 0);
++
++        Q_PROPERTY( QString appName READ appName WRITE setAppName )
++
++        QString appName() const;
++        void setAppName(const QString &appName);
++
++        Q_INVOKABLE void launchScript();
++
++    private:
++    QProcess *m_process;
++    QString m_AppName;
++};
++
++#endif // SCRIPTLAUNCHER_H
+diff --git a/simpleplayer.pro b/simpleplayer.pro
+index 86997c0..d24303c 100755
+--- a/simpleplayer.pro
++++ b/simpleplayer.pro
+@@ -9,9 +9,11 @@ SOURCES += $$LOCAL_SOURCES
+ HEADERS += $$LOCAL_HEADERS
+ RESOURCES += simpleplayer.qrc
+ 
+-SOURCES += memory.cpp
++SOURCES += memory.cpp\
++scriptlauncher.cpp
+ HEADERS += memory.h \
+-fileio.h
++fileio.h\
++scriptlauncher.h
+ 
+ 
+ target.path = $$[QT_INSTALL_EXAMPLES]/multimedia/video/simpleplayer
+-- 
+1.9.1
+

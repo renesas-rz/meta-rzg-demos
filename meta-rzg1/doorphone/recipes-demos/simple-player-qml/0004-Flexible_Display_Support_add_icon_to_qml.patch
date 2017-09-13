@@ -1,0 +1,34 @@
+From 486d6c6f74ee9fada81d0a401aa34d9dfcda20ce Mon Sep 17 00:00:00 2001
+From: khoahvd <khoahvd@fsoft.com.vn>
+Date: Mon, 28 Dec 2015 15:10:41 +0700
+Subject: [PATCH 4/6] Flexible_Display_Support_add_icon_to_qml
+
+Signed-off-by: khoahvd <khoahvd@fsoft.com.vn>
+---
+ simpleplayer.qrc                                  |  11 +++++++++++
+ 1 files changed
+
+diff --git a/simpleplayer.qrc b/simpleplayer.qrc
+index d11b4f0..e58ae83 100755
+--- a/simpleplayer.qrc
++++ b/simpleplayer.qrc
+@@ -206,5 +206,16 @@
+ 		<file>qml/simpleplayer/pics/color_ball_bright.png</file>
+ 		<file>qml/simpleplayer/pics/color_ball_inactive.png</file>
+ 		<file>qml/simpleplayer/pics/facedetect.png</file>
++		<file>qml/simpleplayer/CPUMonitorComponent.qml</file>
++		<file>qml/simpleplayer/MEMMonitorComponent.qml</file>
++		<file>qml/simpleplayer/pics/full_screen_icon.png</file>
++		<file>qml/simpleplayer/pics/16_10_icon.png</file>
++		<file>qml/simpleplayer/pics/5_4_icon.png</file>
++		<file>qml/simpleplayer/pics/4_3_icon.png</file>
++		<file>qml/simpleplayer/pics/screen_icon.png</file>
++		<file>qml/simpleplayer/pics/full_screen_icon_active.png</file>
++		<file>qml/simpleplayer/pics/16_10_icon_active.png</file>
++		<file>qml/simpleplayer/pics/5_4_icon_active.png</file>
++		<file>qml/simpleplayer/pics/4_3_icon_active.png</file>
+     </qresource>
+ </RCC>
+-- 
+1.9.1
+

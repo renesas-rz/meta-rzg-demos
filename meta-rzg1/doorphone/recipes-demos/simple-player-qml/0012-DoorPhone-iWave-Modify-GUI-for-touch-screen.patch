@@ -1,0 +1,293 @@
+From dfeac2c4f3bc7161c680364ea89539b320b89dd3 Mon Sep 17 00:00:00 2001
+From: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+Date: Fri, 10 Jun 2016 10:30:27 +0700
+Subject: [PATCH] DoorPhone-iWave-Modify GUI for touch screen
+
+At current time, GUI of DoorPhone will display not good on LCD
+touch screen, the text is so big on LCD touch scree...
+
+This patch file modifies for GUI of DoorPhone adapt with LCD touch screen
+of iWave board
+
+Signed-off-by: Chien Nguyen <chien.nguyen.eb@rvc.renesas.com>
+---
+ qml/simpleplayer/main.qml | 64 +++++++++++++++++++++++++----------------------
+ 1 file changed, 34 insertions(+), 30 deletions(-)
+
+diff --git a/qml/simpleplayer/main.qml b/qml/simpleplayer/main.qml
+index 78bc60f..03c2af4 100755
+--- a/qml/simpleplayer/main.qml
++++ b/qml/simpleplayer/main.qml
+@@ -3698,7 +3698,7 @@ Rectangle {
+             y: 545 * root.scaleh
+             text: "CPU"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+         Text {
+@@ -3707,7 +3707,7 @@ Rectangle {
+             y: t_cpu.y + (10 * root.scaleh)
+             text: "Usage"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+ 
+@@ -3717,7 +3717,7 @@ Rectangle {
+             y: t_cpu.y
+             text: "CPU1"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+         Text {
+@@ -3726,7 +3726,7 @@ Rectangle {
+             y: t_cpu_usage.y
+             text: "History"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+ 
+@@ -3736,7 +3736,7 @@ Rectangle {
+             y: t_cpu.y
+             text: "CPU2"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+ 
+         }
+@@ -3746,7 +3746,7 @@ Rectangle {
+             y: t_cpu_usage.y
+             text: "History"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+ 
+@@ -3757,7 +3757,7 @@ Rectangle {
+             y: bus_reading.y
+             text: "0.0"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+ 
+         }
+@@ -3768,7 +3768,7 @@ Rectangle {
+             y: mem_usage_text.y
+             text: "GB"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+ 
+         }
+@@ -3779,7 +3779,7 @@ Rectangle {
+             y: t_cpu.y
+             text: "MEM"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+         Text {
+@@ -3788,7 +3788,7 @@ Rectangle {
+             y: t_cpu_usage.y
+             text: "Usage"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+ 
+@@ -3798,7 +3798,7 @@ Rectangle {
+             y: t_cpu.y
+             text: "MEM"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+         Text {
+@@ -3807,7 +3807,7 @@ Rectangle {
+             y: t_cpu_usage.y
+             text: "History"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+ 
+@@ -3818,7 +3818,7 @@ Rectangle {
+             y: t_cpu.y
+             text: "BUS"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+         Text {
+@@ -3827,7 +3827,7 @@ Rectangle {
+             y: t_cpu_usage.y
+             text: "Usage"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+         }
+ 
+@@ -3837,7 +3837,7 @@ Rectangle {
+             y: 480 * root.scaleh
+             text: ""
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "White"
+ 
+         }
+@@ -3851,7 +3851,7 @@ Rectangle {
+             text: "READ: "
+             color: "green"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 7
++            font.pointSize: 7 * root.scalew
+ 
+         }
+ 
+@@ -3864,7 +3864,7 @@ Rectangle {
+             text: "WRITE: "
+             color: "red"
+             font.family: "Comic Sans MS"
+-            font.pointSize: 7
++            font.pointSize: 7 * root.scalew
+ 
+         }
+ 
+@@ -3956,7 +3956,7 @@ Rectangle {
+                 anchors.horizontalCenter: ddrBt.horizontalCenter
+                 anchors.verticalCenter: ddrBt.verticalCenter
+                 font.family: "Comic Sans MS"
+-                font.pointSize: 8
++                font.pointSize: 8 * root.scalew
+             }
+         }
+ 
+@@ -3994,7 +3994,7 @@ Rectangle {
+                 anchors.horizontalCenter: cpuBt.horizontalCenter
+                 anchors.verticalCenter: cpuBt.verticalCenter
+                 font.family: "Comic Sans MS"
+-                font.pointSize: 8
++                font.pointSize: 8 * root.scalew
+             }
+         }
+ 
+@@ -4032,7 +4032,7 @@ Rectangle {
+                 anchors.horizontalCenter: gpuBt.horizontalCenter
+                 anchors.verticalCenter: gpuBt.verticalCenter
+                 font.family: "Comic Sans MS"
+-                font.pointSize: 8
++                font.pointSize: 8 * root.scalew
+             }
+         }
+ 
+@@ -4147,7 +4147,7 @@ Rectangle {
+             x:  root.width - time.width - (320 * root.scalew) - (10 * root.scalew)
+             y:  510 * root.scaleh
+             font.family: "Comic Sans MS"
+-            font.pointSize: 9
++            font.pointSize: 9 * root.scalew
+             color: "Yellow"
+ 
+         }
+@@ -4171,11 +4171,11 @@ Rectangle {
+             Image {
+                 id: sun
+                 source: "pics/Sun.png"
+-                x:  -100 * root.scalew
+-                y:  -260 * root.scaleh
++                x:  (root.width < 1280) ? -350 * root.scalew * 2 : -100 * root.scalew
++                y:  (root.width < 1280) ? -410 * root.scaleh * 2 : -260 * root.scaleh
+                 opacity: 0.0
+ 
+-                //scale: 0.2
++                scale: root.scalew
+ 
+                 states: State {
+                     name: "light"; when: enable_light
+@@ -4207,7 +4207,7 @@ Rectangle {
+         /*List view for file in folder*/
+         Rectangle {
+             id: listViewRect
+-            width: 330 * root.scalew
++            width: (root.width < 1280) ? 410 * root.scalew : 330 * root.scalew
+             height: 250 * root.scaleh
+             border.color: "grey"
+             border.width: 1
+@@ -4248,11 +4248,12 @@ Rectangle {
+ 
+             ListView {
+                 id: listView
+-                width: 315 * root.scalew
++                width: (root.width < 1280) ? 400 * root.scalew : 315 * root.scalew
++//				width: 505 * root.scalew
+                 height: 185 * root.scaleh
+                 x: 10 * root.scalew
+                 y: 20 * root.scaleh
+-                highlight: Rectangle { color: "red"; radius: 3 ; opacity: 0.7 }
++                highlight: Rectangle { color: "blue"; radius: 3 ; opacity: 0.7 }
+                 highlightFollowsCurrentItem: true
+                 highlightMoveVelocity: 900 //Speed of movement highlightItem
+                 cacheBuffer: 0
+@@ -4272,18 +4273,20 @@ Rectangle {
+ 
+                     Item {
+                         id: lwEleItem
+-                        width: 315 * root.scalew
++                        width: (root.width < 1280) ? 390 * root.scalew : 315 * root.scalew
+                         height: 30 * root.scaleh
+                         z: 11
+                         Text {
+                             color: "#FFFFFF"
+                             text: index + " - "
++                            font.pointSize: 9 * root.scalew
+                         }
+                         Text {
+                             id: fName
+                             color: "#FFFFFF"
+                             text: fileName
+                             x: 30 * root.scalew
++                            font.pointSize: 9 * root.scalew
+                         }
+ 
+                         // Highlight selected item
+@@ -4311,16 +4314,17 @@ Rectangle {
+             Rectangle {
+                 //id: titleRlRect
+                 y: (-10) * root.scaleh
+-                width: 330 * root.scalew
++                width: (root.width < 1280) ? 410 * root.scalew : 330 * root.scalew
+                 height: 30 * root.scaleh
+                 border.color: "grey"
+                 border.width: 1
+                 radius: 20
+ 
+                 Text {
+-                    x: 50 * root.scalew
++                    x: (root.width < 1280) ? 70 * root.scalew : 50 * root.scalew
+                     y: 5 * root.scaleh
+                     text: "Please slelect recorded file to play"
++                    font.pointSize: 9 * root.scalew
+                 }
+ 
+                 gradient: Gradient {
+-- 
+1.9.1
+

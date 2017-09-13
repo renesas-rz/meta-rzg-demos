@@ -1,0 +1,56 @@
+From fdf1b192eef20ff3ff6c0910e540db19e1758306 Mon Sep 17 00:00:00 2001
+From: tamnm2 <tamnm2@fsoft.com.vn>
+Date: Fri, 16 Oct 2015 15:42:54 +0700
+Subject: [PATCH] fix memory leak audiostreaming
+
+Signed-off-by: Tam Nguyen <tamnm2@fsoft.com.vn>
+
+---
+ .../qgstreameraudiostreamingsession.cpp            |   31 +++++++++
+ 1 files changed, 31 insertions(+)
+
+diff --git a/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.cpp b/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.cpp
+index f851144..ad9f17d 100755
+--- a/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.cpp
++++ b/src/plugins/gstreamer/audiostreaming/qgstreameraudiostreamingsession.cpp
+@@ -40,6 +40,37 @@ QGstreamerAudioStreamingSession::~QGstreamerAudioStreamingSession()
+         gst_object_unref(GST_OBJECT(m_bus));
+         gst_object_unref(GST_OBJECT(m_pipeline));
+     }
++    //Check for element and caps when destruction
++    if(m_alsasrc)
++        gst_object_unref(m_alsasrc);
++    if(m_aconvert)
++        gst_object_unref(m_aconvert);
++    if(m_aacenc)
++        gst_object_unref(m_aacenc);
++    if(m_rtpmp4apay)
++        gst_object_unref(m_rtpmp4apay);
++    if(m_udpsink)
++        gst_object_unref(m_udpsink);
++    if(m_udpsrc)
++        gst_object_unref(m_udpsrc);
++    if(m_rtpjitterbuffer)
++        gst_object_unref(m_rtpjitterbuffer);
++    if(m_queue)
++        gst_object_unref(m_queue);
++    if(m_rtpmp4adepay)
++        gst_object_unref(m_rtpmp4adepay);
++    if(m_alsasink)
++        gst_object_unref(m_alsasink);
++    if(m_aacdec)
++        gst_object_unref(m_aacdec);
++
++    if(m_pulsesrc)
++        gst_object_unref(m_pulsesrc);
++    if(m_pulsesink)
++        gst_object_unref(m_pulsesink);
++
++    if(m_capsfilter)
++        gst_caps_unref(m_capsfilter);
+ }
+ 
+ bool QGstreamerAudioStreamingSession::processBusMessage(const QGstreamerMessage &message)
+-- 
+1.7.9.5
+
