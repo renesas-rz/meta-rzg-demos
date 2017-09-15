@@ -1,5 +1,5 @@
 FILESEXTRAPATHS_prepend := '${THISDIR}/weston:'
 
 SRC_URI_append = " \
-    file://0021-add-script-kill-Loading-app-when-finish-display-Qt.patch \
+    file://0001-weston-add-active-when-set-toplevel.patch \
 "

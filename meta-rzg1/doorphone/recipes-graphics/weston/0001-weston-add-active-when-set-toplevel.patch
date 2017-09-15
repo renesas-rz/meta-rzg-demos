@@ -1,0 +1,28 @@
+From 0d3a606450df8ddab92a728ad9446197f5bb6deb Mon Sep 17 00:00:00 2001
+From: nhannguyen <nhan.nguyen.yb@renesas.com>
+Date: Wed, 13 Sep 2017 20:34:33 +0700
+Subject: [PATCH] weston add active when set toplevel
+
+---
+ desktop-shell/shell.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index 5b71bc2..7431b57 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -2521,6 +2521,11 @@ set_toplevel(struct shell_surface *shsurf)
+ 	shell_surface_set_parent(shsurf, NULL);
+ 	surface_clear_next_states(shsurf);
+ 	set_type(shsurf, SHELL_SURFACE_TOPLEVEL);
++       	struct weston_seat *seat;
++
++	wl_list_for_each(seat, &shsurf->shell->compositor->seat_list, link) {
++ 		activate(shsurf->shell, shsurf->surface, seat, true);
++      	}
+ 
+ 	/* The layer_link is updated in set_surface_type(),
+ 	 * called from configure. */
+-- 
+1.9.1
+
