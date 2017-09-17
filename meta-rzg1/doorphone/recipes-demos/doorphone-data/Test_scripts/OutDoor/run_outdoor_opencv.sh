@@ -10,8 +10,8 @@ echo "streaming from Camera: "${CAM_DEV}
 VIDEOLOCATION=/home/root/videos
 SCRIPTLOCATION=/home/root/doorphone/    # Only effect in this file, remember to change other files as well
 
-gst-launch-1.0 alsasrc do-timestamp=true ! alawenc ! rtppcmapay ! udpsink host=192.168.10.100 port=2000 sync=false &> /dev/null &
-gst-launch-1.0 -v udpsrc port=2001 caps="application/x-rtp, media=(string)audio" typefind=1 ! rtppcmadepay ! queue ! alawdec ! alsasink &> /dev/null &
+#gst-launch-1.0 alsasrc do-timestamp=true ! alawenc ! rtppcmapay ! udpsink host=192.168.10.100 port=2000 sync=false &> /dev/null &
+#gst-launch-1.0 -v udpsrc port=2001 caps="application/x-rtp, media=(string)audio" typefind=1 ! rtppcmadepay ! queue ! alawdec ! alsasink &> /dev/null &
 
 # Send video stream to Base phone and Out door
 gst-launch-1.0 -e v4l2src device=${CAM_DEV} ! video/x-raw,format=UYVY,width=720,height=480 ! tee name=t t. ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=640,height=480 ! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay pt=96 config-interval=3 mtu=9000 ! udpsink host=192.168.10.255 port=1234 t. ! vspmfilter outbuf-alloc=true ! video/x-raw,format=NV12,width=640,height=480 ! omxh264enc target-bitrate=10485760 num-p-frames=0 ! h264parse ! video/x-h264,stream-format=avc,alignment=au ! rtph264pay pt=96 config-interval=3 ! udpsink host=192.168.10.101 port=5555 &> /dev/null &
