@@ -2,13 +2,17 @@ LICENSE = "CLOSED"
 DESCRIPTION = "This is configuration for environments"
 
 FILESEXTRAPATHS_prepend := "${THISDIR}/files:"
+
 SRC_URI = " \
  file://RZ_scripts.tar.xz  \
  file://ATT93936.bashrc \
+ file://0001-Add-CAM_DEV-variable-to-camera-encoding-script.patch \
 "
 
 do_install () {
 	install -d ${D}/${ROOT_HOME}/RZ_scripts
+	cd ${S}/../RZ_scripts
+	git apply ../*.patch
 	cp ${S}/../RZ_scripts/* ${D}/${ROOT_HOME}/RZ_scripts
 	cp ${S}/../ATT93936.bashrc ${D}/${ROOT_HOME}/.bashrc
 }

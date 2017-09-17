@@ -1,4 +1,5 @@
 #!/bin/bash
+source /home/root/.bashrc
 
 TTY=$(grep "\/sbin\/getty" /etc/inittab | grep 'ttyS' | awk '{ print $NF }')
 TTY=/dev/${TTY}

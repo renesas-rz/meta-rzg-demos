@@ -10,3 +10,4 @@ getWestonHeight() {
 
 export D_WIDTH=`getWestonWidth`
 export D_HEIGHT=`getWestonHeight`
+export CAM_DEV=/dev/video0
