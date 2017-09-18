@@ -13,6 +13,7 @@ do_install () {
 	install -d ${D}/${ROOT_HOME}/RZ_scripts
 	cd ${S}/../RZ_scripts
 	git apply ../*.patch
+	chmod 755 ${S}/../RZ_scripts -Rf
 	cp ${S}/../RZ_scripts/* ${D}/${ROOT_HOME}/RZ_scripts
 	cp ${S}/../ATT93936.bashrc ${D}/${ROOT_HOME}/.bashrc
 }
