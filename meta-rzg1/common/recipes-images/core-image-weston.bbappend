@@ -36,14 +36,19 @@ update_issue() {
       BSP_SOC="RZG1M"
       BSP_BOARD="SK"
       ;;
+    iwg20m)
+      case "${SOC_FAMILY}" in
+        *r8a7743*)
+          BSP_SOC="RZG1M"
+          BSP_BOARD="iWave"
+        ;;
+        *)
+          BSP_SOC="RZG1N"
+          BSP_BOARD="iWave"
+        ;;
+      esac
+      ;;
     *)
-      if [ "${SOC_FAMILY}" == "rzg1:r8a7743" ]; then
-        BSP_SOC="RZG1M"
-        BSP_BOARD="iWave"
-      else
-        BSP_SOC="RZG1N"
-        BSP_BOARD="iWave"
-      fi
       ;;
     esac
 
