@@ -18,6 +18,9 @@ IMAGE_INSTALL_append = " \
     qt5-launch-demo \
     qt5-qml-presentation-system \
 	qtwebsockets \
+    qtserialport \
+    qtwebchannel \
+    qtwebchannel-qmlplugins \
     qtwebkit \
     qtwebkit-examples-examples \
     qtwebkit-qmlplugins \
