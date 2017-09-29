@@ -327,7 +327,7 @@ index 0000000..cd64b70
 +{
 +    Q_OBJECT
 +public:
-+    explicit QWaylandEventThread(QObject *parent = 0);
++    explicit QWaylandEventThread(QObject *parent = Q_NULLPTR);
 +    ~QWaylandEventThread();
 +
 +    void displayConnect();

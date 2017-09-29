@@ -427,7 +427,7 @@ index 0000000..9db1584
 +        InputArgumentError  = QCameraRecorderMode::InputArgumentError
 +    };
 +
-+    QDeclarativeCameraRecorderMode(QObject *parent = 0);
++    QDeclarativeCameraRecorderMode(QObject *parent = Q_NULLPTR);
 +    ~QDeclarativeCameraRecorderMode();
 +
 +    Status status() const;
@@ -669,7 +669,7 @@ index 0000000..c77afbc
 +    void error(int error, const QString &errorString);
 +
 +protected:
-+    QCameraRecorderModeControl(QObject* parent = 0);
++    QCameraRecorderModeControl(QObject* parent = Q_NULLPTR);
 +};
 +
 +#define QCameraRecorderModeControl_iid "org.qt-project.qt.CameraRecorderModecontrol/5.0"
@@ -1086,7 +1086,7 @@ index 0000000..cbf90c9
 +        InvalidRequestError
 +    };
 +
-+    QCameraRecorderMode(QObject *parent = 0);
++    QCameraRecorderMode(QObject *parent = Q_NULLPTR);
 +    ~QCameraRecorderMode();
 +
 +    State state() const;
@@ -1415,7 +1415,7 @@ index 0000000..0511540
 +    Q_OBJECT
 +
 +public:
-+    QGstreamerCameraRecorderModeControl(QGstreamerCameraRecorderModeSession *session, QObject *parent = 0);
++    QGstreamerCameraRecorderModeControl(QGstreamerCameraRecorderModeSession *session, QObject *parent = Q_NULLPTR);
 +    ~QGstreamerCameraRecorderModeControl();
 +
 +    QCameraRecorderMode::MediaStatus mediaStatus() const;
@@ -1596,7 +1596,7 @@ index 0000000..2356a41
 +{
 +    Q_OBJECT
 +public:
-+    QGstreamerCameraRecorderModeService(QObject *parent = 0);
++    QGstreamerCameraRecorderModeService(QObject *parent = Q_NULLPTR);
 +    ~QGstreamerCameraRecorderModeService();
 +
 +    QMediaControl *requestControl(const char *name);
