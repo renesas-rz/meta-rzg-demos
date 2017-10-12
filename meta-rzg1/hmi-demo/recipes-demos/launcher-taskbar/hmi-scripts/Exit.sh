@@ -20,6 +20,7 @@ killall -9 -q banner
 killall -9 -q fps_out
 killall -9 -q fps_show
 killall -9 -q glmark2-es2-wayland
+killall -9 -q Demo3D
 killall -q -9 OGLES2Water
 killall -q -9 test-multicast2
 
