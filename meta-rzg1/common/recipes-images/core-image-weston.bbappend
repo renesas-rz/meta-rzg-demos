@@ -5,7 +5,7 @@ IMAGE_INSTALL_append = " \
 
 update_issue() {
     # Set BSP version
-    BSP_VERSION="1.0.0"
+    BSP_VERSION="2.0.0"
 
     # Set SoC and Board info
     case "${MACHINE}" in
@@ -23,11 +23,11 @@ update_issue() {
       ;;
     skrzg1e)
       BSP_SOC="RZG1E"
-      BSP_BOARD="SK"
+      BSP_BOARD="RZG1E-SK"
       ;;
     skrzg1m)
       BSP_SOC="RZG1M"
-      BSP_BOARD="SK"
+      BSP_BOARD="RZG1M-SK"
       ;;
     iwg20m)
       case "${SOC_FAMILY}" in
