@@ -4,6 +4,8 @@ EXTRA_IMAGE_FEATURES = "debug-tweaks tools-debug tools-profile"
 IMAGE_INSTALL_append_rzg1 = " \
     mm-init \
     cairo \
+    pulseaudio-init \
+    ltp \
     gstreamer1.0-plugins-base-vspmfilter \
     gstreamer1.0-plugins-base-apps \
     gstreamer1.0-plugins-good-multifile \

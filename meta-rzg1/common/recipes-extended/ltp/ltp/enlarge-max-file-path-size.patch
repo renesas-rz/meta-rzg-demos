@@ -1,0 +1,81 @@
+From 99670328686f4b93cb1c57b1666dd32490a8a0ea Mon Sep 17 00:00:00 2001
+From: Noriyuki Shiota <noriyuki.shiota@miraclelinux.com>
+Date: Thu, 12 Oct 2017 17:38:02 +0900
+Subject: [PATCH] Enlarge max file path size
+
+---
+ testcases/kernel/fs/doio/doio.h                           | 2 +-
+ testcases/kernel/security/prot_hsymlinks/prot_hsymlinks.c | 2 +-
+ testcases/kernel/syscalls/chdir/chdir03.c                 | 2 +-
+ testcases/kernel/syscalls/fchdir/fchdir03.c               | 2 +-
+ testcases/kernel/syscalls/pread/pread03.c                 | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/testcases/kernel/fs/doio/doio.h b/testcases/kernel/fs/doio/doio.h
+index 28c4feb..dbce804 100644
+--- a/testcases/kernel/fs/doio/doio.h
++++ b/testcases/kernel/fs/doio/doio.h
+@@ -129,7 +129,7 @@
+  *		This is an allowed assumption in C.
+  */
+ 
+-#define MAX_FNAME_LENGTH    128
++#define MAX_FNAME_LENGTH    256
+ 
+ struct read_req {
+     char    r_file[MAX_FNAME_LENGTH];
+diff --git a/testcases/kernel/security/prot_hsymlinks/prot_hsymlinks.c b/testcases/kernel/security/prot_hsymlinks/prot_hsymlinks.c
+index 15f20a2..a6b8a9e 100644
+--- a/testcases/kernel/security/prot_hsymlinks/prot_hsymlinks.c
++++ b/testcases/kernel/security/prot_hsymlinks/prot_hsymlinks.c
+@@ -51,7 +51,7 @@ int TST_TOTAL = 396;
+ 
+ /* create 3 files and 1 dir in each base dir */
+ #define MAX_FILES_CREATED	4
+-#define MAX_PATH		128
++#define MAX_PATH		256
+ #define MAX_CMD_LEN		64
+ #define MAX_USER_NAME		16
+ 
+diff --git a/testcases/kernel/syscalls/chdir/chdir03.c b/testcases/kernel/syscalls/chdir/chdir03.c
+index cc46781..8b6c840 100644
+--- a/testcases/kernel/syscalls/chdir/chdir03.c
++++ b/testcases/kernel/syscalls/chdir/chdir03.c
+@@ -67,7 +67,7 @@ int TST_TOTAL = 1;
+ void setup(void);
+ void cleanup(void);
+ 
+-char good_dir[100];
++char good_dir[256];
+ 
+ static uid_t nobody_uid, bin_uid;
+ 
+diff --git a/testcases/kernel/syscalls/fchdir/fchdir03.c b/testcases/kernel/syscalls/fchdir/fchdir03.c
+index 647b68c..3f0a5bd 100644
+--- a/testcases/kernel/syscalls/fchdir/fchdir03.c
++++ b/testcases/kernel/syscalls/fchdir/fchdir03.c
+@@ -69,7 +69,7 @@ int TST_TOTAL = 1;
+ void setup(void);
+ void cleanup(void);
+ 
+-char good_dir[100];
++char good_dir[256];
+ int fd;
+ 
+ static uid_t nobody_uid;
+diff --git a/testcases/kernel/syscalls/pread/pread03.c b/testcases/kernel/syscalls/pread/pread03.c
+index f56b22f..90dbf65 100644
+--- a/testcases/kernel/syscalls/pread/pread03.c
++++ b/testcases/kernel/syscalls/pread/pread03.c
+@@ -88,7 +88,7 @@ char *TCID = "pread03";
+ int TST_TOTAL = 1;
+ 
+ char *read_buf[NBUFS];		/* buffer to hold data read from file */
+-char test_dir[100];
++char test_dir[256];
+ int fd1;
+ 
+ void setup();			/* Main setup function of test */
+-- 
+1.8.3.1
+

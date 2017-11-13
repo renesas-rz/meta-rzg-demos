@@ -1,0 +1,51 @@
+#!/bin/sh -e
+
+#
+# We use the same value for XDG_RUNTIME_DIR which weston process
+# uses.
+. /etc/profile
+
+DESC="PulseAudio"
+
+do_start() {
+    amixer set "LINEOUT Mixer DACL" on
+    amixer set "DVC Out" 80
+    amixer set "DVC In" 15
+    amixer set "Digital" 200,200
+
+    # It's not recommended to run pulseaudio as a system service,
+    # while we need it. Here, use home directory of 'root' user
+    # as pulseaudio's home directory to store some settings.
+    export HOME=/home/root
+    pulseaudio --start
+}
+
+do_stop() {
+    pid=$(/bin/pidof pulseaudio)
+    if [ "$pid" != "" ] ; then
+         kill $pid
+    fi
+}
+
+case "$1" in
+  start)
+    echo "Starting $DESC"
+    do_start
+    ;;
+  stop)
+    echo "Stoping $DESC"
+    do_stop
+    ;;
+  restart)
+    echo "Restarting $DESC"
+    do_stop
+    sleep 1
+    do_start
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart}" >&2
+    exit 1
+    ;;
+esac
+
+exit 0
