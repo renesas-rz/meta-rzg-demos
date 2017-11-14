@@ -8,10 +8,9 @@
 DESC="PulseAudio"
 
 do_start() {
-    amixer set "LINEOUT Mixer DACL" on
-    amixer set "DVC Out" 80
-    amixer set "DVC In" 15
-    amixer set "Digital" 200,200
+    amixer set 'PCM' 70%
+    amixer set 'Headphone' 100%
+    amixer set 'Mic' 70%
 
     # It's not recommended to run pulseaudio as a system service,
     # while we need it. Here, use home directory of 'root' user

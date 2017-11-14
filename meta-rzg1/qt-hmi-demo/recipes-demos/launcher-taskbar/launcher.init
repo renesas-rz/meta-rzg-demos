@@ -17,8 +17,8 @@ killproc() {
 
 case "$1" in
   start)
-	amixer set "LINEOUT Mixer DACL" on
-	amixer set "Digital" 100%
+	amixer set 'PCM' 70%
+	amixer set 'Headphone' 100%
 	. /etc/profile
 	export LD_PRELOAD=/usr/lib/libEGL.so
   ;;
