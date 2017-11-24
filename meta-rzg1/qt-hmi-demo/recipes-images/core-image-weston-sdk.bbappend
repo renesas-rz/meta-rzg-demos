@@ -1,7 +1,10 @@
 inherit meta
+inherit toolchain-scripts
 inherit populate_sdk
 
 create_sdk_files_append () {
+
+       toolchain_create_sdk_env_script ${SDK_OUTPUT}/${SDKPATH}/environment-setup-${REAL_MULTIMACH_TARGET_SYS}
 
        echo "export PATH=${SDKPATHNATIVE}/usr/bin/qt5:\$PATH" >> $script
        echo 'export OE_QMAKE_COMPILER="arm-poky-linux-gnueabi-gcc -march=armv7-a -mthumb-interwork -mfloat-abi=hard -mfpu=neon -mtune=cortex-a7 --sysroot=$SDKTARGETSYSROOT"' >> $script
