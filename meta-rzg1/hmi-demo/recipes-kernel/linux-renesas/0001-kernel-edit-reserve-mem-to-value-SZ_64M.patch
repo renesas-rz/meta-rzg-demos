@@ -1,0 +1,26 @@
+From 60fb8fa7c54cad03f91e2bc59a59f11943e44314 Mon Sep 17 00:00:00 2001
+From: nhannguyen <nhan.nguyen.yb@renesas.com>
+Date: Wed, 29 Nov 2017 11:51:09 +0700
+Subject: [PATCH] kernel: edit reserve mem to value SZ_64M
+
+Signed-off-by: nhannguyen <nhan.nguyen.yb@renesas.com>
+---
+ arch/arm/mach-shmobile/setup-rcar-gen2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/arm/mach-shmobile/setup-rcar-gen2.c b/arch/arm/mach-shmobile/setup-rcar-gen2.c
+index 5e7c507..638c1f4 100644
+--- a/arch/arm/mach-shmobile/setup-rcar-gen2.c
++++ b/arch/arm/mach-shmobile/setup-rcar-gen2.c
+@@ -192,7 +192,7 @@ void __init rcar_gen2_reserve(void)
+ 
+ 	/* reserve 256 MiB at the top of the physical legacy 32-bit space */
+ 	memset(&mrc, 0, sizeof(mrc));
+-	mrc.reserved = SZ_256M;
++	mrc.reserved = SZ_64M;
+ 
+ 	of_scan_flat_dt(rcar_gen2_scan_mem, &mrc);
+ #ifdef CONFIG_DMA_CMA
+-- 
+1.9.1
+
