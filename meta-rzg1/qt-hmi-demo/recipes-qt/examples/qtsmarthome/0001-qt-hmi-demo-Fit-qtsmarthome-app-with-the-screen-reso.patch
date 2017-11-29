@@ -1,0 +1,1297 @@
+From 3b512494fb8e7d830fe071ca1a5eb322def83c4f Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+Date: Tue, 28 Nov 2017 11:32:39 +0700
+Subject: [PATCH] qt-hmi-demo: Fit qtsmarthome app with the screen resolution
+
+Flexible qtsmarthome application with the screen resolution on G1M/G1E board
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+---
+ components/qml/components/tabwidget/TabPage.qml    |  18 ++--
+ .../qml/components/timepicker/PickerPathView.qml   |  12 ++-
+ .../qml/components/timepicker/TimePicker.qml       |  30 +++---
+ qml/smarthome/components/ActualValueSlider.qml     |  10 +-
+ qml/smarthome/components/Cloud.qml                 |  26 +++---
+ qml/smarthome/components/FanStack.qml              |   9 +-
+ qml/smarthome/components/ForeCastView.qml          |  18 ++--
+ qml/smarthome/components/MainMenu.qml              |   7 +-
+ qml/smarthome/components/MainScreen.qml            |   4 +-
+ qml/smarthome/components/TemperatureSlider.qml     |  25 +++--
+ qml/smarthome/components/TemperatureView.qml       |  10 +-
+ qml/smarthome/components/Titlebar.qml              |  10 +-
+ qml/smarthome/components/WeatherGod.qml            |  16 ++--
+ qml/smarthome/components/WeatherGodScreen.qml      |   6 +-
+ qml/smarthome/components/WeatherView.qml           | 102 ++++++++++-----------
+ qml/smarthome/components/WindSlider.qml            |   9 +-
+ .../components/settings/LightSettingsTab.qml       |   9 +-
+ qml/smarthome/components/settings/TabPage.qml      |  14 +--
+ .../components/settings/TimePickerTab.qml          |   8 +-
+ .../components/settings/WindowRainTab.qml          |  16 ++--
+ .../components/settings/WindowWindTab.qml          |   9 +-
+ qml/smarthome/components/tabwidget/VTabBar.qml     |   8 +-
+ qml/smarthome/smarthome.qml                        |   7 +-
+ src/main.cpp                                       |  10 +-
+ 24 files changed, 222 insertions(+), 171 deletions(-)
+
+diff --git a/components/qml/components/tabwidget/TabPage.qml b/components/qml/components/tabwidget/TabPage.qml
+index 251f57d..6dba154 100644
+--- a/components/qml/components/tabwidget/TabPage.qml
++++ b/components/qml/components/tabwidget/TabPage.qml
+@@ -78,7 +78,7 @@ Item {
+         anchors.leftMargin: 20
+         font {
+             family: "Arial"
+-            pointSize: 19
++            pointSize: parent.width * 2 / 79 - 1
+             bold: true
+         }
+         color: "white"
+@@ -108,10 +108,12 @@ Item {
+ 
+     Image {
+         id: icon
++        width: parent.width * 64 / 395
++        height: parent.height * 32 / 85
+         anchors.top:line.bottom
+-        anchors.topMargin: 20
++        anchors.topMargin: parent.width * 2 / 79
+         anchors.left: parent.left
+-        anchors.leftMargin: 20
++        anchors.leftMargin: parent.height / 17
+     }
+ 
+     Text {
+@@ -119,7 +121,7 @@ Item {
+         color: "white"
+         font {
+             family: "Arial"
+-            pointSize: 18
++            pointSize: settingText.font.pointSize
+             bold: false
+         }
+         anchors.left: icon.right
+@@ -138,13 +140,13 @@ Item {
+     Text {
+         id: explain1
+         anchors.top: icon.bottom
+-        anchors.topMargin: 25
++        anchors.topMargin: parent.height * 5 / 68
+         anchors.left: parent.left
+         anchors.leftMargin: 20
+         color: "white"
+         font {
+             family: "Arial"
+-            pointSize: 18
++            pointSize: parent.width * 2 / 79 - 1
+             bold: false
+         }
+ 
+@@ -160,13 +162,13 @@ Item {
+     Text {
+         id: explain2
+         anchors.top: explain1.bottom
+-        anchors.topMargin: 20
++        anchors.topMargin: parent.height / 17
+         anchors.left: parent.left
+         anchors.leftMargin: 20
+         color: "white"
+         font {
+             family: "Arial"
+-            pointSize: 18
++            pointSize: parent.width * 2 / 79 - 1
+             bold: false
+         }
+ 
+diff --git a/components/qml/components/timepicker/PickerPathView.qml b/components/qml/components/timepicker/PickerPathView.qml
+index 7038331..ecd2aea 100644
+--- a/components/qml/components/timepicker/PickerPathView.qml
++++ b/components/qml/components/timepicker/PickerPathView.qml
+@@ -41,7 +41,8 @@ import QtQuick 2.0
+ */
+ PathView {
+     id: path_view1
+-
++    property int parWidth: parent.width
++    property int parHeight: parent.height
+     property variant currentValue
+ 
+     /**
+@@ -59,15 +60,16 @@ PathView {
+         }
+     }
+ 
+-    width: 58
+-    height: Math.floor( model.length / 3 ) * 200
+-    y: -40
++    width: parWidth * 29 / 115
++    height: Math.floor( model.length / 3 ) * parHeight
++    y: -(parWidth / 5)
++
+     model: ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"]
+     // The delegate shows the information as a Text Item
+     delegate: Text {
+         font.family: "Arial"
+         font.bold: true
+-        font.pixelSize: 50
++        font.pixelSize: parWidth / 4
+         smooth: true
+         color: "black"
+         horizontalAlignment: Text.AlignHCenter
+diff --git a/components/qml/components/timepicker/TimePicker.qml b/components/qml/components/timepicker/TimePicker.qml
+index 484c65e..66ece7d 100644
+--- a/components/qml/components/timepicker/TimePicker.qml
++++ b/components/qml/components/timepicker/TimePicker.qml
+@@ -65,6 +65,9 @@ Rectangle {
+     property alias rightBarrelModel: rightBarrel.model
+     property alias backgroundImagePath: backgroundImage.source
+ 
++    property int parWidth: parent.width
++    property int parHeight: parent.height
++
+     signal valueChanged
+ 
+     function setCurrentValues(value1,value2) {
+@@ -85,6 +88,8 @@ Rectangle {
+ 
+     Image {
+         id: backgroundImage
++        width: parWidth * 23 / 79
++        height: parHeight * 13 / 17
+         x: 0
+         y: 0
+         source: "../pics/timer/double_picker_background.svg"
+@@ -96,11 +101,10 @@ Rectangle {
+          */
+         Item {
+             id: maskItem
+-            x: 15
+-            y: 47
+-            width: 200
+-            height: 200
+-
++            x: parent.width * 3 / 46
++            y: parent.height * 23 / 130
++            width: parent.height * 10 / 13
++            height: parent.height * 10 / 13
+             /*
+              * Set clip to true to enable clipping of child items.
+              */
+@@ -108,16 +112,16 @@ Rectangle {
+ 
+             PickerPathView {
+                 id: leftBarrel
+-                x: 23
++                x: parent.width * 3 / 25
+                 model: ["00","01","02","03","04","05","06","07","08","09","10","11","12",
+                         "13","14","15","16","17","18","19","20","21","22","23"]
+             }
+ 
+             PickerPathView {
+                 id: rightBarrel
+-                x: 118
+-                width: 58
+-                height: 800
++                x: parent.width * 59 / 100
++                width: parent.width * 29 / 100 + 5
++                height: parent.height * 4
+             }
+         }
+ 
+@@ -128,12 +132,12 @@ Rectangle {
+             id: caption
+             x: 15
+             y: 11
+-            width: 200
+-            height: 20
++            width: parent.width * 20 / 23
++            height: parent.height / 13
+             color: "#ffffff"
+             text: timePicker.caption
+             font.bold: true
+-            font.pointSize: 13
++            font.pointSize: parent.width * 7 / 115 - 1
+             verticalAlignment: "AlignVCenter"
+             horizontalAlignment: "AlignHCenter"
+         }
+@@ -148,6 +152,8 @@ Rectangle {
+         id: image1
+         x: 0
+         y: 0
++        width: parent.width 
++        height: parent.height
+         source: "../pics/timer/double_picker_reflex.svg"
+     }
+ }
+diff --git a/qml/smarthome/components/ActualValueSlider.qml b/qml/smarthome/components/ActualValueSlider.qml
+index 047b74b..a660897 100644
+--- a/qml/smarthome/components/ActualValueSlider.qml
++++ b/qml/smarthome/components/ActualValueSlider.qml
+@@ -81,8 +81,10 @@ Item {
+     property string balloonImage
+     property string balloonTriangleImage
+     property string knobImagePressed
++    property int knobImageSize: 50
+     property string knobImageNormal
+     property string needleImage
++    property int focusImageSize: 72
+     property alias focusVisible: focus.visible
+     property string focusImage
+     property real maxSliderValue: width / pixelPerValue - knob.offset
+@@ -147,9 +149,9 @@ Item {
+     */
+     Image {
+         id: knob
+-
+         property bool pressed: false
+-
++        width: knobImageSize
++        height: knobImageSize
+         source: knob.pressed ? knobImagePressed : knobImageNormal
+         // since value can be set from outside the actual position of the slider
+         // has to be determined with an offset
+@@ -205,6 +207,8 @@ Item {
+ 
+     Image {
+         id: focus
++        width: focusImageSize
++        height: focusImageSize
+         source: (visible == true) ? focusImage : ""
+         anchors {
+             bottom: background.top
+@@ -234,7 +238,7 @@ Item {
+             id: balloon
+             anchors.centerIn: parent
+             font {
+-                pointSize: 14
++                pointSize: actualValueSlider.width / 44 - 1
+                 bold: true
+             }
+             text: balloonText
+diff --git a/qml/smarthome/components/Cloud.qml b/qml/smarthome/components/Cloud.qml
+index 10ba206..63769c7 100644
+--- a/qml/smarthome/components/Cloud.qml
++++ b/qml/smarthome/components/Cloud.qml
+@@ -76,7 +76,6 @@ Image {
+     height: 157
+     property color color1: "#74c4fd"
+     property color color2: "#3690d1"
+-
+     property bool animationsHalted: false
+ 
+     /*
+@@ -164,14 +163,13 @@ Image {
+ 
+         Emitter {
+             id: imageEmitter
+-
+             enabled: ! cloud.animationsHalted
+ 
+-            x: 50
+-            y: 90
++            x: cloud.width * 5 / 27
++            y: cloud.height * 9 / 16
+             z: -2
+-            width:  cloud.width  - 100
+-            height: 10
++            width:  cloud.width  - cloud.width * 10 / 27
++            height: cloud.height / 16
+             size: 20
+             //not used yet:
+             // sizeVariation: 4
+@@ -221,22 +219,22 @@ Image {
+      */
+     Image {
+         id: flash1
+-        x: 110
+-        y: cloud.height - 80
++        x: cloud.width * 11 / 27
++        y: cloud.height - cloud.height / 2
+         z: -2
+-        width: 20
+-        height: 100
++        width: cloud.width * 2 / 27
++        height: cloud.height * 5 / 8
+         source: "pics/particle/flash-01.png"
+         opacity: 0
+     }
+ 
+     Image {
+         id: flash2
+-        x: 90
+-        y: cloud.height - 110
++        x: cloud.width / 3
++        y: cloud.height - cloud.height * 11 / 16
+         z: -2
+-        width: 20
+-        height: 180
++        width: cloud.width * 2 / 27
++        height: cloud.height * 9 / 8
+         source: "pics/particle/flash-01.png"
+         opacity: 0
+     }
+diff --git a/qml/smarthome/components/FanStack.qml b/qml/smarthome/components/FanStack.qml
+index 605d95f..c77d0ce 100644
+--- a/qml/smarthome/components/FanStack.qml
++++ b/qml/smarthome/components/FanStack.qml
+@@ -163,9 +163,8 @@ Rectangle {
+             x: index * 10
+             y: index * 10
+ 
+-            width: 100
+-            height: 100
+-
++            width: flippedHeight * 5 / 17
++            height: flippedHeight * 5 / 17
+             /*
+             This property is used for the rotation animation effect
+             */
+@@ -192,13 +191,15 @@ Rectangle {
+                     id: itemText
+                     text: name
+                     color: "white"
+-                    font.pointSize: 14
++                    font.pointSize: flippedWidth * 7 / 395
+                     font.bold: false
+                     x: (parent.width - width) / 2
+                     y: 3
+                 }
+                 Image {
+                     id: image
++                    width: parent.width * 13 / 20
++                    height: parent.height * 11 / 20
+                     source: on ? iconOn : iconOff
+                     anchors.centerIn: parent
+                 }
+diff --git a/qml/smarthome/components/ForeCastView.qml b/qml/smarthome/components/ForeCastView.qml
+index 044370c..e3b6f09 100644
+--- a/qml/smarthome/components/ForeCastView.qml
++++ b/qml/smarthome/components/ForeCastView.qml
+@@ -71,12 +71,14 @@ Item {
+     Grid {
+         id: grid
+         columns: 2
+-        spacing: 10
++        spacing: 5
+         /**
+         * Image instance to show storm_force icon
+         */
+         Image {
+             id: storm
++            width: foreCast.width / 3
++            height: foreCast.height * 11 / 28
+             source: "pics/icons/storm_force.png"
+         }
+         /**
+@@ -84,7 +86,7 @@ Item {
+         */
+         SHText {
+             id: windDescription
+-            font.pointSize: 21
++            font.pointSize: foreCast.width * 4 / 39
+             height: storm.height
+         }
+         /**
+@@ -92,6 +94,8 @@ Item {
+         */
+         Image {
+             id: rainPropability
++            width: foreCast.width / 3
++            height: foreCast.height * 11 / 28
+             source: "pics/icons/possibility_of_rain_low.png"
+         }
+         /**
+@@ -99,7 +103,7 @@ Item {
+         */
+         SHText {
+             id: rainPropabilityText
+-            font.pointSize: 21
++            font.pointSize: foreCast.width * 4 / 39
+             height: rainPropability.height
+         }
+         /**
+@@ -107,6 +111,8 @@ Item {
+         */
+         Image {
+             id: rainAmount
++            width: foreCast.width / 3
++            height: foreCast.height * 11 / 28
+             source: "pics/icons/quantity_of_rain.png"
+         }
+         /**
+@@ -114,7 +120,7 @@ Item {
+         */
+         SHText {
+             id: rainAmountText
+-            font.pointSize: 21
++            font.pointSize: foreCast.width * 4 / 39
+             height: rainAmount.height
+         }
+     }
+@@ -122,8 +128,8 @@ Item {
+     * A Column positioner is used here.
+     */
+     Column {
+-        x: 10
+-        y: 55
++        x: foreCast.width * 2 / 39
++        y: foreCast.height * 11 / 28
+         spacing: 65
+         /**
+         * A simple white rectangle with a border is drawn
+diff --git a/qml/smarthome/components/MainMenu.qml b/qml/smarthome/components/MainMenu.qml
+index 7f23717..461aa18 100644
+--- a/qml/smarthome/components/MainMenu.qml
++++ b/qml/smarthome/components/MainMenu.qml
+@@ -54,6 +54,7 @@ Item {
+ 
+     property alias menuIsCovered: menu.isCovered
+ 
++
+     function checkStates() {
+         menu.checkStates();
+     }
+@@ -78,8 +79,8 @@ Item {
+          * count:   The total number of elements
+          */
+         function calculateX(index,count) {
+-            var ELEMENT_WIDTH = 150
+-            var SPACING = 30
++            var ELEMENT_WIDTH = parent.width * 3 / 16
++            var SPACING = parent.width * 3 / 80
+             var TOTAL_WIDTH = count * ELEMENT_WIDTH + SPACING
+             var OFFSET = ( menu.width - TOTAL_WIDTH ) / 2
+             var x = index * ELEMENT_WIDTH + index * SPACING + OFFSET
+@@ -171,7 +172,7 @@ Item {
+             flippedXPos: -x
+             flippedYPos: -mainMenu.y
+             flippedWidth: mainMenu.baseWidth - 2 * xSpacing
+-            flippedHeight: 58+mainMenu.baseHeight - 2 * ySpacing
++            flippedHeight: mainMenu.baseHeight - ySpacing
+             xSpacing: mainMenu.xSpacing
+             ySpacing: mainMenu.ySpacing
+             currentMinute: mainMenu.currentMinute
+diff --git a/qml/smarthome/components/MainScreen.qml b/qml/smarthome/components/MainScreen.qml
+index f86b4a8..8c9a1a9 100644
+--- a/qml/smarthome/components/MainScreen.qml
++++ b/qml/smarthome/components/MainScreen.qml
+@@ -97,8 +97,8 @@ Item {
+     Item {
+         id: rowWrapper
+         clip: true
+-        anchors { left: parent.left; right: parent.right; top: parent.top; topMargin: 60 }
+-        height: (parent.height / 2 ) - 60
++        anchors { left: parent.left; right: parent.right; top: parent.top; topMargin: parent.height * 3 / 20 }
++        height: (parent.height / 2 ) - parent.height * 3 / 20
+ 
+         Row {
+             id: weatherId
+diff --git a/qml/smarthome/components/TemperatureSlider.qml b/qml/smarthome/components/TemperatureSlider.qml
+index 13800b7..5ffe4df 100644
+--- a/qml/smarthome/components/TemperatureSlider.qml
++++ b/qml/smarthome/components/TemperatureSlider.qml
+@@ -49,6 +49,9 @@ Rectangle {
+     property alias secondHandleVisible: secondHandle.visible
+     property alias secondHandleIconSource: secondHandleIcon.source
+ 
++    property int parWidth: parent.width
++    property int parHeight: parent.height
++
+     width: background.width+20
+     height: background.height+3
+     color: "transparent"
+@@ -67,7 +70,7 @@ Rectangle {
+ 
+         anchors {
+             top: temperatureSlider.top
+-            topMargin: 30
++            topMargin: parHeight * 15 / 169
+         }
+ 
+         /**
+@@ -77,24 +80,24 @@ Rectangle {
+             id: background
+             smooth: true
+             source: "pics/temperature/temperature_background.svg"
+-            height:  280
++            height:  parHeight * 140 / 169
+ 
+             TemperatureScale {
+                 id: scaleLeft
+                 anchors.top: parent.top
+-                anchors.topMargin: 31
+-                height: 170
++                anchors.topMargin: parent.height * 3 / 28
++                height: parent.height * 17 / 28
+                 anchors.left: parent.left
+-                anchors.leftMargin: 4
++                anchors.leftMargin: parent.width / 30
+             }
+ 
+             TemperatureScale {
+                 id: scaleRight
+-                height: 170
++                height: parent.height * 17 / 28
+                 anchors.bottom: parent.bottom
+-                anchors.bottomMargin: 73
++                anchors.bottomMargin: parent.height * 9 / 35
+                 anchors.right: parent.right
+-                anchors.rightMargin: 7
++                anchors.rightMargin: parent.width * 7 / 120
+                 enableText: false
+                 transform: Rotation {
+                     origin.x: scaleRight.width/2
+@@ -110,7 +113,7 @@ Rectangle {
+             id: fill
+             anchors.top:  background.top
+             source: "pics/temperature/temperature_fill.svg"
+-            height:  280
++            height:  parHeight * 140 / 169
+         }
+         /**
+         * A nice reflex is overlayed
+@@ -119,7 +122,7 @@ Rectangle {
+             id: reflex
+             anchors.top:  background.top
+             source: "pics/temperature/temperature_reflex.svg"
+-            height:  280
++            height:  parHeight * 140 / 169
+         }
+ 
+         /**
+@@ -199,7 +202,9 @@ Rectangle {
+     // some values has to be initialized after the component is loaded
+     Component.onCompleted: {
+         handle.y = ((firstTemperature - privateItem.lowestDegree) * privateItem.valuePerPixel - handleMouseArea.drag.maximumY) * -1
++        handle.y = parHeight * 3 / 13
+         secondHandle.y = ((secondTemperature - privateItem.lowestDegree) * privateItem.valuePerPixel - handleMouseArea.drag.maximumY) * -1
++        secondHandle.y = parHeight * 56 / 169
+         firstTemperature = ((handleMouseArea.drag.maximumY - handle.y) / privateItem.valuePerPixel) + privateItem.lowestDegree
+         if( !secondHandle.visible )
+             fill.y = ((firstTemperature - privateItem.lowestDegree) * privateItem.valuePerPixel - handleMouseArea.drag.maximumY + privateItem.lowestDegree) * -1
+diff --git a/qml/smarthome/components/TemperatureView.qml b/qml/smarthome/components/TemperatureView.qml
+index f391609..0cf3d90 100644
+--- a/qml/smarthome/components/TemperatureView.qml
++++ b/qml/smarthome/components/TemperatureView.qml
+@@ -52,7 +52,7 @@ Item {
+     Column {
+ 
+         anchors.horizontalCenter: parent.horizontalCenter
+-        spacing: parent.height > 200 ? 10 : 5
++        spacing: parent.height > 200 ? 10 : 0
+ 
+         Item {
+             id: dummy1
+@@ -66,7 +66,7 @@ Item {
+ 
+             SHText {
+                 text: trailingZero(Math.floor(current * 10) / 10)
+-                font.pointSize: 70
++                font.pointSize: temperatureView.width * 5 / 14
+                 color: temperatureView.textColor
+             }
+ 
+@@ -76,7 +76,7 @@ Item {
+             SHText {
+                 id: cText
+                 text: "°C"
+-                font.pointSize: 40
++                font.pointSize: temperatureView.width * 8 / 39
+                 color: temperatureView.textColor
+             }
+         }
+@@ -94,7 +94,7 @@ Item {
+             id: maxTemp
+             anchors.horizontalCenter: parent.horizontalCenter
+             text: "Max: " + trailingZero(Math.floor(maximum * 10) / 10)
+-            font.pointSize: 15
++            font.pointSize: temperatureView.width / 13
+             color: temperatureView.textColor
+         }
+         /**
+@@ -104,7 +104,7 @@ Item {
+             id: minTemp
+             anchors.horizontalCenter: parent.horizontalCenter
+             text: "Min: " + trailingZero(Math.floor(minimum * 10) / 10)
+-            font.pointSize: 15
++            font.pointSize: temperatureView.width / 13
+             color: temperatureView.textColor
+         }
+     }
+diff --git a/qml/smarthome/components/Titlebar.qml b/qml/smarthome/components/Titlebar.qml
+index 0ec4d97..5dc8d84 100644
+--- a/qml/smarthome/components/Titlebar.qml
++++ b/qml/smarthome/components/Titlebar.qml
+@@ -50,6 +50,8 @@ Image {
+ 
+     Image {
+         id:qtLogo
++        width: parent.width / 20
++        height: parent.height * 4 / 5
+         anchors.left: parent.left
+         anchors.verticalCenter: parent.verticalCenter
+         source: "pics/logos/qt-logo-small.png"
+@@ -58,7 +60,7 @@ Image {
+     BorderImage {
+         id: dateImage
+         source: "pics/screenelements/text.svg"
+-        width: dateText.width + 40; height: parent.height - 16
++        width: dateText.width + 40; height: parent.height > 480 ? parent.height - 16 : parent.height
+         anchors.left: qtLogo.right
+         anchors.verticalCenter: parent.verticalCenter
+         border { left: 25; right: 25; top: 16; bottom: 16 }
+@@ -70,7 +72,7 @@ Image {
+             anchors.centerIn: parent
+             color: "white"
+             font {
+-                pointSize: titleBar.width > 840 ? 14 : 11
++                pointSize: parent.height / 5
+             }
+         }
+     }
+@@ -79,7 +81,7 @@ Image {
+         id: borderGod
+         source: "pics/screenelements/text.svg"
+         width: parent.height
+-        height: parent.height - 16
++        height: parent.height > 480 ? parent.height - 16 : parent.height
+         anchors.left: dateImage.right
+         anchors.verticalCenter: parent.verticalCenter
+         anchors.rightMargin: 20
+@@ -112,7 +114,7 @@ Image {
+         anchors.leftMargin: 8
+         anchors.verticalCenter: parent.verticalCenter
+         color: "white"
+-        font { pointSize: 21; bold: true }
++        font { pointSize: parent.width / 40; bold: true }
+     }
+ 
+     BorderImage {
+diff --git a/qml/smarthome/components/WeatherGod.qml b/qml/smarthome/components/WeatherGod.qml
+index 29ac6f5..92b2266 100644
+--- a/qml/smarthome/components/WeatherGod.qml
++++ b/qml/smarthome/components/WeatherGod.qml
+@@ -50,7 +50,7 @@ Item {
+         id: lord
+         x: conditionSlider.x
+         text: "CHOOSE YOUR WEATHER"
+-        font.pointSize: 20
++        font.pointSize: parent.width / 40
+     }
+ 
+     /**
+@@ -58,15 +58,15 @@ Item {
+     */
+     Image {
+         id: balloon
+-
+         property string text: weatherStates[Math.round(newWeatherCondition)]
+ 
+         anchors {
+             top: lord.bottom
+             horizontalCenter: god.horizontalCenter
+-            topMargin: 50
++            topMargin: parent.height * 9 / 70
+         }
+         source: "pics/weathergod/preset.svg"
++        height: parent.height / 7
+ 
+         SHText {
+             anchors.centerIn: parent
+@@ -85,8 +85,10 @@ Item {
+         anchors {
+             top: balloon.bottom
+             horizontalCenter: god.horizontalCenter
+-            topMargin: 40
++            topMargin: parent.height / 10
+         }
++        height: parent.height * 6 / 35
++        width: parent.width * 7 / 8
+         source: "pics/weathergod/icons_line.png"
+     }
+ 
+@@ -100,8 +102,8 @@ Item {
+         anchors.horizontalCenter: god.horizontalCenter
+         anchors.topMargin: -98
+ 
+-        width: 660
+-        valueSliderHeight: 54
++        width: parent.width * 33 / 40
++        valueSliderHeight: parent.height * 11 / 70
+         backgroundImage: "pics/weathergod/weathergod_scale.png"
+ 
+         /**
+@@ -115,6 +117,7 @@ Item {
+         /**
+          * styling the knob
+          */
++        knobImageSize: parent.height / 7
+         knobImagePressed: "pics/fader/button_pressed.svg"
+         knobImageNormal: "pics/fader/button_normal.svg"
+ 
+@@ -127,6 +130,7 @@ Item {
+         /**
+          * styling the focus
+          */
++        focusImageSize: width / 8
+         focusVisible: true
+         focusImage: "pics/weathergod/focus.svg"
+ 
+diff --git a/qml/smarthome/components/WeatherGodScreen.qml b/qml/smarthome/components/WeatherGodScreen.qml
+index 7616fe3..67d9a40 100644
+--- a/qml/smarthome/components/WeatherGodScreen.qml
++++ b/qml/smarthome/components/WeatherGodScreen.qml
+@@ -48,7 +48,7 @@ Rectangle {
+ 
+     WeatherGod {
+         id: godInstance
+-        y: parent.height/2 - height/3
++        y: parent.height / 2 - height / 3
+         width: parent.width
+         height: parent.height
+     }
+@@ -57,8 +57,8 @@ Rectangle {
+         id:basyskomGodLogo
+         anchors{ top: parent.top; topMargin:25; right: parent.right; rightMargin: 25}
+         smooth: true
+-        width: 200
+-        height: 100
++        width: parent.width / 4
++        height: parent.height * 2 / 7
+         source: "pics/logos/basyskom-logo.png"
+         sourceSize.width: width
+         sourceSize.height: height
+diff --git a/qml/smarthome/components/WeatherView.qml b/qml/smarthome/components/WeatherView.qml
+index 1293678..17a6d4e 100644
+--- a/qml/smarthome/components/WeatherView.qml
++++ b/qml/smarthome/components/WeatherView.qml
+@@ -67,8 +67,8 @@ Item {
+     Item {
+         id: weatherWrapper
+         anchors.horizontalCenter: parent.horizontalCenter
+-        width: 220
+-        height: 300
++        width: parent.width * 44 / 39
++        height: parent.height * 15 / 7
+         clip: true
+ 
+         /**
+@@ -77,8 +77,8 @@ Item {
+         Image {
+             id: sun
+             x: (parent.width - width) / 2
+-            width: 140
+-            height: 140
++            width: parent.height * 7 / 15
++            height: parent.height * 7 / 15
+             source: "pics/weather/sun.png"
+             rotation: 0
+             opacity: 0
+@@ -147,10 +147,10 @@ Item {
+         Cloud {
+             id: cloud
+             objectName: "cloud"
+-            x: 60
+-            y: 64
+-            width: 267
+-            height: 157
++            x: parent.width * 3 / 11
++            y: parent.height * 16 / 75
++            width: parent.width * 27 / 22
++            height: parent.height * 8 / 15
+             animationsHalted: weatherView.animationsHalted
+         }
+ 
+@@ -160,9 +160,9 @@ Item {
+         Cloud {
+             id: stormCloud1
+             objectName: "storm cloud1"
+-            y: 30
+-            width: 100
+-            height: 50
++            y: parent.height / 10
++            width: parent.width * 5 / 11
++            height: parent.height / 6
+             opacity: 0
+             z: -10
+             animationsHalted: weatherView.animationsHalted
+@@ -173,9 +173,9 @@ Item {
+         Cloud {
+             id: stormCloud2
+             objectName: "storm cloud2"
+-            y: 50
+-            width: 150
+-            height: 60
++            y: parent.height / 6
++            width: parent.width * 15 / 22
++            height: parent.height / 5
+             opacity: 0
+             z: -10
+             animationsHalted: weatherView.animationsHalted
+@@ -208,10 +208,10 @@ Item {
+                 wind:  ! animationsHalted
+                 rain:  false
+                 flash: false
+-                x: 40
+-                y: 64
+-                width: 160
+-                height: 94
++                x: parent.width * 2 / 11
++                y: parent.height * 16 / 75
++                width: parent.width * 8 / 11
++                height: parent.height * 3 / 10
+                 color1: "#74c4fd"
+                 color2: "#3690d1"
+             }
+@@ -231,8 +231,8 @@ Item {
+             }
+             PropertyChanges {
+                 target: weatherWrapper
+-                width: 220
+-                height: 300
++                width: parent.width * 44 / 39
++                height: parent.height * 15 / 7
+             }
+ 
+         },
+@@ -264,16 +264,16 @@ Item {
+                 storm: false
+                 flash: ! animationsHalted
+                 x: 0
+-                y: 20
+-                width: 214
+-                height: 126
++                y: parent.height / 15
++                width: parent.width * 43 / 44
++                height: parent.height * 5 / 12
+                 color1: "#638299"
+                 color2: "#35464d"
+             }
+             PropertyChanges {
+                 target: weatherWrapper
+-                width: 220
+-                height: 300
++                width: parent.width * 44 / 39
++                height: parent.height * 15 / 7
+             }
+         },
+         // Rainy
+@@ -303,16 +303,16 @@ Item {
+                 wind:  ! animationsHalted
+                 storm: false
+                 x: 0
+-                y: 20
+-                width: 214
+-                height: 126
++                y: parent.height / 15
++                width: parent.width * 43 / 44
++                height: parent.height * 5 / 12
+                 color1: "#b6dffd"
+                 color2: "#7d97ab"
+             }
+             PropertyChanges {
+                 target: weatherWrapper
+-                width: 220
+-                height: 300
++                width: parent.width * 44 / 39
++                height: parent.height * 15 / 7
+             }
+         },
+         // Snow
+@@ -339,9 +339,9 @@ Item {
+                 flash: false
+                 rain:  ! animationsHalted
+                 x: 0
+-                y: 20
+-                width: 214
+-                height: 126
++                y: parent.height / 15
++                width: parent.width * 43 / 44
++                height: parent.height * 5 / 12
+                 particleSize:  20
+                 particleCount: 20
+                 particleSource: "pics/particle/snowflake.png"
+@@ -356,8 +356,8 @@ Item {
+             }
+             PropertyChanges {
+                 target: weatherWrapper
+-                width: 220
+-                height: 300
++                width: parent.width * 44 / 39
++                height: parent.height * 15 / 7
+             }
+         },
+         // Cloudy
+@@ -383,10 +383,10 @@ Item {
+                 flash: false
+                 rain:  false
+                 opacity: 1
+-                x: 20
+-                y: 14
+-                width: 200
+-                height: 120
++                x: parent.width / 11
++                y: parent.height / 20
++                width: parent.width * 10 / 11
++                height: parent.height * 2 / 5
+             }
+             PropertyChanges {
+                 target: stormCloud1
+@@ -397,11 +397,11 @@ Item {
+                 flash: false
+                 rain:  false
+                 opacity: 1
+-                x: 60
+-                y: 44
++                x: parent.width * 3 / 11
++                y: parent.height * 3 / 20
+                 z: 2
+-                width: 150
+-                height:100
++                width: parent.width * 15 / 22
++                height: parent.height / 3
+             }
+             PropertyChanges {
+                 target: stormCloud2
+@@ -410,15 +410,15 @@ Item {
+                 wind: false; storm: false; flash: false; rain: false
+                 opacity: 1
+                 x: 0
+-                y: 44
++                y: parent.height * 3 / 20
+                 z: -2
+-                width: 180
+-                height:130
++                width: parent.width * 9 / 11
++                height: parent.height * 13 / 30
+             }
+             PropertyChanges {
+                 target: weatherWrapper
+-                width: 220
+-                height: 300
++                width:  parent.width * 44 / 39
++                height: parent.height * 15 / 7
+             }
+         },
+         // Stormy
+@@ -472,11 +472,11 @@ Item {
+                 storm: ! animationsHalted
+                 flash: false
+                 x: -24
+-                y: 14
++                y: parent.height / 20
+                 xStart: -100
+                 xEnd: 500
+-                width: 214
+-                height: 126
++                width: parent.width * 43 / 44
++                height: parent.height * 5 / 12
+                 color1: "#638299"
+                 color2: "#35464d"
+                 cloudSpeed: 1.5
+diff --git a/qml/smarthome/components/WindSlider.qml b/qml/smarthome/components/WindSlider.qml
+index b173965..ab7ac69 100644
+--- a/qml/smarthome/components/WindSlider.qml
++++ b/qml/smarthome/components/WindSlider.qml
+@@ -40,21 +40,22 @@ ActualValueSlider {
+     //type: "wind"
+     actualValue: 11
+ 
+-    width: 520
+-    valueSliderHeight: 120
++    width: parent.width * 52 / 79
++    valueSliderHeight: parent.height * 6 / 17
+     backgroundImage: "pics/wind/wind_scale.png"
+ 
+     /**
+      * style the balloon
+      */
+-    balloonHeight: 56
+-    balloonTriangleHeight: 20
++    balloonHeight: parent.height * 14 / 85
++    balloonTriangleHeight: parent.height / 17
+     balloonImage: "pics/wind/balloon/balloon_minsize.svg"
+     balloonTriangleImage: "pics/wind/balloon/balloon_triangle.svg"
+ 
+     /**
+      * style the knob
+      */
++    knobImageSize: parent.height * 5 / 34
+     knobImagePressed: "pics/fader/button_pressed.svg"
+     knobImageNormal: "pics/fader/button_normal.svg"
+ 
+diff --git a/qml/smarthome/components/settings/LightSettingsTab.qml b/qml/smarthome/components/settings/LightSettingsTab.qml
+index 422d854..549376b 100644
+--- a/qml/smarthome/components/settings/LightSettingsTab.qml
++++ b/qml/smarthome/components/settings/LightSettingsTab.qml
+@@ -54,21 +54,22 @@ TabPage {
+         id: lightSlider
+         anchors.centerIn: parent
+ 
+-        width: 520
+-        valueSliderHeight: 120
++        width: parent.width * 52 / 79
++        valueSliderHeight: parent.height * 6 / 17
+         backgroundImage: "pics/light/light_scale.png"
+ 
+         /**
+          * style the balloon
+          */
+-        balloonHeight: 56
+-        balloonTriangleHeight: 20
++        balloonHeight: parent.height * 14 / 85
++        balloonTriangleHeight: parent.height / 17
+         balloonImage: "pics/light/balloon/balloon_minsize.svg"
+         balloonTriangleImage: "pics/light/balloon/balloon_triangle.svg"
+ 
+         /**
+          * style the knob
+          */
++        knobImageSize: parent.height * 5 / 34
+         knobImagePressed: "pics/fader/button_pressed.svg"
+         knobImageNormal: "pics/fader/button_normal.svg"
+ 
+diff --git a/qml/smarthome/components/settings/TabPage.qml b/qml/smarthome/components/settings/TabPage.qml
+index cc80a47..afcfeab 100644
+--- a/qml/smarthome/components/settings/TabPage.qml
++++ b/qml/smarthome/components/settings/TabPage.qml
+@@ -74,7 +74,7 @@ Item {
+         anchors.left: parent.left
+         anchors.leftMargin: 20        
+         font {
+-            pointSize: 19
++            pointSize: parent.width * 2 / 79 - 1
+             bold: true
+         }
+         color: "white"
+@@ -98,6 +98,8 @@ Item {
+ 
+     Image {
+         id: icon
++        width: parent.width * 64 / 395
++        height: parent.height * 32 / 85
+         anchors.top:line.bottom
+         anchors.topMargin: 20
+         anchors.left: parent.left
+@@ -108,7 +110,7 @@ Item {
+         id: closeText
+         color: "white"
+         font {
+-            pointSize: 18
++            pointSize: settingText.font.pointSize
+             bold: false
+         }
+         anchors.left: icon.right
+@@ -122,12 +124,12 @@ Item {
+     SHText {
+         id: explain1
+         anchors.top: icon.bottom
+-        anchors.topMargin: 25
++        anchors.topMargin: parent.height * 5 / 68
+         anchors.left: parent.left
+         anchors.leftMargin: 20
+         color: "white"
+         font {
+-            pointSize: 18
++            pointSize: parent.width * 2 / 79 - 1
+             bold: false
+         }
+     }
+@@ -135,12 +137,12 @@ Item {
+     SHText {
+         id: explain2
+         anchors.top: explain1.bottom
+-        anchors.topMargin: 20
++        anchors.topMargin: parent.height / 17
+         anchors.left: parent.left
+         anchors.leftMargin: 20
+         color: "white"
+         font {
+-            pointSize: 18
++            pointSize: parent.width * 2 / 79 - 1
+             bold: false
+         }
+     }
+diff --git a/qml/smarthome/components/settings/TimePickerTab.qml b/qml/smarthome/components/settings/TimePickerTab.qml
+index 5acffb2..c94d7ec 100644
+--- a/qml/smarthome/components/settings/TimePickerTab.qml
++++ b/qml/smarthome/components/settings/TimePickerTab.qml
+@@ -68,9 +68,9 @@ TabPage {
+         id: startTime
+         caption: "Start time"
+         anchors.horizontalCenter: parent.horizontalCenter
+-        anchors.horizontalCenterOffset: -140
++        anchors.horizontalCenterOffset: -(parent.width * 14 / 79)
+         anchors.verticalCenter: parent.verticalCenter
+-        anchors.verticalCenterOffset: 50
++        anchors.verticalCenterOffset: parent.height * 5 / 34
+         onValueChanged: checkStateTriggered()
+     }
+ 
+@@ -83,9 +83,9 @@ TabPage {
+         id: endTime
+         caption: "End time"
+         anchors.horizontalCenter: parent.horizontalCenter
+-        anchors.horizontalCenterOffset: 110
++        anchors.horizontalCenterOffset: parent.width * 11 / 79
+         anchors.verticalCenter: parent.verticalCenter
+-        anchors.verticalCenterOffset: 50
++        anchors.verticalCenterOffset: parent.height * 5 / 34
+         onValueChanged: checkStateTriggered()
+     }
+ }
+diff --git a/qml/smarthome/components/settings/WindowRainTab.qml b/qml/smarthome/components/settings/WindowRainTab.qml
+index 31f2edf..264180e 100644
+--- a/qml/smarthome/components/settings/WindowRainTab.qml
++++ b/qml/smarthome/components/settings/WindowRainTab.qml
+@@ -52,20 +52,21 @@ TabPage {
+     */
+     ActualValueSlider {
+         id: rainSlider
+-        anchors.verticalCenter: parent.verticalCenter
+-        anchors.verticalCenterOffset: 70
++//        anchors.verticalCenter: parent.verticalCenter
++        anchors.verticalCenterOffset: -(parent.height * 10 / 79)
+         anchors.horizontalCenter: parent.horizontalCenter
+-        anchors.horizontalCenterOffset: -100
++//        anchors.horizontalCenterOffset: -100
++        
+ 
+-        width: 520
+-        valueSliderHeight: 54
++        width: parent.width * 52 / 79
++        valueSliderHeight: parent.height * 11 / 68
+         backgroundImage: "pics/rain/rain_scale.png"
+ 
+         /**
+          * style the balloon
+          */
+-        balloonHeight: 56
+-        balloonTriangleHeight: 20
++        balloonHeight: parent.height * 14 / 85
++        balloonTriangleHeight: parent.height / 17
+         balloonImage: "pics/rain/balloon/balloon_minsize.svg"
+         balloonTriangleImage: "pics/rain/balloon/balloon_triangle.svg"
+         balloonText: Math.floor(value) + " ml"
+@@ -73,6 +74,7 @@ TabPage {
+         /**
+          * style the knob
+          */
++        knobImageSize: parent.height * 5 / 34
+         knobImagePressed: "pics/fader/button_pressed.svg"
+         knobImageNormal: "pics/fader/button_normal.svg"
+ 
+diff --git a/qml/smarthome/components/settings/WindowWindTab.qml b/qml/smarthome/components/settings/WindowWindTab.qml
+index 5eb45b6..fc686d6 100644
+--- a/qml/smarthome/components/settings/WindowWindTab.qml
++++ b/qml/smarthome/components/settings/WindowWindTab.qml
+@@ -52,10 +52,11 @@ TabPage {
+     */
+     WindSlider {
+         id: windSlider
+-        anchors.verticalCenter: parent.verticalCenter
+-        anchors.verticalCenterOffset: 70
+-        anchors.horizontalCenter: parent.horizontalCenter
+-        anchors.horizontalCenterOffset: -100
++//        anchors.verticalCenter: parent.verticalCenter
++//        anchors.verticalCenterOffset: 70
++//        anchors.horizontalCenter: parent.horizontalCenter
++//        anchors.horizontalCenterOffset: -100
++        anchors.centerIn: parent
+         value: 35
+         actualValue: currentWindForceValue / 12 * 60
+         onValueChanged: checkStateTriggered()
+diff --git a/qml/smarthome/components/tabwidget/VTabBar.qml b/qml/smarthome/components/tabwidget/VTabBar.qml
+index 9da5d36..381e07f 100644
+--- a/qml/smarthome/components/tabwidget/VTabBar.qml
++++ b/qml/smarthome/components/tabwidget/VTabBar.qml
+@@ -56,9 +56,11 @@ Rectangle {
+ 
+     property string tabIconDirectory
+     property string tabIconFileType
+-
+     property int currentIndex: 0
+ 
++    property int parWidth: parent.width
++    property int parHeight: parent.height
++
+     signal currentChanged(int index)
+ 
+     /**
+@@ -109,6 +111,8 @@ Rectangle {
+ 
+                 Image {
+                     id: imageIcon
++                    width: parWidth * 13 / 158
++                    height: parHeight * 11 / 68
+                     anchors.centerIn: parent
+                     source: tabBar.icons.length > index ? tabBar.icons[index] : ""
+                 }
+@@ -121,7 +125,7 @@ Rectangle {
+                     x: parent.width/2 - width/2
+                     text: tabBar.tabs[index]
+                     font.family: "Arial"
+-                    font.pointSize: 12
++                    font.pointSize: parWidth / 79 + 1
+                     font.bold: tabBar.currentIndex == index
+                 }
+ 
+diff --git a/qml/smarthome/smarthome.qml b/qml/smarthome/smarthome.qml
+index 42dd4da..6ee4d0f 100644
+--- a/qml/smarthome/smarthome.qml
++++ b/qml/smarthome/smarthome.qml
+@@ -32,6 +32,7 @@
+ 
+ //import QtQuick 2.0
+ import QtQuick 2.0
++import QtQuick.Window 2.1
+ import "components/models"
+ import "components"
+ 
+@@ -49,14 +50,14 @@ elements. The screen switch logic is implemented using QML States and QML Transi
+ 
+ Item {
+     id: smartHome
+-    width: 800
+-    height: 480
++    width: Screen.desktopAvailableWidth < 800 ? Screen.desktopAvailableWidth : 800
++    height: Screen.desktopAvailableHeight < 480 ? Screen.desktopAvailableHeight - 80 : 400
+     smooth: false
+ 
+     property int parentOpacity: (parent == null) ? 1 : parent.opacity
+ 
+     property int currentWeather: 0
+-    property int titlebarHeight: 50
++    property int titlebarHeight: smartHome.height / 8
+     property int spacing: 10
+ 
+     /**    This Element defines the main screen area which is visible most of the time.
+diff --git a/src/main.cpp b/src/main.cpp
+index dad6f66..ed7c13b 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -1,5 +1,7 @@
+ #include <QtQuick/QQuickView>
+ #include <QGuiApplication>
++#include <QtGui/QScreen>
++#include <QtQuick/QQuickItem>
+ 
+ #include "myquickview.h"
+ 
+@@ -14,7 +16,13 @@ Q_DECL_EXPORT int main(int argc, char *argv[])
+ 
+     QObject::connect((QObject*)viewer.engine(), SIGNAL(quit()), &app, SLOT(quit()));
+ 
+-    viewer.resize(800, 480);
++    // Classify width and height for screens
++    foreach (QScreen *screen, QGuiApplication::screens()) {
++    // Get screen has coordinates 0 and 0
++        if((screen->geometry().y() == 0) && (screen->geometry().x() == 0)) {
++            viewer.resize(screen->availableSize().width() < 800 ? screen->availableSize().width() : 800, screen->availableSize().height() < 480 ? screen->availableSize().height() - 80 : 400);
++        }
++    }
+     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
+ 
+     viewer.show();
+-- 
+1.9.1
+
