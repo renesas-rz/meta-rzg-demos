@@ -1,3 +1,5 @@
+include core-image-weston.inc
+
 IMAGE_INSTALL_append = " \
   xkeyboard-config \
   usb-init \
@@ -5,7 +7,7 @@ IMAGE_INSTALL_append = " \
 
 update_issue() {
     # Set BSP version
-    BSP_VERSION="2.0.0"
+    BSP_VERSION="2.0.1"
 
     # Set SoC and Board info
     case "${MACHINE}" in

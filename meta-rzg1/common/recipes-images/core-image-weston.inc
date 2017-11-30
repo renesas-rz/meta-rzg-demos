@@ -33,7 +33,7 @@ IMAGE_INSTALL_append_rzg1 = " \
 IMAGE_INSTALL_append_rzg1 = " \
     dosfstools \
     evtest \
-    e2fsprogs-mke2fs \
+    e2fsprogs \
     i2c-tools \
     iproute2 \
     memtester \
