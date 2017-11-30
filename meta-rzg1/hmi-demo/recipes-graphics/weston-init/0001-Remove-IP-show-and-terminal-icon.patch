@@ -12,17 +12,6 @@ diff --git a/weston.ini b/weston.ini
 index 9fd15c7..40ec3db 100644
 --- a/weston.ini
 +++ b/weston.ini
-@@ -5,10 +5,6 @@ path=/usr/lib/weston/weston-keyboard
- device=/dev/media-vsp2
- 
- [launcher]
--icon=/usr/share/weston/terminal.png
--path=/usr/bin/weston-terminal
--
--[launcher]
- icon=/home/root/launcher-taskbar/hmi-icons/Video-Playback.png
- path=/home/root/launcher-taskbar/hmi-scripts/Video_Playback.sh
- 
 @@ -33,9 +29,5 @@ icon=/home/root/launcher-taskbar/hmi-icons/Demo3D.png
  path=/home/root/launcher-taskbar/hmi-scripts/Demo3D.sh
  
