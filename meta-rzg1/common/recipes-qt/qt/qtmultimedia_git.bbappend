@@ -14,4 +14,4 @@ SRC_URI_append_iwg22m += " \
     file://0002-qtmultimedia-qmlvideofx-correct-Fullscreen-setting-f.patch \
 "
 
-PACKAGECONFIG += " gstreamer"
+PACKAGECONFIG += " gstreamer alsa"
