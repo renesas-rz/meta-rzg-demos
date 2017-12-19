@@ -81,3 +81,6 @@ include core-image-weston.inc
 
 # Qt multimedia needs alsa-dev when self-compiling
 IMAGE_INSTALL_append = " alsa-dev "
+
+# weston drm-backend need xkeyboard-config
+IMAGE_INSTALL_append = " xkeyboard-config "
