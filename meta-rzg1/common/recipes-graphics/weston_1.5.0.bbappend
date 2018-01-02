@@ -16,6 +16,7 @@ SRC_URI_append = " \
     file://0003-libtoytoolkit-rename-header-window.h-toytoolkit.h.patch \
     file://0007-notify-client-immediately-on-buffer-release.patch \
     file://0008-window.c-do-not-resize-if-not-needed.patch \
+    file://0009-touch-input-Don-t-dereference-NULL-pointer-during-fu.patch \
 "
 
 FILES_${PN}-dev += "${libdir}/libweston-toytoolkit*"

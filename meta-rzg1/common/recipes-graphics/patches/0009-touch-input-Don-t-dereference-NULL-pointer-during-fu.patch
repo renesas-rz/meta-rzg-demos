@@ -1,0 +1,64 @@
+From 362656bfa308b653ed6c40b3e788b481d92b7cc8 Mon Sep 17 00:00:00 2001
+From: Derek Foreman <derekf@osg.samsung.com>
+Date: Thu, 4 Sep 2014 10:23:05 -0500
+Subject: [PATCH] touch-input: Don't dereference NULL pointer during full
+ screen fade
+
+If a full screen program is fading out and a touch start happens, it
+will result in a NULL pointer dereference when weston_touch_set_focus
+tries to derefernce view->surface->resource.
+
+Instead, this patch sets the focus to NULL, which should be the
+same as if the program was destroyed during the touch anyway.
+
+Bug: https://bugs.freedesktop.org/show_bug.cgi?id=78706
+Reviewed-by: Pekka Paalanen <pekka.paalanen@collabora.co.uk>
+---
+ desktop-shell/shell.c |  6 +++++-
+ src/input.c           | 10 ++++++++--
+ 2 files changed, 13 insertions(+), 3 deletions(-)
+
+diff --git a/desktop-shell/shell.c b/desktop-shell/shell.c
+index bf52b93..ad6750d 100644
+--- a/desktop-shell/shell.c
++++ b/desktop-shell/shell.c
+@@ -4444,10 +4444,14 @@ fullscreen_binding(struct weston_seat *seat, uint32_t time, uint32_t button, voi
+ static void
+ touch_move_binding(struct weston_seat *seat, uint32_t time, void *data)
+ {
+-	struct weston_surface *focus = seat->touch->focus->surface;
++	struct weston_surface *focus;
+ 	struct weston_surface *surface;
+ 	struct shell_surface *shsurf;
+ 
++	if (seat->touch->focus == NULL)
++		return;
++
++	focus = seat->touch->focus->surface;
+ 	surface = weston_surface_get_main_surface(focus);
+ 	if (surface == NULL)
+ 		return;
+diff --git a/src/input.c b/src/input.c
+index d03333a..5e82f5d 100644
+--- a/src/input.c
++++ b/src/input.c
+@@ -1471,8 +1471,14 @@ weston_touch_set_focus(struct weston_seat *seat, struct weston_view *view)
+ 	}
+ 
+ 	if (view) {
+-		struct wl_client *surface_client =
+-			wl_resource_get_client(view->surface->resource);
++		struct wl_client *surface_client;
++
++		if (!view->surface->resource) {
++			seat->touch->focus = NULL;
++			return;
++		}
++
++		surface_client = wl_resource_get_client(view->surface->resource);
+ 		move_resources_for_client(focus_resource_list,
+ 					  &seat->touch->resource_list,
+ 					  surface_client);
+-- 
+2.7.4
+
