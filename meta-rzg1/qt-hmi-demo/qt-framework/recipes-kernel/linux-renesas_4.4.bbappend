@@ -6,7 +6,8 @@ do_configure_append_iwg23s() {
 }
 
 SRC_URI_append_iwg20m = " \
-    file://0001-Add-fake-button-for-create-virtual-keyboard-for-r8a7743.patch \
+    file://iwg20m/0001-Add-fake-button-for-create-virtual-keyboard-for-r8a7743.patch \
+    file://iwg20m/0002-Add-fake-button-for-create-virtual-keyboard-for-r8a7744.patch \
 "
 
 SRC_URI_append_iwg22m = " \
