@@ -46,6 +46,13 @@ do_install_append_iwg20m(){
     install -m 755 ${SRC}/iwg20m_scripts/* ${D}/home/root/launcher-taskbar/
 }
 
+do_install_append_iwg21m(){
+    install -d ${D}/home/root/renesas_iWave_info_files
+    install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info_files/* ${D}/home/root/renesas_iWave_info_files
+    install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info.html ${D}/home/root/
+    install -m 755 ${SRC}/iwg20m_scripts/* ${D}/home/root/launcher-taskbar/
+}
+
 do_install_append_iwg22m(){
     install -d ${D}/home/root/renesas_iWave_info_files
     install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info_files/* ${D}/home/root/renesas_iWave_info_files
