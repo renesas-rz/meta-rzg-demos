@@ -3,6 +3,7 @@ include core-image-weston.inc
 IMAGE_INSTALL_append = " \
   xkeyboard-config \
   usb-init \
+  bluez5 \
 "
 
 update_issue() {
@@ -53,3 +54,7 @@ update_issue() {
     echo "Version: ${BSP_VERSION}" >> ${IMAGE_ROOTFS}/etc/issue
 }
 ROOTFS_POSTPROCESS_COMMAND += "update_issue; "
+
+IMAGE_INSTALL_remove = " \
+  bluez4 \
+"
