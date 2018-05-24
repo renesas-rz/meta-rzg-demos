@@ -39,7 +39,7 @@ index 81c1c85..da04b1a 100644
      QQuickView view;
      view.setResizeMode(QQuickView::SizeRootObjectToView);
      view.setSource(QUrl::fromLocalFile(QCoreApplication::applicationDirPath() + QLatin1String("/Qt5_CinematicExperience.qml")));
-+    QObject::connect(view.engine(), SIGNAL(quit()), &view, SLOT(close()));
++    QObject::connect(view.engine(), SIGNAL(quit()), &app, SLOT(quit()));
 
      const QString lowerArgument = QString::fromLatin1(argv[1]).toLower();
      if (lowerArgument == QLatin1String("--fullscreen")) {

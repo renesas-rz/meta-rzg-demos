@@ -26,7 +26,7 @@ index 626139f..3c8329f 100644
      QQuickItem *rootObject = viewer.rootObject();
      rootObject->setProperty("fileName", fileName);
      viewer.rootObject()->setProperty("volume", volume);
-+    QObject::connect(viewer.engine(), SIGNAL(quit()), &viewer, SLOT(close()));
++    QObject::connect(viewer.engine(), SIGNAL(quit()), &app, SLOT(quit()));
 
  #ifdef PERFORMANCEMONITOR_SUPPORT
      if (performanceMonitorState.valid) {
