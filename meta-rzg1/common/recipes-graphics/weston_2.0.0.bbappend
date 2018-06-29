@@ -12,8 +12,6 @@ SRC_URI_append = " \
     file://1005-Fixed-memory-corruption-when-focus-listener-is-moved.patch \
     file://1007-set-position-to-fix-problem-app-under-weston-bar.patch \
 	file://1008-larger-weston-bar-suitable-for-touch-screen.patch \
-	file://1009-Remove-checking-status-of-device-to-support-display-.patch \
-    file://1010-Fix-Weston-crash-on-touchscreen-input.patch \
 "
 
 FILES_${PN}-dev += "${libdir}/libweston-toytoolkit*"

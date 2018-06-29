@@ -1,25 +1,27 @@
-From c80bcc8824a39aa48052623926ce61fdc790da14 Mon Sep 17 00:00:00 2001
-From: TungDang <tung.dang.jy@rvc.renesas.com>
-Date: Thu, 8 Sep 2016 19:26:18 +0700
-Subject: [PATCH 2/2] update-weston-bar-larger-for-touch-easier
+From 33dcf6fd5b067fe4706ffdd3efc117a7e0c8c509 Mon Sep 17 00:00:00 2001
+From: TraHT <traht@fsoft.com.vn>
+Date: Wed, 27 Jun 2018 20:42:27 +0700
+Subject: Modify 1008-larger-weston-bar-suitable-for-touch-screen.patch to fix
+ hunk
 
-Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+Signed-off-by: TraHT <traht@fsoft.com.vn>
 ---
  clients/desktop-shell.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/clients/desktop-shell.c b/clients/desktop-shell.c
-index 9cf3d68..e3029de 100644
+index b133d86..3769d00 100644
 --- a/clients/desktop-shell.c
 +++ b/clients/desktop-shell.c
-@@ -469,7 +469,7 @@ panel_configure(void *data,
-	struct surface *surface = window_get_user_data(window);
-	struct panel *panel = container_of(surface, struct panel, base);
-
--	window_schedule_resize(panel->window, width, 32);
+@@ -545,7 +545,7 @@ panel_configure(void *data,
+ 		}
+ 		break;
+ 	}
+-	window_schedule_resize(panel->window, width, height);
 +	window_schedule_resize(panel->window, width, 50);
  }
-
+ 
  static void
---
-1.9.1
+-- 
+2.7.4
+

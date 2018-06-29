@@ -1,55 +1,43 @@
-From 2455b74823d4f20af38ffe1eec1d1bd0e414fd94 Mon Sep 17 00:00:00 2001
-From: TungDang <tung.dang.jy@rvc.renesas.com>
-Date: Tue, 6 Sep 2016 19:54:15 +0700
-Subject: [PATCH] libtoytoolkit: rename header window.h->toytoolkit.h
+From 666f0e237b5d9ab4843ea654088043efc2dff3dc Mon Sep 17 00:00:00 2001
+From: TraHT <traht@fsoft.com.vn>
+Date: Thu, 28 Jun 2018 18:32:15 +0700
+Subject: Modify 1003-libtoytoolkit-rename-header-window.h-toytoolkit.h.patch
 
-Refer the patch from Andrey Gusakov <andrey.gusakov@cogentembedded.com>
-
-Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+Signed-off-by: TraHT <traht@fsoft.com.vn>
 ---
- Makefile.am  |   6 +-
- clients/toytoolkit.h | 629 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- clients/window.h     | 604 +-------------------------------------------------------
- 3 files changed, 635 insertions(+), 604 deletions(-)
+ Makefile.am          |   3 +-
+ clients/toytoolkit.h | 611 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ clients/window.h     | 575 +-----------------------------------------------
+ 3 files changed, 619 insertions(+), 570 deletions(-)
  create mode 100644 clients/toytoolkit.h
 
 diff --git a/Makefile.am b/Makefile.am
-index 3e3f4f8..33bf413 100644
+index e52a06c..561c241 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -198,7 +198,7 @@ westoninclude_HEADERS =			\
-	shared/config-parser.h		\
-	shared/zalloc.h				\
-	shared/platform.h           \
--    clients/window.h
-+   clients/toytoolkit.h
- if ENABLE_EGL
- module_LTLIBRARIES += gl-renderer.la
- gl_renderer_la_LDFLAGS = -module -avoid-version
-@@ -550,7 +550,8 @@ noinst_LTLIBRARIES += libtoytoolkit.la
- libtoytoolkit_la_SOURCES =				\
-	clients/window.c				\
-	clients/window.h				\
--	shared/helpers.h
-+	shared/helpers.h                \
-+   clients/toytoolkit.h
-
- nodist_libtoytoolkit_la_SOURCES =			\
-	protocol/text-cursor-position-protocol.c	\
-@@ -580,6 +581,7 @@ lib_LTLIBRARIES += libweston-toytoolkit.la
- libweston_toytoolkit_la_SOURCES =  \
-    clients/window.c                \
-    clients/window.h                \
-+   clients/toytoolkit.h			   \
-    protocol/text-cursor-position-protocol.c    \
-    protocol/text-cursor-position-client-protocol.h \
-    protocol/scaler-protocol.c          \
+@@ -112,7 +112,7 @@ libweston_@LIBWESTON_MAJOR@_la_SOURCES =			\
+ 	shared/timespec-util.h				\
+ 	shared/zalloc.h					\
+ 	shared/platform.h				\
+-	clients/window.h				\
++	clients/toytoolkit.h			\
+ 	shared/weston-egl-ext.h
+ 
+ lib_LTLIBRARIES += libweston-desktop-@LIBWESTON_MAJOR@.la
+@@ -158,6 +158,7 @@ systemd_notify_la_CFLAGS =			\
+ systemd_notify_la_SOURCES =			\
+ 	compositor/systemd-notify.c		\
+ 	shared/helpers.h			\
++	clients/toytoolkit.h			\
+ 	shared/zalloc.h				\
+ 	libweston/compositor.h
+ endif
 diff --git a/clients/toytoolkit.h b/clients/toytoolkit.h
 new file mode 100644
-index 0000000..8426d53
+index 0000000..5753c78
 --- /dev/null
 +++ b/clients/toytoolkit.h
-@@ -0,0 +1,629 @@
+@@ -0,0 +1,611 @@
 +/*
 + * Copyright © 2008 Kristian Høgsberg
 + *
@@ -97,16 +85,16 @@ index 0000000..8426d53
 +	int32_t height;
 +};
 +
-+void *
-+fail_on_null(void *p);
-+void *
-+xmalloc(size_t s);
-+void *
-+xzalloc(size_t s);
-+char *
-+xstrdup(const char *s);
-+void *
-+xrealloc(char *p, size_t s);
++// void *
++// fail_on_null(void *p);
++//void *
++//xmalloc(size_t s);
++//void *
++//xzalloc(size_t s);
++//char *
++//xstrdup(const char *s);
++//void *
++//xrealloc(char *p, size_t s);
 +
 +struct display *
 +display_create(int *argc, char *argv[]);
@@ -223,24 +211,6 @@ index 0000000..8426d53
 +
 +void
 +display_exit(struct display *d);
-+
-+enum cursor_type {
-+	CURSOR_BOTTOM_LEFT,
-+	CURSOR_BOTTOM_RIGHT,
-+	CURSOR_BOTTOM,
-+	CURSOR_DRAGGING,
-+	CURSOR_LEFT_PTR,
-+	CURSOR_LEFT,
-+	CURSOR_RIGHT,
-+	CURSOR_TOP_LEFT,
-+	CURSOR_TOP_RIGHT,
-+	CURSOR_TOP,
-+	CURSOR_IBEAM,
-+	CURSOR_HAND1,
-+	CURSOR_WATCH,
-+
-+	CURSOR_BLANK
-+};
 +
 +typedef void (*window_key_handler_t)(struct window *window, struct input *input,
 +				     uint32_t time, uint32_t key, uint32_t unicode,
@@ -679,23 +649,23 @@ index 0000000..8426d53
 +			  const char *name);
 +
 +#endif
+\ No newline at end of file
 diff --git a/clients/window.h b/clients/window.h
-index 05784ae..91b5d48 100644
+index 199333b..c33013a 100644
 --- a/clients/window.h
 +++ b/clients/window.h
-@@ -26,610 +26,10 @@
-
+@@ -27,147 +27,11 @@
  #include "config.h"
-
+ 
+ #include <stdint.h>
 -#include <xkbcommon/xkbcommon.h>
 -#include <wayland-client.h>
 -#include <cairo.h>
 +#include "toytoolkit.h"
-+
  #include "shared/config-parser.h"
  #include "shared/zalloc.h"
  #include "shared/platform.h"
-
+ 
 -struct window;
 -struct widget;
 -struct display;
@@ -713,17 +683,6 @@ index 05784ae..91b5d48 100644
 -	int32_t width;
 -	int32_t height;
 -};
--
--void *
--fail_on_null(void *p);
--void *
--xmalloc(size_t s);
--void *
--xzalloc(size_t s);
--char *
--xstrdup(const char *s);
--void *
--xrealloc(char *p, size_t s);
 -
 -struct display *
 -display_create(int *argc, char *argv[]);
@@ -841,22 +800,21 @@ index 05784ae..91b5d48 100644
 -void
 -display_exit(struct display *d);
 -
--enum cursor_type {
--	CURSOR_BOTTOM_LEFT,
--	CURSOR_BOTTOM_RIGHT,
--	CURSOR_BOTTOM,
--	CURSOR_DRAGGING,
--	CURSOR_LEFT_PTR,
--	CURSOR_LEFT,
--	CURSOR_RIGHT,
--	CURSOR_TOP_LEFT,
--	CURSOR_TOP_RIGHT,
--	CURSOR_TOP,
--	CURSOR_IBEAM,
--	CURSOR_HAND1,
--	CURSOR_WATCH,
--
--	CURSOR_BLANK
+ int
+ display_get_data_device_manager_version(struct display *d);
+ 
+@@ -185,38 +49,12 @@ enum cursor_type {
+ 	CURSOR_IBEAM,
+ 	CURSOR_HAND1,
+ 	CURSOR_WATCH,
+-	CURSOR_DND_MOVE,
+-	CURSOR_DND_COPY,
+-	CURSOR_DND_FORBIDDEN,
++ 	CURSOR_DND_MOVE,
++ 	CURSOR_DND_COPY,
++ 	CURSOR_DND_FORBIDDEN,
+ 
+ 	CURSOR_BLANK
 -};
 -
 -typedef void (*window_key_handler_t)(struct window *window, struct input *input,
@@ -884,6 +842,14 @@ index 05784ae..91b5d48 100644
 -typedef void (*window_state_changed_handler_t)(struct window *window,
 -					       void *data);
 -
++ };
+ 
+ typedef void (*window_locked_pointer_motion_handler_t)(struct window *window,
+ 						       struct input *input,
+@@ -240,55 +78,6 @@ typedef void (*confined_pointer_unconfined_handler_t)(struct window *window,
+ 						      struct input *input,
+ 						      void *data);
+ 
 -typedef void (*widget_resize_handler_t)(struct widget *widget,
 -					int32_t width, int32_t height,
 -					void *data);
@@ -933,6 +899,13 @@ index 05784ae..91b5d48 100644
 -				      wl_fixed_t value,
 -				      void *data);
 -
+ typedef void (*widget_pointer_frame_handler_t)(struct widget *widget,
+ 					       struct input *input,
+ 					       void *data);
+@@ -310,77 +99,6 @@ typedef void (*widget_axis_discrete_handler_t)(struct widget *widget,
+ 					       int32_t discrete,
+ 					       void *data);
+ 
 -struct window *
 -window_create(struct display *display);
 -struct window *
@@ -948,11 +921,6 @@ index 05784ae..91b5d48 100644
 -
 -typedef void (*menu_func_t)(void *data, struct input *input, int index);
 -
--struct window *
--window_create_menu(struct display *display,
--		   struct input *input, uint32_t time,
--		   menu_func_t func, const char **entries, int count,
--		   void *user_data);
 -void
 -window_show_menu(struct display *display,
 -		 struct input *input, uint32_t time, struct window *parent,
@@ -1009,10 +977,13 @@ index 05784ae..91b5d48 100644
 -void
 -window_schedule_resize(struct window *window, int width, int height);
 -
--void
--window_damage(struct window *window, int32_t x, int32_t y,
--	      int32_t width, int32_t height);
--
+ int
+ window_lock_pointer(struct window *window, struct input *input);
+ 
+@@ -410,83 +128,6 @@ window_confine_pointer_to_widget(struct window *window,
+ void
+ window_unconfine_pointer(struct window *window);
+ 
 -cairo_surface_t *
 -window_get_surface(struct window *window);
 -
@@ -1090,7 +1061,13 @@ index 05784ae..91b5d48 100644
 -window_set_state_changed_handler(struct window *window,
 -				 window_state_changed_handler_t handler);
 -
--void
+ void
+ window_set_pointer_locked_handler(struct window *window,
+ 				  locked_pointer_locked_handler_t locked,
+@@ -502,103 +143,9 @@ window_set_locked_pointer_motion_handler(
+ 	struct window *window, window_locked_pointer_motion_handler_t handler);
+ 
+ void
 -window_set_title(struct window *window, const char *title);
 -
 -const char *
@@ -1185,6 +1162,17 @@ index 05784ae..91b5d48 100644
 -void
 -widget_set_axis_handler(struct widget *widget,
 -			widget_axis_handler_t handler);
+-void
+ widget_set_pointer_frame_handler(struct widget *widget,
+ 				 widget_pointer_frame_handler_t handler);
++
+ void
+ widget_set_axis_handlers(struct widget *widget,
+ 			widget_axis_handler_t axis_handler,
+@@ -606,114 +153,4 @@ widget_set_axis_handlers(struct widget *widget,
+ 			widget_axis_stop_handler_t axis_stop_handler,
+ 			widget_axis_discrete_handler_t axis_discrete_handler);
+ 
 -void
 -widget_schedule_redraw(struct widget *widget);
 -void
@@ -1296,5 +1284,6 @@ index 05784ae..91b5d48 100644
 -			  const char *name);
 -
  #endif
---
-1.9.1
+-- 
+2.7.4
+

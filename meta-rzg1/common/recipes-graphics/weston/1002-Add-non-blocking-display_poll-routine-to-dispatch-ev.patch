@@ -1,23 +1,23 @@
-From d66801f576011331bb1e23b3e7d3510fe17db594 Mon Sep 17 00:00:00 2001
-From: Andrey Gusakov <andrey.gusakov@cogentembedded.com>
-Date: Wed, 18 Feb 2015 14:09:09 +0300
-Subject: [PATCH 2/3] Add non-blocking display_poll routine to dispatch events
+From 3486ee8dadc0d26fa172510a0df5546a9f4d69a5 Mon Sep 17 00:00:00 2001
+From: TraHT <traht@fsoft.com.vn>
+Date: Wed, 27 Jun 2018 20:30:03 +0700
+Subject: Modify
+ 1002-Add-non-blocking-display_poll-routine-to-dispatch-ev.patch to fix hunk
 
-
-Signed-off-by: Andrey Gusakov <andrey.gusakov@cogentembedded.com>
+Signed-off-by: TraHT <traht@fsoft.com.vn>
 ---
- clients/window.c |   41 +++++++++++++++++++++++++++++++++++++++++
- clients/window.h |    3 +++
+ clients/window.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ clients/window.h |  3 +++
  2 files changed, 44 insertions(+)
 
 diff --git a/clients/window.c b/clients/window.c
-index 4592ef9..182e101 100644
+index 95796d4..dff204d 100644
 --- a/clients/window.c
 +++ b/clients/window.c
-@@ -5531,6 +5531,47 @@ display_unwatch_fd(struct display *display, int fd)
-	epoll_ctl(display->epoll_fd, EPOLL_CTL_DEL, fd, NULL);
+@@ -6464,6 +6464,47 @@ display_unwatch_fd(struct display *display, int fd)
+ 	epoll_ctl(display->epoll_fd, EPOLL_CTL_DEL, fd, NULL);
  }
-
+ 
 +int
 +display_poll(struct display *display, int timeout)
 +{
@@ -63,18 +63,19 @@ index 4592ef9..182e101 100644
  display_run(struct display *display)
  {
 diff --git a/clients/window.h b/clients/window.h
-index 4e4ccc1..40dc3f6 100644
+index 1ec9eac..199333b 100644
 --- a/clients/window.h
 +++ b/clients/window.h
-@@ -173,6 +173,9 @@ display_watch_fd(struct display *display,
+@@ -159,6 +159,9 @@ display_watch_fd(struct display *display,
  void
  display_unwatch_fd(struct display *display, int fd);
-
+ 
 +int
 +display_poll(struct display *display, int timeout);
 +
  void
  display_run(struct display *d);
+ 
+-- 
+2.7.4
 
---
-1.7.10.4
