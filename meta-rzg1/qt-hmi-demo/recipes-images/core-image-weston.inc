@@ -23,7 +23,6 @@ IMAGE_INSTALL_append = " \
     qtwebkit \
     qtwebkit-examples-examples \
     qtwebkit-qmlplugins \
-    glmark2 \
 "
 
 # Remove qt-framework-launcher inherited from qt-framework since we
