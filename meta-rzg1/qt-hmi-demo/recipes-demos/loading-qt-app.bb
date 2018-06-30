@@ -14,6 +14,9 @@ do_install() {
     install -m 755 ${S}/check_loading.sh ${D}/home/root/loading-qt-app/
 }
 
+do_package_qa() {
+}
+
 FILES_${PN} = "/home/root/loading-qt-app/* \
 "
 FILES_${PN}-dbg = "/home/root/loading-qt-app/.debug/*"
