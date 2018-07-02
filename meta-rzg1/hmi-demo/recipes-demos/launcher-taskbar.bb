@@ -22,6 +22,9 @@ do_install() {
     install ${WORKDIR}/Demo3D.sh ${D}/home/root/launcher-taskbar/hmi-scripts/
 }
 
+do_package_qa() {
+}
+
 FILES_${PN} = "/home/root/launcher-taskbar/hmi-icons \
                /home/root/launcher-taskbar/hmi-scripts \
                /home/root \
