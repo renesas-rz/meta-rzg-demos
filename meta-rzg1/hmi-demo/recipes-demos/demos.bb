@@ -29,6 +29,9 @@ INSANE_SKIP_${PN} += "ldflags debug-files"
 do_cofigure[noexec] = "1"
 do_compile[noexec] = "1"
 
+do_package_qa(){
+}
+
 PACKAGES = "${PN}"
 
 FILES_${PN} = " /* "
