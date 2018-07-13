@@ -1,6 +1,6 @@
 #!/bin/bash
 
-TTY=$(grep "\/sbin\/getty" /etc/inittab | grep 'ttyS' | awk '{ print $NF }')
+TTY=$(grep "\/bin\/start_getty" /etc/inittab | grep 'ttyS' | awk '{ print $3 }')
 TTY=/dev/${TTY}
 
 printf "\n\e[32m[Info]:\e[0m\n" > ${TTY}
