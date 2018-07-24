@@ -51,4 +51,7 @@ IMAGE_INSTALL_append_rzg1 = " \
     lttng-tools \
     lttng-modules \
     lttng-ust \
+    wpa-supplicant \
+    wireless-tools \
+    usbutils \
 "
