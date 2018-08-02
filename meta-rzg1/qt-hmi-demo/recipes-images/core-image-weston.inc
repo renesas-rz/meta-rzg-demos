@@ -2,7 +2,6 @@
 #EXTRA_IMAGE_FEATURES = "debug-tweaks tools-debug tools-profile"
 
 IMAGE_INSTALL_append = " \
-    wireless-firmware \
     libegl \
 	\
     strace \
