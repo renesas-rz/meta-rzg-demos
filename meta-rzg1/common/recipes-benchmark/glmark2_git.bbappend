@@ -7,6 +7,7 @@ DEPENDS += " libegl mesa"
 
 SRC_URI_append = " \
     file://0001-glmark2-Define-WL_EGL_PLATFORM-to-fix-compilation-wi.patch \
+    file://0002-glmark2-gl-state-egl-Add-define-EGL_PLATFORM_GBM_KHR.patch \
 "
 
 FILES_${PN}-dev = "${libdir}/* ${includedir}"

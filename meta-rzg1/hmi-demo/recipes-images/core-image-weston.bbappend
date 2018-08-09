@@ -5,4 +5,5 @@ IMAGE_INSTALL_append = " \
     demos \
     launcher-taskbar \
     demo-videos \
+    glmark2 \
 "
