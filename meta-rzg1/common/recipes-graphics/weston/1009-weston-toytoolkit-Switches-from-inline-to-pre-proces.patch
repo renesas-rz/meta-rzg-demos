@@ -1,0 +1,93 @@
+From d4ccf780ddfcd0da888fd5015272706238627baf Mon Sep 17 00:00:00 2001
+From: Thang Tran <ThangT@fsoft.com.vn>
+Date: Thu, 2 Aug 2018 18:37:17 +0700
+Subject: [PATCH] weston-toytoolkit: Switches from inline to pre-processor
+ definitions in order to utilize __FILE__ and __LINE__ from the .c file in
+ order to display the location of memory allocation failures when failing.
+
+Now xmalloc, et al calls will produce out of memory.
+Besides, weston 2.0.0 support defines cursor_type, so toytoolkit don't need to allocate
+again.
+
+Signed-off-by: Thang Tran <ThangT@fsoft.com.vn>
+---
+ Makefile.am          | 10 +++++++---
+ clients/toytoolkit.h | 15 +++------------
+ 2 files changed, 10 insertions(+), 15 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 561c241..6b89da3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -296,7 +296,9 @@ libwestoninclude_HEADERS =			\
+ 	libweston/timeline-object.h		\
+ 	shared/matrix.h				\
+ 	shared/config-parser.h			\
+-	shared/zalloc.h
++	shared/zalloc.h			\
++	shared/platform.h           \
++	clients/toytoolkit.h
+ 
+ libwestoninclude_HEADERS +=			\
+ 	libweston-desktop/libweston-desktop.h
+@@ -687,7 +689,8 @@ noinst_LTLIBRARIES += libtoytoolkit.la
+ libtoytoolkit_la_SOURCES =				\
+ 	clients/window.c				\
+ 	clients/window.h				\
+-	shared/helpers.h
++	shared/helpers.h                \
++	clients/toytoolkit.h
+ 
+ nodist_libtoytoolkit_la_SOURCES =			\
+ 	protocol/text-cursor-position-protocol.c	\
+@@ -716,7 +719,8 @@ lib_LTLIBRARIES += libweston-toytoolkit.la
+ 
+ libweston_toytoolkit_la_SOURCES =  \
+    clients/window.c                \
+-   clients/window.h
++   clients/window.h                \
++   clients/toytoolkit.h
+ 
+ BUILT_SOURCES += $(libweston_toytoolkit_la_SOURCES)
+ 
+diff --git a/clients/toytoolkit.h b/clients/toytoolkit.h
+index 5753c78..1fdc392 100644
+--- a/clients/toytoolkit.h
++++ b/clients/toytoolkit.h
+@@ -27,6 +27,8 @@
+ #include <xkbcommon/xkbcommon.h>
+ #include <wayland-client.h>
+ #include <cairo.h>
++#include <shared/xalloc.h>
++
+ struct window;
+ struct widget;
+ struct display;
+@@ -45,17 +47,6 @@ struct rectangle {
+ 	int32_t height;
+ };
+ 
+-// void *
+-// fail_on_null(void *p);
+-//void *
+-//xmalloc(size_t s);
+-//void *
+-//xzalloc(size_t s);
+-//char *
+-//xstrdup(const char *s);
+-//void *
+-//xrealloc(char *p, size_t s);
+-
+ struct display *
+ display_create(int *argc, char *argv[]);
+ 
+@@ -608,4 +599,4 @@ xkb_mod_mask_t
+ keysym_modifiers_get_mask(struct wl_array *modifiers_map,
+ 			  const char *name);
+ 
+-#endif
+\ No newline at end of file
++#endif
+-- 
+2.7.4
+
