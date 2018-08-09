@@ -11,6 +11,7 @@ SRC_URI = " \
  file://0003-HMI-encoding-app-support-LVDS-resolution.patch \
  file://0004-HMI-network-previewing-app-support-LVDS-resolution.patch \
  file://0005-adding-scaling-function-for-video-playback.patch \
+ file://0006-demos-Add-more-element-h264parse-to-video_playback-a.patch \
 "
 
 do_patch () {
