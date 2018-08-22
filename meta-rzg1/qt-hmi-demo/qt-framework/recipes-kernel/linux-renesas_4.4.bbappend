@@ -12,3 +12,7 @@ SRC_URI_append_iwg22m = " \
 SRC_URI_append_iwg21m = " \
     file://iwg21m.cfg \
 "
+
+SRC_URI_append_iwg23s = " \
+    file://iwg23s.cfg \
+"
