@@ -1,0 +1,25 @@
+From c9e095b413d1818a68c68dc1d6a852a33375717b Mon Sep 17 00:00:00 2001
+From: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+Date: Wed, 22 Aug 2018 15:28:23 +0700
+Subject: [PATCH] weston: add script kill Loading app when finish display Qt
+
+Signed-off-by: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+---
+ libweston-desktop/wl-shell.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/libweston-desktop/wl-shell.c b/libweston-desktop/wl-shell.c
+index 94a2b06..ef783e1 100644
+--- a/libweston-desktop/wl-shell.c
++++ b/libweston-desktop/wl-shell.c
+@@ -370,6 +370,7 @@ weston_desktop_wl_shell_surface_protocol_set_title(struct wl_client *wl_client,
+ 		wl_resource_get_user_data(resource);
+ 
+ 	weston_desktop_surface_set_title(surface, title);
++	system("/home/root/loading-qt-app/check_loading.sh");
+ }
+ 
+ static void
+-- 
+1.9.1
+
