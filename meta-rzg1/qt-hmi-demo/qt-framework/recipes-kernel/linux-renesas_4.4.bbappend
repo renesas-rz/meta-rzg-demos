@@ -8,3 +8,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 SRC_URI_append_iwg22m = " \
     file://iwg22m/0001-ARM-mach-shmobile-Reducing-CMA-reserve-from-256M-to-.patch \
 "
+
+SRC_URI_append_iwg21m = " \
+    file://iwg21m.cfg \
+"
