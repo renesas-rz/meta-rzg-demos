@@ -19,6 +19,9 @@ do_install() {
     install -m 755 ${S}/qtpreload.sh ${D}/etc/init.d/
 }
 
+do_package_qa() {
+}
+
 FILES_${PN} = "/home/root/qtpreload/* \
 /etc/init.d/ \
 "
