@@ -2,13 +2,12 @@ include core-image-weston.inc
 
 IMAGE_INSTALL_append = " \
   xkeyboard-config \
-  usb-init \
   bluez5 \
 "
 
 update_issue() {
     # Set BSP version
-    BSP_VERSION="2.0.5"
+    BSP_VERSION="2.1.0"
 
     # Set SoC and Board info
     case "${MACHINE}" in

@@ -19,8 +19,6 @@ IMAGE_INSTALL_append_rzg1 = " \
     gstreamer1.0-plugins-base-volume \
     gstreamer1.0-plugins-base-audiorate \
     gstreamer1.0-plugins-base-videorate \
-    gstreamer1.0-plugins-base-encodebin \
-    gstreamer1.0-plugins-bad-camerabin2 \
     gstreamer1.0-plugins-good-icydemux \
     libgstphotography-1.0 \
     faac \
@@ -31,27 +29,6 @@ IMAGE_INSTALL_append_rzg1 = " \
 
 # Common apps
 IMAGE_INSTALL_append_rzg1 = " \
-    dosfstools \
-    evtest \
-    e2fsprogs \
-    i2c-tools \
-    iproute2 \
-    memtester \
-    python-subprocess \
-    python-datetime \
-    python-json \
-    ethtool \
-    mtd-utils \
-    mtd-utils-ubifs \
-    iperf \
-    can-utils \
-    pciutils \
-    libsocketcan \
-    minicom \
-    lttng-tools \
-    lttng-modules \
-    lttng-ust \
-    wpa-supplicant \
-    wireless-tools \
     usbutils \
+    iperf3 \
 "
