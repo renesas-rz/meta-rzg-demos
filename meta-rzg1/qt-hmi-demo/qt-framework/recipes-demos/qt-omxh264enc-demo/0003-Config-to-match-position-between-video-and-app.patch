@@ -39,7 +39,7 @@ index a7eaa0e..847e11a 100755
 -            x_position: root.width*(10/100)
 -            y_position: root.height*(10/100)
 +            x_position: Math.round(root.width*(10/100))
-+            y_position: Math.round(root.height*(10/100))+32
++            y_position: Math.round(root.height*(10/100))+80
              out_width: root.width*(50/100)
              out_height: root.height*(50/100)
 -
