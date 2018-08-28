@@ -6,6 +6,7 @@ SRC_URI = " \
  file://hmi-scripts/* \
  file://Demo3D.png \
  file://Demo3D.sh \
+ file://libjpeg.so.9 \
 "
 
 INSANE_SKIP_${PN} = "already-stripped"
@@ -14,12 +15,15 @@ do_install() {
     install -d ${D}/home/root/launcher-taskbar/hmi-icons
     install -d ${D}/home/root/launcher-taskbar/hmi-scripts
     install -d ${D}/home/root/videos
+    install -d ${D}/usr/lib/
 
     cp -Rf ${S}/../hmi-icons/* ${D}/home/root/launcher-taskbar/hmi-icons/
     cp -Rf ${S}/../hmi-scripts/* ${D}/home/root/launcher-taskbar/hmi-scripts/
 
     install ${WORKDIR}/Demo3D.png ${D}/home/root/launcher-taskbar/hmi-icons/
     install ${WORKDIR}/Demo3D.sh ${D}/home/root/launcher-taskbar/hmi-scripts/
+
+    install ${WORKDIR}/libjpeg.so.9 ${D}/usr/lib/ 
 }
 
 do_package_qa() {
@@ -29,6 +33,7 @@ FILES_${PN} = "/home/root/launcher-taskbar/hmi-icons \
                /home/root/launcher-taskbar/hmi-scripts \
                /home/root \
                /home/root/videos \
+               /usr/lib/ \
 "
 FILES_${PN}-dbg += " \
  /home/root/launcher-taskbar/hmi-scripts/.debug/* \
