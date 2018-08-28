@@ -10,13 +10,13 @@ SRC_URI_append_iwg22m = " \
 "
 
 SRC_URI_append_iwg21m = " \
-    file://iwg21m.cfg \
+    file://iwg21m-qt.cfg \
 "
 
 SRC_URI_append_iwg23s = " \
-    file://iwg23s.cfg \
+    file://iwg23s-qt.cfg \
 "
 
 SRC_URI_append_iwg20m = " \
-    file://iwg20m.cfg \
+    file://iwg20m-qt.cfg \
 "
