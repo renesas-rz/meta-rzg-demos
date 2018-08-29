@@ -2,9 +2,9 @@ LICENSE = "CLOSED"
 DESCRIPTION = "Videos for Doorphone demo, need to encode in H264 with I frames only for sending via network"
 
 FILESEXTRAPATHS = "${THISDIR}/doorphone-data:"
-SRC_URI = "http://www.renesas.com/ja-jp/media/products/microcontrollers-microprocessors/rz/rzg/doorphone-videos/vga1.h264;name=vga1 \
-           http://www.renesas.com/ja-jp/media/products/microcontrollers-microprocessors/rz/rzg/doorphone-videos/vga2.h264;name=vga2 \
-           http://www.renesas.com/ja-jp/media/products/microcontrollers-microprocessors/rz/rzg/doorphone-videos/vga3.h264;name=vga3 "
+SRC_URI = "http://www.renesas.com/jp/ja/img/products/media/auto-j/microcontrollers-microprocessors/rz/rzg/doorphone-videos/vga1.h264;name=vga1 \
+           http://www.renesas.com/jp/ja/img/products/media/auto-j/microcontrollers-microprocessors/rz/rzg/doorphone-videos/vga2.h264;name=vga2 \
+           http://www.renesas.com/jp/ja/img/products/media/auto-j/microcontrollers-microprocessors/rz/rzg/doorphone-videos/vga3.h264;name=vga3 "
 
 SRC_URI[vga1.md5sum] = "60ffbac29a9e0d11dc7386dc27b621aa"
 SRC_URI[vga1.sha256sum] = "3c7186328f2b4408f04ec16488a4439e233b3a7fa0f087868a5f77bde5e70b30"
