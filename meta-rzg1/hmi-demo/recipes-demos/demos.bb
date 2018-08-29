@@ -15,6 +15,7 @@ SRC_URI = " \
  file://0007-HMI-demos-demos-encoded-Change-the-properties-of-vspmfil.patch \
  file://0008-HMI-Video_Playback-Remove-properties-out-width-and-o.patch \
  file://0009-HMI-demos-demos-set-width-and-height-in-capsfilter-i.patch \
+ file://0010-demos-streaming-add-h264parse-to-correct-pipeline-st.patch \
 "
 
 do_patch () {

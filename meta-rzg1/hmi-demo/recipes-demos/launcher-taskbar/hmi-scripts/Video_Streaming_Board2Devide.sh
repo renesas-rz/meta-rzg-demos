@@ -15,9 +15,9 @@ printf "\n\e[31mNOTE:\n\
 /home/root/RZ_scripts/test-multicast2 &
 
 gst-launch-1.0 -e filesrc location=/home/root/videos/h264-wvga-30.mp4 ! \
-qtdemux ! omxh264dec no-copy=true ! vspmfilter outbuf-alloc=true ! \
+qtdemux ! h264parse ! omxh264dec no-copy=true ! vspmfilter outbuf-alloc=true ! \
 video/x-raw,format=NV12,width=640,height=480 ! omxh264enc \
-target-bitrate=5242880 num-p-frames=0 ! h264parse ! video/x-h264,\
+target-bitrate=5242880 ! h264parse ! video/x-h264,\
 stream-format=avc,alignment=au ! rtph264pay pt=96 name=pay0 \
 config-interval=3 ! udpsink host=127.255.255.255 port=5000
 
