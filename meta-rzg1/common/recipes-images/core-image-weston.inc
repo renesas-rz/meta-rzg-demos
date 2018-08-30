@@ -2,7 +2,6 @@ EXTRA_IMAGE_FEATURES = "debug-tweaks tools-debug tools-profile"
 
 # Common lib,app
 IMAGE_INSTALL_append_rzg1 = " \
-    mm-init \
     cairo \
     pulseaudio-init \
     ltp \
