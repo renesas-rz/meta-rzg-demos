@@ -15,6 +15,7 @@ SRC_URI_append_iwg21m = " \
 
 SRC_URI_append_iwg23s = " \
     file://iwg23s-qt.cfg \
+    file://iwg23s/0001-ARM-shmobilel-setup-rcar-gen2-resize-CMA-area-1-for-.patch \
 "
 
 SRC_URI_append_iwg20m = " \
