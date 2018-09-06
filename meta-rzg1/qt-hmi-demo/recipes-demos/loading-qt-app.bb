@@ -17,11 +17,8 @@ do_install() {
     install -m 755 ${S}/libjpeg.so.9 ${D}/usr/lib/
 }
 
-do_package_qa() {
-}
-
 FILES_${PN} = "/home/root/loading-qt-app/* \
                /usr/lib/* \
 "
 FILES_${PN}-dbg = "/home/root/loading-qt-app/.debug/*"
-INSANE_SKIP_${PN} = "already-stripped"
+INSANE_SKIP_${PN} = "already-stripped file-rdeps"

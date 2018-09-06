@@ -30,13 +30,10 @@ do_install () {
 	cp ${S}/../ATT93936.bashrc ${D}/${ROOT_HOME}/.bashrc
 }
 
-INSANE_SKIP_${PN} += "ldflags debug-files"
+INSANE_SKIP_${PN} += "ldflags debug-files file-rdeps"
 #do_patch[noexec] = "1"
 do_cofigure[noexec] = "1"
 do_compile[noexec] = "1"
-
-do_package_qa(){
-}
 
 PACKAGES = "${PN}"
 

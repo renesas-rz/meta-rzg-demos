@@ -13,5 +13,4 @@ SRC_URI_append = " \
 
 FILES_${PN}-dev = "${libdir}/* ${includedir}"
 
-do_package_qa() {
-}
+RDEPENDS_${PN} += "gles-user-module"

@@ -37,8 +37,7 @@ do_install() {
     install ${WORKDIR}/Renesas.mp4 ${D}/home/root/Demo3D/
 }
 
-do_package_qa() {
-}
+RDEPENDS_${PN} += "gles-user-module"
 
 FILES_${PN}-dev = "${libdir}/* ${includedir}"
 

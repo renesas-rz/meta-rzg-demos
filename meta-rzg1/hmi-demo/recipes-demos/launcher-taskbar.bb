@@ -26,8 +26,7 @@ do_install() {
     install ${WORKDIR}/libjpeg.so.9 ${D}/usr/lib/ 
 }
 
-do_package_qa() {
-}
+INSANE_SKIP_${PN} += "file-rdeps"
 
 FILES_${PN} = "/home/root/launcher-taskbar/hmi-icons \
                /home/root/launcher-taskbar/hmi-scripts \

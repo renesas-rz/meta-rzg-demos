@@ -19,8 +19,7 @@ do_install() {
     install -m 755 ${S}/qtpreload.sh ${D}/etc/init.d/
 }
 
-do_package_qa() {
-}
+INSANE_SKIP_${PN} += "file-rdeps"
 
 FILES_${PN} = "/home/root/qtpreload/* \
 /etc/init.d/ \
