@@ -7,8 +7,8 @@ DESCRIPTION = "Videos for demos"
 #           http://www.renesas.com/ja-jp/media/products/microcontrollers-microprocessors/rz/rzg/hmi-mmpoc-videos/h264-vga-24.mp4;name=video4 \
 #           http://www.renesas.com/ja-jp/media/products/microcontrollers-microprocessors/rz/rzg/hmi-mmpoc-videos/h264-hd-30.mp4;name=video5 "
 
-SRC_URI = "http://www.renesas.com/ja-jp/media/products/microcontrollers-microprocessors/rz/rzg/hmi-mmpoc-videos/h264-fhd-60.mp4;name=video1 \
-           http://www.renesas.com/ja-jp/media/products/microcontrollers-microprocessors/rz/rzg/hmi-mmpoc-videos/h264-wvga-30.mp4;name=video2 \
+SRC_URI = "http://www.renesas.com/jp/ja/img/products/media/auto-j/microcontrollers-microprocessors/rz/rzg/hmi-mmpoc-videos/h264-fhd-60.mp4;name=video1 \
+           http://www.renesas.com/jp/ja/img/products/media/auto-j/microcontrollers-microprocessors/rz/rzg/hmi-mmpoc-videos/h264-wvga-30.mp4;name=video2 \
            file://VIDEO_LICENSE "
 
 LIC_FILES_CHKSUM = "file://${WORKDIR}/VIDEO_LICENSE;md5=9af30502fc628a73ff57c2a135fe2f24"
