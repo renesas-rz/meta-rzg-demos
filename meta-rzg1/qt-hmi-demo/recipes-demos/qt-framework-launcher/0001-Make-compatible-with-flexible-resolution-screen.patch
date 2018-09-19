@@ -1,0 +1,792 @@
+From e21b5b7e8312263c35bf4781da105a290118ecf6 Mon Sep 17 00:00:00 2001
+From: Chuan Anh Nguyen <chuan.nguyen.jy@rvc.renesas.com>
+Date: Sat, 5 Nov 2016 01:58:05 +0700
+Subject: [PATCH] Make compatible with flexible resolution screen
+
+---
+ content/Data_Storage_Delegate.qml   |  19 ++--
+ content/Graphics_Delegate.qml       |  19 ++--
+ content/Module_Delegate.qml         |   8 +-
+ content/Multimedia_Delegate.qml     |  19 ++--
+ content/Networking_Delegate.qml     |  19 ++--
+ content/User_Interface_Delegate.qml |  19 ++--
+ fileio.h                            |  29 ++++++
+ launcher.qml                        | 184 ++++++++++++++++++++++--------------
+ main.cpp                            |  32 ++++++-
+ 9 files changed, 241 insertions(+), 107 deletions(-)
+ create mode 100755 fileio.h
+
+diff --git a/content/Data_Storage_Delegate.qml b/content/Data_Storage_Delegate.qml
+index 460f74b..9c6c1ae 100644
+--- a/content/Data_Storage_Delegate.qml
++++ b/content/Data_Storage_Delegate.qml
+@@ -6,13 +6,17 @@ Rectangle {
+ 	property bool selected: GridView.isCurrentItem
+ 	property real itemSize
+ 
+-	width: itemSize
+-	height: itemSize
++	width: (itemSize < 240) ? 240 : itemSize
++	height: width
+ 
+ 	color: "transparent"
+ 
++	property int fontSize: width * 5 / 100
++
+ 	Image {
+-		id: icon 
++		id: icon
++		width: parent.width * 20 / 100
++		height: width
+ 		y:10
+ 		anchors.horizontalCenter: parent.horizontalCenter
+ 		source: image 
+@@ -22,10 +26,13 @@ Rectangle {
+ 		id: title
+ 		anchors { top: icon.bottom; horizontalCenter: parent.horizontalCenter }
+ 		text: name
+-		font.pointSize: 14 
++		width: parent.width / 2
++		wrapMode: Text.Wrap
++		horizontalAlignment: Text.AlignHCenter
++		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
+ 		font.bold: selected ? true : false
+-      color: selected ? "yellow" : "white"
+-      Behavior on color { ColorAnimation { duration: 100 } }
++		color: selected ? "yellow" : "white"
++		Behavior on color { ColorAnimation { duration: 100 } }
+ 	}
+ 
+ 	MouseArea {
+diff --git a/content/Graphics_Delegate.qml b/content/Graphics_Delegate.qml
+index 24c5915..9ee7067 100644
+--- a/content/Graphics_Delegate.qml
++++ b/content/Graphics_Delegate.qml
+@@ -6,13 +6,17 @@ Rectangle {
+ 	property bool selected: GridView.isCurrentItem
+ 	property real itemSize
+ 
+-	width: itemSize
+-	height: itemSize
++	width: (itemSize < 240) ? 240 : itemSize
++	height: width
+ 
+ 	color: "transparent"
+ 
++	property int fontSize: width * 5 / 100
++
+ 	Image {
+-		id: icon 
++		id: icon
++		width: parent.width * 20 / 100
++		height: width
+ 		y:10
+ 		anchors.horizontalCenter: parent.horizontalCenter
+ 		source: image 
+@@ -22,10 +26,13 @@ Rectangle {
+ 		id: title
+ 		anchors { top: icon.bottom; horizontalCenter: parent.horizontalCenter }
+ 		text: name
+-		font.pointSize: 14 
++		width: parent.width / 2
++		wrapMode: Text.Wrap
++		horizontalAlignment: Text.AlignHCenter
++		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
+ 		font.bold: selected ? true : false
+-      color: selected ? "yellow" : "white"
+-      Behavior on color { ColorAnimation { duration: 100 } }
++		color: selected ? "yellow" : "white"
++		Behavior on color { ColorAnimation { duration: 100 } }
+ 	}
+ 
+ 	MouseArea {
+diff --git a/content/Module_Delegate.qml b/content/Module_Delegate.qml
+index 63e934f..38ba2a2 100644
+--- a/content/Module_Delegate.qml
++++ b/content/Module_Delegate.qml
+@@ -10,6 +10,8 @@ Rectangle {
+ 	width: itemSize
+ 	height: itemSize + 10
+ 
++	property int fontSize: itemSize * 12 / 100
++
+ 	color: "transparent"
+ 
+ 	Image {
+@@ -25,10 +27,10 @@ Rectangle {
+ 
+ 		anchors { top: icon.bottom; topMargin: 5; horizontalCenter: parent.horizontalCenter }
+ 		text: name
+-		font.pointSize: 15 
++		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
+ 		font.bold: selected ? true : false
+-      color: selected ? "yellow" : "white"
+-      Behavior on color { ColorAnimation { duration: 100 } }
++		color: selected ? "yellow" : "white"
++		Behavior on color { ColorAnimation { duration: 100 } }
+ 	}
+ 
+ 	MouseArea {
+diff --git a/content/Multimedia_Delegate.qml b/content/Multimedia_Delegate.qml
+index 09c7845..826219a 100644
+--- a/content/Multimedia_Delegate.qml
++++ b/content/Multimedia_Delegate.qml
+@@ -6,13 +6,17 @@ Rectangle {
+ 	property bool selected: GridView.isCurrentItem
+ 	property real itemSize
+ 
+-	width: itemSize
+-	height: itemSize
++	width: (itemSize < 240) ? 240 : itemSize
++	height: width
+ 
+ 	color: "transparent"
+ 
++	property int fontSize: width * 5 / 100
++
+ 	Image {
+-		id: icon 
++		id: icon
++		width: parent.width * 20 / 100
++		height: width
+ 		y:10
+ 		anchors.horizontalCenter: parent.horizontalCenter
+ 		source: image 
+@@ -22,10 +26,13 @@ Rectangle {
+ 		id: title
+ 		anchors { top: icon.bottom; horizontalCenter: parent.horizontalCenter }
+ 		text: name
+-		font.pointSize: 14 
++		width: parent.width / 2
++		wrapMode: Text.Wrap
++		horizontalAlignment: Text.AlignHCenter
++		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
+ 		font.bold: selected ? true : false
+-      color: selected ? "yellow" : "white"
+-      Behavior on color { ColorAnimation { duration: 100 } }
++		color: selected ? "yellow" : "white"
++		Behavior on color { ColorAnimation { duration: 100 } }
+ 	}
+ 
+ 	MouseArea {
+diff --git a/content/Networking_Delegate.qml b/content/Networking_Delegate.qml
+index 3aa1d34..3c1cd57 100644
+--- a/content/Networking_Delegate.qml
++++ b/content/Networking_Delegate.qml
+@@ -6,13 +6,17 @@ Rectangle {
+ 	property bool selected: GridView.isCurrentItem
+ 	property real itemSize
+ 
+-	width: itemSize
+-	height: itemSize
++	width: (itemSize < 240) ? 240 : itemSize
++	height: width
+ 
+ 	color: "transparent"
+ 
++	property int fontSize: width * 5 / 100
++
+ 	Image {
+-		id: icon 
++		id: icon
++		width: parent.width * 20 / 100
++		height: width
+ 		y:10
+ 		anchors.horizontalCenter: parent.horizontalCenter
+ 		source: image 
+@@ -22,10 +26,13 @@ Rectangle {
+ 		id: title
+ 		anchors { top: icon.bottom; horizontalCenter: parent.horizontalCenter }
+ 		text: name
+-		font.pointSize: 14 
++		width: parent.width / 2
++		wrapMode: Text.Wrap
++		horizontalAlignment: Text.AlignHCenter
++		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
+ 		font.bold: selected ? true : false
+-      color: selected ? "yellow" : "white"
+-      Behavior on color { ColorAnimation { duration: 100 } }
++		color: selected ? "yellow" : "white"
++		Behavior on color { ColorAnimation { duration: 100 } }
+ 	}
+ 
+ 	MouseArea {
+diff --git a/content/User_Interface_Delegate.qml b/content/User_Interface_Delegate.qml
+index 122e078..80aa109 100644
+--- a/content/User_Interface_Delegate.qml
++++ b/content/User_Interface_Delegate.qml
+@@ -6,13 +6,17 @@ Rectangle {
+ 	property bool selected: GridView.isCurrentItem
+ 	property real itemSize
+ 
+-	width: itemSize
+-	height: itemSize
++	width: (itemSize < 240) ? 240 : itemSize
++	height: width
+ 
+ 	color: "transparent"
+ 
++	property int fontSize: width * 5 / 100
++
+ 	Image {
+-		id: icon 
++		id: icon
++		width: parent.width * 20 / 100
++		height: width
+ 		y:10
+ 		anchors.horizontalCenter: parent.horizontalCenter
+ 		source: image 
+@@ -22,10 +26,13 @@ Rectangle {
+ 		id: title
+ 		anchors { top: icon.bottom; horizontalCenter: parent.horizontalCenter }
+ 		text: name
+-		font.pointSize: 14 
++		width: parent.width / 2
++		wrapMode: Text.Wrap
++		horizontalAlignment: Text.AlignHCenter
++		font.pointSize: (fontSize > 15) ? 15 : (fontSize < 10) ? 10 : fontSize
+ 		font.bold: selected ? true : false
+-      color: selected ? "yellow" : "white"
+-      Behavior on color { ColorAnimation { duration: 100 } }
++		color: selected ? "yellow" : "white"
++		Behavior on color { ColorAnimation { duration: 100 } }
+ 	}
+ 
+ 	MouseArea {
+diff --git a/fileio.h b/fileio.h
+new file mode 100755
+index 0000000..37b9b7b
+--- /dev/null
++++ b/fileio.h
+@@ -0,0 +1,29 @@
++#ifndef FILEIO_H
++#define FILEIO_H
++
++#include <QObject>
++#include <QFile>
++#include <QTextStream>
++
++class FileIO : public QObject
++{
++    Q_OBJECT
++
++public slots:
++    bool write(const QString& source, const QString& data)
++    {
++        QFile file(source);
++        if (!file.open(QFile::WriteOnly | QFile::Truncate))
++            return false;
++
++        QTextStream out(&file);
++        out << data << endl;
++        file.close();
++        return true;
++    }
++
++public:
++    FileIO() {}
++};
++
++#endif // FILEIO_H
+diff --git a/launcher.qml b/launcher.qml
+index 2796f56..bcd21fc 100644
+--- a/launcher.qml
++++ b/launcher.qml
+@@ -6,8 +6,12 @@ import _Launcher 1.0
+ Rectangle {
+ 	id: launcher_window
+ 
+-	width: 1920 / 2
+-	height: width * 9/16 // 9:16 is full HD ratio
++	width: screenWidth
++	height: screenHeight
++	//width: 1920 / 2
++	//height: width * 9/16 // 9:16 is full HD ratio
++
++	property real iDfontSize: width * 1.2 / 100
+ 
+ 	Image {
+ 		id: launcher_wallpaper
+@@ -28,16 +32,16 @@ Rectangle {
+ 
+ 		property int itemWidth: parent.width * 4 /(16 * 2)
+ 
+-		width: parent.width * 3/16
+-		height: 480
+-		spacing: 35
+-		contentHeight: 617
+-
+ 		anchors.top: parent.top
+ 		anchors.topMargin: parent.width * 1/(16 * 2)
+ 		anchors.left: parent.left
+ 		anchors.leftMargin : parent.width * 1/(16 * 2)
+ 
++		width: parent.width * 3/16
++		height: parent.height - 2 * anchors.topMargin
++		spacing: 35
++		contentHeight: 617
++
+ 		model: module_model
+ 		delegate: Module_Delegate {itemSize: module_window.itemWidth}
+ 	}
+@@ -49,9 +53,8 @@ Rectangle {
+ 		anchors.topMargin: parent.width * 1/(16 * 2)
+ 		anchors.left: module_window.right
+ 		color: "white"
+-		anchors.leftMargin: -27
+ 		width: 1
+-		height: 479
++		height: parent.height * 85 / 100
+ 	}
+ 
+ 	// Apps in User_Interface Module
+@@ -63,6 +66,11 @@ Rectangle {
+ 		anchors.topMargin: launcher_window.width * 1/(16 * 2)
+ 		anchors.left: module_window.right
+ 
++		color: "transparent"
++
++		width: parent.width - x
++		height: parent.height - y
++
+ 		property string currentAppDetail: user_interface_model.get(0).detail
+ 		property string currentAppPath: user_interface_model.get(0).path
+ 
+@@ -73,37 +81,39 @@ Rectangle {
+ 		GridView {
+ 			id: user_interface_window
+ 
+-			width: 720
+-			height: 355
++			width: parent.width
++			height: parent.height * 85 / 100
+ 
+ 			anchors.top: parent.top
+ 			anchors.left: parent.left
+ 
+-			cellWidth: 240
++			cellWidth: module_window.itemWidth * 5 / 3
++			cellHeight: module_window.itemWidth * 7 / 6
+ 			clip: true
+ 			focus: true
+ 
+-			cellHeight: module_window.itemWidth * 3 / 4
+ 			model: user_interface_model
+-			delegate: User_Interface_Delegate {itemSize: user_interface_window.cellWidth * 3/4 }
++			delegate: User_Interface_Delegate {itemSize: user_interface_window.cellWidth }
+ 		}
+ 
+ 		// App Description
+ 		Rectangle {
+ 			id: description
+ 
+-			width: 520
+-			height: 100
++			property int iWidth: parent.height * 15 / 100
+ 
+-			anchors.top: user_interface_window.bottom
+-			anchors.topMargin: 12
++			width: parent.width * 90 / 100
++			height: (iWidth < 85) ? 85 : (iWidth > 110) ? 110 : iWidth
++
++			anchors.horizontalCenter: user_interface_window.horizontalCenter
++			anchors.bottom: parent.bottom
+ 			color: "black"
+ 			opacity: 0.65
+ 
+ 			Text {
+ 				anchors { left: parent.left; leftMargin: 10; top:parent.top; topMargin: 10}
+ 				text: user_interface_window_big.currentAppDetail
+-				font.pointSize: 15 
++				font.pointSize: (iDfontSize > 15) ? 15 : ((iDfontSize < 10) ? 10 : iDfontSize)
+ 				color: "yellow"
+ 			}
+ 		}
+@@ -111,10 +121,10 @@ Rectangle {
+ 		// Start app button
+ 		Rectangle {
+ 			id: start_app
+-			width: 100 
+-			height: width
+-			anchors.left: description.right
+-			anchors.top: description.top
++			width: description.height
++				height: width
++			anchors.right: description.right
++				anchors.top: description.top
+ 
+ 			color: "black"
+ 			opacity: 0.65
+@@ -131,7 +141,7 @@ Rectangle {
+ 				anchors.fill: start_app
+ 				onClicked: {
+ 					app.launch(user_interface_window_big.currentAppPath)
+-				}
++                }
+ 			}
+ 		}
+ 	}
+@@ -145,6 +155,11 @@ Rectangle {
+ 		anchors.topMargin: launcher_window.width * 1/(16 * 2)
+ 		anchors.left: module_window.right
+ 
++		color: "transparent"
++
++		width: parent.width - x
++		height: parent.height - y
++
+ 		property string currentAppDetail: data_storage_model.get(0).detail
+ 		property string currentAppPath: data_storage_model.get(0).path
+ 
+@@ -155,37 +170,39 @@ Rectangle {
+ 		GridView {
+ 			id: data_storage_window
+ 
+-			width: 720
+-			height: 355
++			width: parent.width
++			height: parent.height * 85 / 100
+ 
+ 			anchors.top: parent.top
+ 			anchors.left: parent.left
+ 
+-			cellWidth: 240
++			cellWidth: module_window.itemWidth * 5 / 3
++			cellHeight: module_window.itemWidth * 7 / 6
+ 			clip: true
+ 			focus: true
+ 
+-			cellHeight: module_window.itemWidth * 3 / 4
+ 			model: data_storage_model
+-			delegate: Data_Storage_Delegate {itemSize: data_storage_window.cellWidth * 3/4 }
++			delegate: Data_Storage_Delegate {itemSize: data_storage_window.cellWidth }
+ 		}
+ 
+ 		// App Description
+ 		Rectangle {
+ 			id: data_storage_description
+ 
+-			width: 520
+-			height: 100
++			property int iWidth: parent.height * 15 / 100
+ 
+-			anchors.top: data_storage_window.bottom
+-			anchors.topMargin: 12
++			width: parent.width * 90 / 100
++			height: (iWidth < 85) ? 85 : (iWidth > 110) ? 110 : iWidth
++
++			anchors.horizontalCenter: parent.horizontalCenter
++			anchors.bottom: parent.bottom
+ 			color: "black"
+ 			opacity: 0.65
+ 
+ 			Text {
+ 				anchors { left: parent.left; leftMargin: 10; top:parent.top; topMargin: 10}
+ 				text: data_storage_window_big.currentAppDetail
+-				font.pointSize: 15 
++                font.pointSize: (iDfontSize > 15) ? 15 : ((iDfontSize < 10) ? 10 : iDfontSize)
+ 				color: "yellow"
+ 			}
+ 		}
+@@ -193,9 +210,9 @@ Rectangle {
+ 		// Start app button
+ 		Rectangle {
+ 			id: data_storage_start_app
+-			width: 100 
++			width: data_storage_description.height
+ 			height: width
+-			anchors.left: data_storage_description.right
++			anchors.right: data_storage_description.right
+ 			anchors.top: data_storage_description.top
+ 
+ 			color: "black"
+@@ -227,6 +244,11 @@ Rectangle {
+ 		anchors.topMargin: launcher_window.width * 1/(16 * 2)
+ 		anchors.left: module_window.right
+ 
++		color: "transparent"
++
++		width: parent.width - x
++		height: parent.height - y
++
+ 		property string currentAppDetail: multimedia_model.get(0).detail
+ 		property string currentAppPath: multimedia_model.get(0).path
+ 
+@@ -237,37 +259,39 @@ Rectangle {
+ 		GridView {
+ 			id: multimedia_window
+ 
+-			width: 720
+-			height: 355
++			width: parent.width
++			height: parent.height * 85 / 100
+ 
+ 			anchors.top: parent.top
+ 			anchors.left: parent.left
+ 
+-			cellWidth: 240
++			cellWidth: module_window.itemWidth * 5 / 3
++			cellHeight: module_window.itemWidth * 7 / 6
+ 			clip: true
+ 			focus: true
+ 
+-			cellHeight: module_window.itemWidth * 3 / 4
+ 			model: multimedia_model
+-			delegate: Multimedia_Delegate {itemSize: multimedia_window.cellWidth * 3/4 }
++			delegate: Multimedia_Delegate {itemSize: multimedia_window.cellWidth }
+ 		}
+ 
+ 		// App Description
+ 		Rectangle {
+ 			id: multimedia_description
+ 
+-			width: 520
+-			height: 100
++			property int iWidth: parent.height * 15 / 100
++
++			width: parent.width * 90 / 100
++			height: (iWidth < 85) ? 85 : (iWidth > 110) ? 110 : iWidth
+ 
+-			anchors.top: multimedia_window.bottom
+-			anchors.topMargin: 12
++			anchors.horizontalCenter: parent.horizontalCenter
++			anchors.bottom: parent.bottom
+ 			color: "black"
+ 			opacity: 0.65
+ 
+ 			Text {
+ 				anchors { left: parent.left; leftMargin: 10; top:parent.top; topMargin: 10}
+ 				text: multimedia_window_big.currentAppDetail
+-				font.pointSize: 15 
++				font.pointSize: (iDfontSize > 15) ? 15 : ((iDfontSize < 10) ? 10 : iDfontSize)
+ 				color: "yellow"
+ 			}
+ 		}
+@@ -275,9 +299,9 @@ Rectangle {
+ 		// Start app button
+ 		Rectangle {
+ 			id: multimedia_start_app
+-			width: 100 
++			width: multimedia_description.height
+ 			height: width
+-			anchors.left: multimedia_description.right
++			anchors.right: multimedia_description.right
+ 			anchors.top: multimedia_description.top
+ 
+ 			color: "black"
+@@ -309,6 +333,11 @@ Rectangle {
+ 		anchors.topMargin: launcher_window.width * 1/(16 * 2)
+ 		anchors.left: module_window.right
+ 
++		color: "transparent"
++
++		width: parent.width - x
++		height: parent.height - y
++
+ 		property string currentAppDetail: networking_model.get(0).detail
+ 		property string currentAppPath: networking_model.get(0).path
+ 
+@@ -319,37 +348,39 @@ Rectangle {
+ 		GridView {
+ 			id: networking_window
+ 
+-			width: 720
+-			height: 355
++			width: parent.width
++			height: parent.height * 85 / 100
+ 
+ 			anchors.top: parent.top
+ 			anchors.left: parent.left
+ 
+-			cellWidth: 240
++			cellWidth: module_window.itemWidth * 5 / 3
++			cellHeight: module_window.itemWidth * 7 / 6
+ 			clip: true
+ 			focus: true
+ 
+-			cellHeight: module_window.itemWidth * 3 / 4
+ 			model: networking_model
+-			delegate: Networking_Delegate {itemSize: networking_window.cellWidth * 3/4 }
++			delegate: Networking_Delegate {itemSize: networking_window.cellWidth }
+ 		}
+ 
+ 		// App Description
+ 		Rectangle {
+ 			id: networking_description
+ 
+-			width: 520
+-			height: 100
++			property int iWidth: parent.height * 15 / 100
++
++			width: parent.width * 90 / 100
++			height: (iWidth < 85) ? 85 : (iWidth > 110) ? 110 : iWidth
+ 
+-			anchors.top: networking_window.bottom
+-			anchors.topMargin: 12
++			anchors.horizontalCenter: parent.horizontalCenter
++			anchors.bottom: parent.bottom
+ 			color: "black"
+ 			opacity: 0.65
+ 
+ 			Text {
+ 				anchors { left: parent.left; leftMargin: 10; top:parent.top; topMargin: 10}
+ 				text: networking_window_big.currentAppDetail
+-				font.pointSize: 15 
++				font.pointSize: (iDfontSize > 15) ? 15 : ((iDfontSize < 10) ? 10 : iDfontSize)
+ 				color: "yellow"
+ 			}
+ 		}
+@@ -357,9 +388,9 @@ Rectangle {
+ 		// Start app button
+ 		Rectangle {
+ 			id: networking_start_app
+-			width: 100 
++			width: networking_description.height
+ 			height: width
+-			anchors.left: networking_description.right
++			anchors.right: networking_description.right
+ 			anchors.top: networking_description.top
+ 
+ 			color: "black"
+@@ -391,6 +422,11 @@ Rectangle {
+ 		anchors.topMargin: launcher_window.width * 1/(16 * 2)
+ 		anchors.left: module_window.right
+ 
++		color: "transparent"
++
++		width: parent.width - x
++		height: parent.height - y
++
+ 		property string currentAppDetail: graphics_model.get(0).detail
+ 		property string currentAppPath: graphics_model.get(0).path
+ 
+@@ -401,37 +437,39 @@ Rectangle {
+ 		GridView {
+ 			id: graphics_window
+ 
+-			width: 720
+-			height: 355
++			width: parent.width
++			height: parent.height * 85 / 100
+ 
+ 			anchors.top: parent.top
+ 			anchors.left: parent.left
+ 
+-			cellWidth: 240
++			cellWidth: module_window.itemWidth * 5 / 3
++			cellHeight: module_window.itemWidth * 7 / 6
+ 			clip: true
+ 			focus: true
+ 
+-			cellHeight: module_window.itemWidth * 3 / 4
+ 			model: graphics_model
+-			delegate: Graphics_Delegate {itemSize: graphics_window.cellWidth * 3/4 }
++			delegate: Graphics_Delegate {itemSize: graphics_window.cellWidth }
+ 		}
+ 
+ 		// App Description
+ 		Rectangle {
+ 			id: graphics_description
+ 
+-			width: 520
+-			height: 100
++			property int iWidth: parent.height * 15 / 100
++
++			width: parent.width * 90 / 100
++			height: (iWidth < 85) ? 85 : (iWidth > 110) ? 110 : iWidth
+ 
+-			anchors.top: graphics_window.bottom
+-			anchors.topMargin: 12
++			anchors.horizontalCenter: parent.horizontalCenter
++			anchors.bottom: parent.bottom
+ 			color: "black"
+ 			opacity: 0.65
+ 
+ 			Text {
+ 				anchors { left: parent.left; leftMargin: 10; top:parent.top; topMargin: 10}
+ 				text: graphics_window_big.currentAppDetail
+-				font.pointSize: 15 
++				font.pointSize: (iDfontSize > 15) ? 15 : ((iDfontSize < 10) ? 10 : iDfontSize)
+ 				color: "yellow"
+ 			}
+ 		}
+@@ -439,9 +477,9 @@ Rectangle {
+ 		// Start app button
+ 		Rectangle {
+ 			id: graphics_start_app
+-			width: 100 
++			width: graphics_description.height
+ 			height: width
+-			anchors.left: graphics_description.right
++			anchors.right: graphics_description.right
+ 			anchors.top: graphics_description.top
+ 
+ 			color: "black"
+@@ -462,5 +500,5 @@ Rectangle {
+ 				}
+ 			}
+ 		}
+-	}
++    }
+ }
+diff --git a/main.cpp b/main.cpp
+index 5431db3..2daa6d5 100644
+--- a/main.cpp
++++ b/main.cpp
+@@ -4,6 +4,13 @@
+ #include <QQmlEngine>
+ #include <QQmlFileSelector>
+ #include <QQuickView>
++#include <QtGui/QScreen>
++#include <QtGui/QGuiApplication>
++#include <QtQuick/QQuickItem>
++#include <QtQuick/QQuickView>
++#include <QtQml/QQmlContext>
++
++#include "fileio.h"
+ 
+ int main(int argc, char* argv[]) 
+ {
+@@ -13,7 +20,27 @@ int main(int argc, char* argv[])
+ 
+     qmlRegisterType<App_Launcher>("_Launcher", 1 , 0, "App_Launcher");
+ 
++    //Show information of screen (all monitors)
++    // If 2 screen availabe, chose the larger as it is usually default
++    QScreen *screen, *tmp_screen;
++    if(QGuiApplication::screens().at(0) == NULL)
++        screen = QGuiApplication::screens().at(1);
++    else if(QGuiApplication::screens().at(1) == NULL)
++        screen = QGuiApplication::screens().at(0);
++    else {
++        screen = QGuiApplication::screens().at(0);
++        tmp_screen = QGuiApplication::screens().at(1);
++        if((screen->availableSize().width() * screen->availableSize().height()) < (tmp_screen->availableSize().width() * tmp_screen->availableSize().height()))
++            screen = QGuiApplication::screens().at(1);
++    }
++    qDebug() << "Information for screen:" << screen->name();
++    qDebug() << "  Available geometry:" << screen->availableGeometry().x() << screen->availableGeometry().y() << screen->availableGeometry().width() << "x" << screen->availableGeometry().height();
++    qDebug() << "  Available size:" << screen->availableSize().width() << "x" << screen->availableSize().height();
++
+     QQuickView view;
++    view.rootContext()->setContextProperty("screenHeight", screen->availableSize().height() );
++    view.rootContext()->setContextProperty("screenWidth", screen->availableSize().width());
++
+     if (qgetenv("QT_QUICK_CORE_PROFILE").toInt()) {
+         QSurfaceFormat f = view.format();
+         f.setProfile(QSurfaceFormat::CoreProfile);
+@@ -27,7 +54,10 @@ int main(int argc, char* argv[])
+     view.setSource(QUrl("qrc:///launcher/launcher.qml")); 
+     view.setResizeMode(QQuickView::SizeRootObjectToView);
+ 
+-    view.show();
++    view.setFlags(Qt::FramelessWindowHint);
++    view.setColor(QColor(Qt::transparent));
++    view.setMinimumSize(QSize(640, 360));
++    view.showFullScreen();
+     return guiApp.exec();
+ }
+ 
+-- 
+1.9.1
+

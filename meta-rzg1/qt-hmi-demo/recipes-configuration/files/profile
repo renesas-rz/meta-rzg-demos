@@ -1,0 +1,10 @@
+export XDG_RUNTIME_DIR=/run/user/0
+export LD_PRELOAD=/usr/lib/libEGL.so
+export QT_QPA_PLATFORM=wayland
+
+amixer set 'PCM' 70%
+amixer set 'Headphone' 100%
+
+alias ls='ls --color=auto'
+alias ll='ls -l'
+alias la='ls -la'

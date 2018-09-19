@@ -1,17 +1,6 @@
 FILESEXTRAPATHS_append := "${THISDIR}/qtmultimedia:"
 
-SRC_URI_append_iwg20m += " \
-    file://0001-Fix-wrong-GUI-and-warning-when-fullscreen-mode.patch \
-"
-
-SRC_URI_append_iwg21m += " \
-    file://0001-Fix-wrong-GUI-and-warning-when-fullscreen-mode.patch \
-"
-
-SRC_URI_append_iwg22m += " \
-    file://0001-Fix-wrong-GUI-and-warning-when-fullscreen-mode.patch \
-"
-
-SRC_URI_append_iwg23s += " \
-    file://0001-Fix-wrong-GUI-and-warning-when-fullscreen-mode.patch \
+SRC_URI_append += " \
+    file://0001-Fix-warning-issue-when-fullscreen-mode.patch \
+    file://0002-Fix-wrong-GUI-and-warning-when-fullscreen-mode.patch \
 "

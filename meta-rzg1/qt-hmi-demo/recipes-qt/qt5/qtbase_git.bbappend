@@ -1,9 +1,16 @@
-CONF_ADD_WAYLAND = "${@base_contains('DISTRO_FEATURES', 'wayland', ' -qpa wayland -no-xcb -no-eglfs -wayland', '', d)}"
+FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
-# Select wayland as the default platform abstraction plugin for Qt
+SRC_URI_append = " \
+    file://example.xml \
+    file://800px_El_Guamache_Bay.jpg \
+"
 
-PACKAGECONFIG_CONFARGS_append += " \
-            ${CONF_ADD_WAYLAND} \
-            "
+do_install_append() {
+        install -d ${D}/home/root
+        install -m 755 ${WORKDIR}/example.xml ${D}/home/root/
+        install -m 755 ${WORKDIR}/800px_El_Guamache_Bay.jpg ${D}/home/root/
+}
 
-DEPENDS_append = " gles-user-module"
+#INSANE_SKIP_${PN} = "installed-vs-shipped "
+FILES_${PN}-dbg += "home/root/.debug"
+FILES_${PN} += "home/root"

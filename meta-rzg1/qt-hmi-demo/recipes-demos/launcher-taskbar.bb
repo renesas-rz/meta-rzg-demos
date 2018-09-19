@@ -15,14 +15,10 @@ INITSCRIPT_PARAMS = "start 99 2 3 4 5 . stop 99 0 1 6 ."
 
 do_install() {
     install -d ${D}/home/root/launcher-taskbar
-	install -d ${D}/etc/profile.d
-
-	install -m 0755 ${SRC}/weston_exp.sh ${D}/etc/profile.d
-
     install -m 755 ${SRC}/icons/* ${D}/home/root/launcher-taskbar/
 
-	install -d ${D}/etc/init.d
-	install -m 755 ${SRC}/launcher.init ${D}/etc/init.d/launcher.init
+    install -d ${D}/etc/init.d
+    install -m 755 ${SRC}/launcher.init ${D}/etc/init.d/launcher.init
 }
 
 do_install_append_skrzg1e(){
@@ -68,7 +64,6 @@ do_install_append_iwg23s(){
 }
 
 FILES_${PN} = "/home/root/launcher-taskbar/* \
-	/etc/profile.d \
 	/etc/init.d \
 	/home/root/start_files/* \
 	/home/root/renesas_iWave_info_files/* \

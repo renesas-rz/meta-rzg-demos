@@ -1,0 +1,51 @@
+From 9ef3dfa3aae3bf03fd430aba20ac29215ad2b81f Mon Sep 17 00:00:00 2001
+From: TungDang <tung.dang.jy@rvc.renesas.com>
+Date: Fri, 18 Nov 2016 14:45:18 +0700
+Subject: [PATCH] Config to match position between video and app
+
+Signed-off-by: TungDang <tung.dang.jy@rvc.renesas.com>
+---
+ main.qml | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
+
+diff --git a/main.qml b/main.qml
+index a7eaa0e..847e11a 100755
+--- a/main.qml
++++ b/main.qml
+@@ -4,8 +4,8 @@ import QtMultimedia 5.0
+ 
+ Window {
+     visible: true
+-    //visibility: "FullScreen"
+-	width: screenWidth*(90/100); height: screenHeight*(90/100)
++    visibility: "Windowed"
++    width: screenWidth; height: screenHeight
+     x: 0; y: 0
+     title: qsTr("CameraRecorder app")
+     /*refer time data for recording file name*/
+@@ -54,8 +54,6 @@ Window {
+                  record_image.height = root.width*(5/100)
+                  camera.stop()
+                  camera_recorder.start()
+-
+-
+              }
+ 
+          }
+@@ -136,11 +134,10 @@ Window {
+         CameraRecorderMode {
+             id: camera_recorder
+             fSinkLocation: "/home/root/record.mp4"
+-            x_position: root.width*(10/100)
+-            y_position: root.height*(10/100)
++            x_position: Math.round(root.width*(10/100))
++            y_position: Math.round(root.height*(10/100))+80
+             out_width: root.width*(50/100)
+             out_height: root.height*(50/100)
+-
+             onStatusChanged: {
+             }
+         }
+-- 
+1.9.1
+
