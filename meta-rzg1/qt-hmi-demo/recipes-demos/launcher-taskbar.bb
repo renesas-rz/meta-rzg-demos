@@ -21,42 +21,7 @@ do_install() {
     install -m 755 ${SRC}/launcher.init ${D}/etc/init.d/launcher.init
 }
 
-do_install_append_skrzg1e(){
-    install -d ${D}/home/root/start_files
-    install -m 755 ${SRC}/skrzg1e_info/start_files/* ${D}/home/root/start_files
-    install -m 755 ${SRC}/skrzg1e_info/start.html ${D}/home/root/
-    install -m 755 ${SRC}/skrzg1e_scripts/* ${D}/home/root/launcher-taskbar/
-}
-
-do_install_append_skrzg1m(){
-    install -d ${D}/home/root/start_files
-    install -m 755 ${SRC}/skrzg1m_info/start_files/* ${D}/home/root/start_files
-    install -m 755 ${SRC}/skrzg1m_info/start.html ${D}/home/root/
-    install -m 755 ${SRC}/skrzg1m_scripts/* ${D}/home/root/launcher-taskbar/
-}
-
-do_install_append_iwg20m(){
-    install -d ${D}/home/root/renesas_iWave_info_files
-    install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info_files/* ${D}/home/root/renesas_iWave_info_files
-    install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info.html ${D}/home/root/
-    install -m 755 ${SRC}/iwg20m_scripts/* ${D}/home/root/launcher-taskbar/
-}
-
-do_install_append_iwg21m(){
-    install -d ${D}/home/root/renesas_iWave_info_files
-    install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info_files/* ${D}/home/root/renesas_iWave_info_files
-    install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info.html ${D}/home/root/
-    install -m 755 ${SRC}/iwg20m_scripts/* ${D}/home/root/launcher-taskbar/
-}
-
-do_install_append_iwg22m(){
-    install -d ${D}/home/root/renesas_iWave_info_files
-    install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info_files/* ${D}/home/root/renesas_iWave_info_files
-    install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info.html ${D}/home/root/
-    install -m 755 ${SRC}/iwg20m_scripts/* ${D}/home/root/launcher-taskbar/
-}
-
-do_install_append_iwg23s(){
+do_install_append() {
     install -d ${D}/home/root/renesas_iWave_info_files
     install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info_files/* ${D}/home/root/renesas_iWave_info_files
     install -m 755 ${SRC}/iwg20m_info/renesas_iWave_info.html ${D}/home/root/

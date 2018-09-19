@@ -18,32 +18,10 @@ SRC_URI = "git://code.qt.io/{non-gerrit}/qt-labs/qt5-launch-demo.git \
 SRC_URI[video.md5sum] = "44748e486a971d1e039fbfc3bc15b6f1"
 SRC_URI[video.sha256sum] = "148ec58a28be27700a944b66e404d38ac9d0bbb376485ce60069bdc890a0e0c6"
 
-SRC_URI_append_iwg20m += " \
+SRC_URI_append += " \
     file://0001-qt5-launch-demo-update-GUI-compatible-with-iWave.patch \
     file://0002-Change-address-webpage-offline-to-show-for-customer.patch \
     file://0003-Add-flexible-screen-resolution-for-qt-launcher-demo-.patch \
-"
-
-SRC_URI_append_iwg21m += " \
-    file://0001-qt5-launch-demo-update-GUI-compatible-with-iWave.patch \
-    file://0002-Change-address-webpage-offline-to-show-for-customer.patch \
-    file://0003-Add-flexible-screen-resolution-for-qt-launcher-demo-.patch \
-"
-
-SRC_URI_append_iwg22m += " \
-    file://0001-qt5-launch-demo-update-GUI-compatible-with-iWave.patch \
-    file://0002-Change-address-webpage-offline-to-show-for-customer.patch \
-    file://0003-Add-flexible-screen-resolution-for-qt-launcher-demo-.patch \
-"
-
-SRC_URI_append_iwg23s += " \
-    file://0001-qt5-launch-demo-update-GUI-compatible-with-iWave.patch \
-    file://0002-Change-address-webpage-offline-to-show-for-customer.patch \
-    file://0003-Add-flexible-screen-resolution-for-qt-launcher-demo-.patch \
-"
-
-SRC_URI_append_skrzg1e += " \
-    file://0004-qt5-launch-demo-improve-performance-for-RZG1E-only.patch \
 "
 
 S = "${WORKDIR}/git"
