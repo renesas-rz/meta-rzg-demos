@@ -10,7 +10,6 @@ SRC_URI_append = " \
     file://1003-libtoytoolkit-rename-header-window.h-toytoolkit.h.patch \
     file://1004-window.c-do-not-resize-if-not-needed.patch \
     file://1005-Fixed-memory-corruption-when-focus-listener-is-moved.patch \
-    file://1007-set-position-to-fix-problem-app-under-weston-bar.patch \
     file://1008-larger-weston-bar-suitable-for-touch-screen.patch \
     file://1009-weston-toytoolkit-Switches-from-inline-to-pre-proces.patch \
 "

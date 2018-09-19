@@ -2,10 +2,6 @@ EXTRA_IMAGE_FEATURES = "debug-tweaks tools-debug tools-profile"
 
 # Common lib,app
 IMAGE_INSTALL_append_rzg1 = " \
-    cairo \
-    pulseaudio-init \
-    ltp \
-    gstreamer1.0-plugins-base-vspmfilter \
     gstreamer1.0-plugins-base-apps \
     gstreamer1.0-plugins-good-multifile \
     gstreamer1.0-plugins-good-rtp \
@@ -17,17 +13,12 @@ IMAGE_INSTALL_append_rzg1 = " \
     gstreamer1.0-plugins-good-jpeg \
     gstreamer1.0-plugins-base-volume \
     gstreamer1.0-plugins-base-audiorate \
-    gstreamer1.0-plugins-base-videorate \
     gstreamer1.0-plugins-good-icydemux \
     libgstphotography-1.0 \
     faac \
-    gstreamer1.0-plugins-bad-faac \
-    gstreamer1.0-plugins-bad-faad \
-    gstreamer1.0-plugins-good-isomp4 \
 "
 
 # Common apps
 IMAGE_INSTALL_append_rzg1 = " \
-    usbutils \
     iperf3 \
 "
