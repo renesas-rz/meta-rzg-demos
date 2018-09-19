@@ -9,7 +9,6 @@ do_install () {
 	cp ${S}/../profile ${D}/${ROOT_HOME}/.profile
 }
 
-INSANE_SKIP_${PN} += "ldflags"
 do_patch[noexec] = "1"
 do_cofigure[noexec] = "1"
 do_compile[noexec] = "1"

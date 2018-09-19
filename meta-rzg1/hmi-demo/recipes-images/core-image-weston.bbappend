@@ -1,5 +1,3 @@
-include core-image-weston.inc
-
 IMAGE_INSTALL_append = " \
     configuration \
     demos \

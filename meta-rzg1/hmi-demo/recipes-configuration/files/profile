@@ -1,4 +1,3 @@
-export LD_LIBRARY_PATH="/usr/lib/gstreamer-1.0:/lib:/usr/lib:/usr/local/lib"
 export XDG_RUNTIME_DIR=/run/user/0/
 export PATH=/home/root/RZ_scripts:$PATH
 
@@ -8,8 +7,6 @@ amixer set 'Headphone' 70%
 
 # Set Mic
 amixer set 'Mic' 70%
-    
-modprobe -a mmngr mmngrbuf s3ctl uvcs_cmn vspm fdpm
     
 alias ls='ls --color=auto'
 alias ll='ls -l'
