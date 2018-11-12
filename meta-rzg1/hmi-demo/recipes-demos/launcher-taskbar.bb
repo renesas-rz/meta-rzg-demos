@@ -7,9 +7,15 @@ SRC_URI = " \
  file://Demo3D.png \
  file://Demo3D.sh \
  file://libjpeg.so.9 \
+ file://0001-Video_Playback-set-D_SCALE-for-HDMI-sreen-resolution.patch \
 "
 
 INSANE_SKIP_${PN} = "already-stripped"
+
+do_patch() {
+    cd ${WORKDIR}
+    git apply *.patch
+}
 
 do_install() {
     install -d ${D}/home/root/launcher-taskbar/hmi-icons

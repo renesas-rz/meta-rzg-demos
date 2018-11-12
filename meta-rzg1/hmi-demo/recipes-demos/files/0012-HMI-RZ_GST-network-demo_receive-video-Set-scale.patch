@@ -1,0 +1,74 @@
+From b668826a71d8820a35a9a4f88e7f781fafcb3b9c Mon Sep 17 00:00:00 2001
+From: TamND8 <TamND8@fsoft.com.vn>
+Date: Mon, 12 Nov 2018 14:36:26 +0700
+Subject: RZ-GST-network-demo-receive-video: Set scale
+when displaying on HDMI and LVDS screen
+
+	Set scale for different resolution on HDMI
+and LVDS screen.
+
+Signed-off-by: TamND8 <TamND8@fsoft.com.vn>
+---
+ RZ_GST-network-demo_receive-video.sh | 47 ++++++++++++++++++++++++++----------
+ 1 file changed, 34 insertions(+), 13 deletions(-)
+
+diff --git a/RZ_GST-network-demo_receive-video.sh b/RZ_GST-network-demo_receive-video.sh
+index 5c5f3e5..079acde 100755
+--- a/RZ_GST-network-demo_receive-video.sh
++++ b/RZ_GST-network-demo_receive-video.sh
+@@ -1,19 +1,40 @@
+ #!/bin/bash
+ source /home/root/.bashrc
+
+-if [ $D_WIDTH -lt 1920 ]
+-then
+-	scale_width="out-width=$D_WIDTH"
+-	scale_height="out-height=$D_HEIGHT"
++#detect the width to set the value of scale on waylandsink
++D_WIDTH=$(weston-info | grep -B 1 "current"| grep "width" | cut -d" " -f2 | head -1)
++
++if [ $D_WIDTH -le 799 ]; then
++		D_SCALE=0.376					# screen LVDS:480x272
++elif [ $D_WIDTH -le 1023 ]; then
++		D_SCALE=0.625					# screen LVDS:800x480
++elif [ $D_WIDTH -le 1200 ]; then
++		D_SCALE=0						# screen HDMI:1024x768
++elif [ $D_WIDTH -le 1900 ]; then
++		D_SCALE=1						# screen HDMI:1280x720
+ else
+-	unset scale_width
+-	unset scale_height
++		D_SCALE=1.5						# screen HDMI: 1920x1080
+ fi
+
+-gst-launch-1.0 -e \
+-udpsrc port=5000 caps="application/x-rtp" ! \
+-queue ! \
+-rtph264depay ! \
+-h264parse ! \
+-omxh264dec ! \
+-waylandsink max-lateness=-1 qos=false position_x=0 position_y=0
++if [ $D_SCALE -le 0 ]; then
++		gst-launch-1.0 -e udpsrc port=5000 caps="application/x-rtp" ! \
++		rtpjitterbuffer latency=350 ! \
++		rtph264depay ! \
++		h264parse ! \
++		omxh264dec ! \
++		vspmfilter ! \
++		video/x-raw, \
++		format=BGRA, \
++		width=1024, \
++		height=768 ! \
++		waylandsink
++else
++		gst-launch-1.0 -e udpsrc port=5000 caps="application/x-rtp" ! \
++		queue ! \
++		rtph264depay ! \
++		h264parse ! \
++		omxh264dec ! \
++		waylandsink \
++		scale=$D_SCALE \
++		position_x=0 position_y=30 qos=false
++fi
+--
+2.7.4

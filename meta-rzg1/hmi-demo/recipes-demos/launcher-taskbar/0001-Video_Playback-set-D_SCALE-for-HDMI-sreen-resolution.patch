@@ -1,0 +1,42 @@
+From 519643fb3ecf32e6716da3dd1fade64c681c4aef Mon Sep 17 00:00:00 2001
+From: Hao Bui <hao.bui.yg@renesas.com>
+Date: Fri, 13 Sep 2019 15:26:41 +0700
+Subject: [PATCH] Video_Playback: set D_SCALE for HD streaming on HDMI
+
+Set D_SCALE for HD resolution when display on HDMI screen.
+
+Signed-off-by: TamND8 <TamND8@fsoft.com.vn>
+Signed-off-by: Hao Bui <hao.bui.yg@renesas.com>
+---
+ hmi-scripts/Video_Playback.sh | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/hmi-scripts/Video_Playback.sh b/hmi-scripts/Video_Playback.sh
+index 1637e86..37a241d 100755
+--- a/hmi-scripts/Video_Playback.sh
++++ b/hmi-scripts/Video_Playback.sh
+@@ -13,12 +13,16 @@ printf "\n\e[31mNOTE: Click on Exit icon to exit from running applications\e[0m\
+ #detect the width to set the value of scale on waylandsink
+ D_WIDTH=$(weston-info | grep -B 1 "current"| grep "width" | cut -d" " -f2 | head -1)
+ 
+-if [ $D_WIDTH -le 799 ]; then 
+-   D_SCALE=0.25               # screen LVDS:480x272
+-elif [ $D_WIDTH -le 1200 ]; then
+-   D_SCALE=0.5                # screen LVDS:800x480
++if [ $D_WIDTH -le 799 ]; then
++	D_SCALE=0.25		# screen LVDS:480x272
++elif [ $D_WIDTH -le 1023 ]; then
++	D_SCALE=0.5			# screen LVDS:800x480
++elif [ $D_WIDTH -le 1279 ]; then
++	D_SCALE=0.71		# screen HDMI:1024x768
++elif [ $D_WIDTH -le 1919 ]; then
++	D_SCALE=0.667		# screen HDMI:1280x720
+ else
+-   D_SCALE=1                  # screen HDMI
++	D_SCALE=1			# screen HDMI:1920x1080
+ fi
+ 
+ /home/root/RZ_scripts/RZ_GST-demo_video-playback.sh /home/root/videos/h264-fhd-60.mp4 0 0 $D_SCALE  > ${TTY}
+-- 
+2.7.4
+

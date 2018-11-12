@@ -17,6 +17,7 @@ SRC_URI = " \
  file://0009-HMI-demos-demos-set-width-and-height-in-capsfilter-i.patch \
  file://0010-demos-streaming-add-h264parse-to-correct-pipeline-st.patch \
  file://0011-demos-remove-out-width-and-out-height-from-RZ_GST-ne.patch \
+ file://0012-HMI-RZ_GST-network-demo_receive-video-Set-scale.patch \
 "
 
 do_patch () {
