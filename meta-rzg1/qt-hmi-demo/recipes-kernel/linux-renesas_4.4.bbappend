@@ -13,6 +13,10 @@ SRC_URI_append_iwg23s = " \
     file://iwg23s/0001-ARM-shmobilel-setup-rcar-gen2-resize-CMA-area-1-for-.patch \
 "
 
-SRC_URI_append_iwg20m = " \
-    file://iwg20m-qt.cfg \
+SRC_URI_append_iwg20m-g1m = " \
+    file://iwg20m-g1m-qt.cfg \
+"
+
+SRC_URI_append_iwg20m-g1n = " \
+    file://iwg20m-g1n-qt.cfg \
 "
