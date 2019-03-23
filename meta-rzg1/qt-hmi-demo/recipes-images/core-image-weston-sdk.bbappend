@@ -52,7 +52,7 @@ create_sdk_files_prepend () {
 }
 
 IMAGE_INSTALL_append = " qtmultimedia"
-TOOLCHAIN_HOST_TASK_append = " nativesdk-qtbase-tools nativesdk-packagegroup-qt5-toolchain-host"
+TOOLCHAIN_HOST_TASK_append = " nativesdk-qtbase-tools nativesdk-packagegroup-qt5-toolchain-host nativesdk-cmake"
 
 ### For self-compile ###
 IMAGE_INSTALL_append = " packagegroup-qt5-toolchain-target "
