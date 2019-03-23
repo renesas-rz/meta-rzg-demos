@@ -38,4 +38,5 @@ IMAGE_INSTALL_append = " \
     qtwebengine-examples \
     qtwebengine-qmlplugins \
 	demo-videos \
+    cmake \
 "
