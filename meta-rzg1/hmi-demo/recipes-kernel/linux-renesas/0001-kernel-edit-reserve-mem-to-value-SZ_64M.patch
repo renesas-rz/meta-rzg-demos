@@ -1,22 +1,23 @@
-From c03426de735b9732d87c49da409d4b7f575b7835 Mon Sep 17 00:00:00 2001
-From: "linhnv25@fsoft.com.vn" <LinhNV25@fsoft.com.vn>
-Date: Fri, 13 Jul 2018 14:13:28 +0700
+From 09bf22c27e188728f4455422c257cd2e5ad53b75 Mon Sep 17 00:00:00 2001
+From: Duy Nguyen <duynt26@fsoft.com.vn>
+Date: Tue, 3 Sep 2019 09:14:25 +0700
 Subject: [PATCH] kernel: edit reserve mem to value SZ_64M
 
 Signed-off-by: nhannguyen <nhan.nguyen.yb@renesas.com>
 Signed-off-by: linhnv25@fsoft.com.vn <LinhNV25@fsoft.com.vn>
+Signen-off-by: Duy Nguyen <duynt26@fsoft.com.vn>
 ---
  arch/arm/mach-shmobile/setup-rcar-gen2.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm/mach-shmobile/setup-rcar-gen2.c b/arch/arm/mach-shmobile/setup-rcar-gen2.c
-index 1cb5e71..4e25f6a 100644
+index 6f6c5b1..5fb7855 100644
 --- a/arch/arm/mach-shmobile/setup-rcar-gen2.c
 +++ b/arch/arm/mach-shmobile/setup-rcar-gen2.c
-@@ -195,7 +195,7 @@ void __init rcar_gen2_reserve(void)
+@@ -178,7 +178,7 @@ void __init rcar_gen2_reserve(void)
+
  	/* reserve 256 MiB at the top of the physical legacy 32-bit space */
  	memset(&mrc, 0, sizeof(mrc));
- 
 -	mrc.reserved = SZ_256M;
 +	mrc.reserved = SZ_64M;
  

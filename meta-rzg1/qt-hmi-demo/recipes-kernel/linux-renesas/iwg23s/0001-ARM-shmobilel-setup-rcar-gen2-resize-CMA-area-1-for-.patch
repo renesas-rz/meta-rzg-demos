@@ -1,26 +1,27 @@
-From c8bdfc9c6059b7cd90ab585c03e41db7c9d8ae14 Mon Sep 17 00:00:00 2001
-From: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
-Date: Thu, 30 Aug 2018 18:59:21 +0700
+From e94bc2c216268adfa142b37c3b462445ec4cd14b Mon Sep 17 00:00:00 2001
+From: ChinhPC <chinhpc@fsoft.com.vn>
+Date: Fri, 23 Aug 2019 09:43:52 +0700
 Subject: [PATCH] ARM: shmobilel: setup-rcar-gen2: resize CMA area 1 for G1C
 
 Signed-off-by: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
+Signed-off-by: ChinhPC <chinhpc@fsoft.com.vn>
 ---
  arch/arm/mach-shmobile/setup-rcar-gen2.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/arm/mach-shmobile/setup-rcar-gen2.c b/arch/arm/mach-shmobile/setup-rcar-gen2.c
-index 1cb5e71..eccb3a6 100644
+index 6f6c5b1..354a16c 100644
 --- a/arch/arm/mach-shmobile/setup-rcar-gen2.c
 +++ b/arch/arm/mach-shmobile/setup-rcar-gen2.c
-@@ -195,7 +195,7 @@ void __init rcar_gen2_reserve(void)
+@@ -178,7 +178,7 @@ void __init rcar_gen2_reserve(void)
+
  	/* reserve 256 MiB at the top of the physical legacy 32-bit space */
  	memset(&mrc, 0, sizeof(mrc));
- 
 -	mrc.reserved = SZ_256M;
 +	mrc.reserved = SZ_128M;
  
  	of_scan_flat_dt(rcar_gen2_scan_mem, &mrc);
  #ifdef CONFIG_DMA_CMA
 -- 
-1.9.1
+2.7.4
 

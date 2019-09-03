@@ -1,25 +1,26 @@
-From 763aba81fb8a5050c68ecf52b0e18d65220a157a Mon Sep 17 00:00:00 2001
-From: "linhnv25@fsoft.com.vn" <LinhNV25@fsoft.com.vn>
-Date: Fri, 13 Jul 2018 14:18:22 +0700
-Subject: [PATCH] ARM: mach-shmobile: Reducing CMA reserve from 256M to 128M
+From 62f05a595cc55aaf51a06af0f987e2b986e0ce1a Mon Sep 17 00:00:00 2001
+From: Duy Nguyen <duynt26@fsoft.com.vn>
+Date: Mon, 19 Aug 2019 15:36:03 +0700
+Subject: [PATCH] ARM: mach-shmobile: Reducing CMA reserve from 256M to 128M 
  for iwg22m board
 
 Reducing CMA size since RAM size is 512 MB
 
 Signed-off-by: Quoc Ngo <quoc.ngo.wz@rvc.renesas.com>
 Signed-off-by: linhnv25@fsoft.com.vn <LinhNV25@fsoft.com.vn>
+Signed-off-by: Duy Nguyen <duynt26@fsoft.com.vn>
 ---
  arch/arm/mach-shmobile/setup-rcar-gen2.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm/mach-shmobile/setup-rcar-gen2.c b/arch/arm/mach-shmobile/setup-rcar-gen2.c
-index 1cb5e71..2b31613 100644
+index 6f6c5b1..08eb140 100644
 --- a/arch/arm/mach-shmobile/setup-rcar-gen2.c
 +++ b/arch/arm/mach-shmobile/setup-rcar-gen2.c
-@@ -195,7 +195,8 @@ void __init rcar_gen2_reserve(void)
+@@ -178,7 +178,8 @@ void __init rcar_gen2_reserve(void)
+
  	/* reserve 256 MiB at the top of the physical legacy 32-bit space */
  	memset(&mrc, 0, sizeof(mrc));
- 
 -	mrc.reserved = SZ_256M;
 +	/* IWG22M: Reducing CMA size since RAM size is 512 MB*/
 +	mrc.reserved = SZ_128M;
