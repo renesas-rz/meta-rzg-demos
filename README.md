@@ -1,10 +1,10 @@
-meta-rzg-demos-private
+meta-rzg-demos
 
 INTRODUCTION
 ------------
 
 This package supports building Yocto-based images for Renesas RZ/G1 eveluation boards
-with HMI and Qt-HMI demos, basing on following components:
+with HMI or Qt-HMI demos, basing on following components:
 
     GCC 7.2
 
@@ -14,7 +14,7 @@ with HMI and Qt-HMI demos, basing on following components:
 DEPENDENCIES
 ------------
 
-This layer is for Yocto 2.4.2 framework and depends on following packages:
+This package is for Yocto 2.4.2 framework and depends on following layers:
 
     URI: git://git.yoctoproject.org/poky
 
@@ -34,4 +34,3 @@ This layer is for Yocto 2.4.2 framework and depends on following packages:
 
 
 In addition, this package has to be built with corresponding meta-renesas package.
-
