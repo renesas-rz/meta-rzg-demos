@@ -22,6 +22,7 @@ RDEPENDS_libweston-2_append = " gles-user-module "
 
 do_patch() {
     cd ${WORKDIR}/Demo3D
+	git init
     git apply ../*.patch
 }
 
