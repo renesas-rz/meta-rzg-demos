@@ -8,6 +8,7 @@ SRC_URI = " \
  file://Demo3D.sh \
  file://libjpeg.so.9 \
  file://0001-Video_Playback-set-D_SCALE-for-HDMI-sreen-resolution.patch \
+ file://0002-Video_Playback-correct-detecting-width-of-screen.patch \
 "
 
 INSANE_SKIP_${PN} = "already-stripped"

@@ -1,0 +1,31 @@
+From 08495b4641f797662ecaab3e0ded03840a841159 Mon Sep 17 00:00:00 2001
+From: Loc Vu <loc.vu.zn@rensas.com>
+Date: Wed, 26 Aug 2020 13:16:19 +0700
+Subject: [PATCH] RZ_GST-network-demo_receive: correct detecting width of
+ screen
+
+This patch corrects command detecting width of display screen
+for app RZ_GST-network-demo_receive video due to upgrading
+new busybox version.
+
+Signed-off-by: Loc Vu <loc.vu.zn@rensas.com>
+---
+ RZ_GST-network-demo_receive-video.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/RZ_GST-network-demo_receive-video.sh b/RZ_GST-network-demo_receive-video.sh
+index d582ecf..2cba531 100755
+--- a/RZ_GST-network-demo_receive-video.sh
++++ b/RZ_GST-network-demo_receive-video.sh
+@@ -2,7 +2,7 @@
+ source /home/root/.bashrc
+ 
+ #detect the width to set the value of scale on waylandsink
+-D_WIDTH=$(weston-info | grep -B 1 "current"| grep "width" | cut -d" " -f2 | head -1)
++D_WIDTH=$(weston-info | grep -B 1 "current"| grep "width" | cut -d" " -f2 | head -n 1)
+ 
+ if [ $D_WIDTH -le 799 ]; then
+ 		D_SCALE=0.376					# screen LVDS:480x272
+-- 
+1.9.1
+

@@ -1,0 +1,29 @@
+From 577857c9db47d37a46902b221b883f78f8973850 Mon Sep 17 00:00:00 2001
+From: Loc Vu <loc.vu.zn@renesas.com>
+Date: Wed, 26 Aug 2020 10:56:34 +0700
+Subject: [PATCH] Video_Playback: correct detecting width of screen
+
+This patch change command detecting width of display screen
+for app Video_Playback due to upgrading new busybox version.
+
+Signed-off-by: Loc Vu <loc.vu.zn@renesas.com>
+---
+ Video_Playback.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Video_Playback.sh b/Video_Playback.sh
+index 37a241d..00a831b 100755
+--- a/hmi-scripts/Video_Playback.sh
++++ b/hmi-scripts/Video_Playback.sh
+@@ -11,7 +11,7 @@ printf "\tYou are watching Video playback on screen\n\
+ printf "\n\e[31mNOTE: Click on Exit icon to exit from running applications\e[0m\n\n" > ${TTY}
+ 
+ #detect the width to set the value of scale on waylandsink
+-D_WIDTH=$(weston-info | grep -B 1 "current"| grep "width" | cut -d" " -f2 | head -1)
++D_WIDTH=$(weston-info | grep -B 1 "current"| grep "width" | cut -d" " -f2 | head -n 1)
+ 
+ if [ $D_WIDTH -le 799 ]; then
+ 	D_SCALE=0.25		# screen LVDS:480x272
+-- 
+1.9.1
+
