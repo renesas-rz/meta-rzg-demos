@@ -9,7 +9,7 @@ LIC_FILES_CHKSUM = "file://main.qml;beginline=1;endline=39;md5=46fcfe21b4d588450
 SRCREV = "c43ddf9d354761c51266ecbdc6cb90a3aac1903d"
 SRC_URI = "git://code.qt.io/{non-gerrit}/qt-labs/qt5-launch-demo.git \
            file://0001-change_video_file.patch \
-           http://www.renesas.com/jp/ja/img/products/media/auto-j/microcontrollers-microprocessors/rz/rzg/qt-videos/renesas-bigideasforeveryspace.mp4;name=video \
+           http://resource.renesas.com/resource/lib/img/products/media/auto-j/microcontrollers-microprocessors/rz/rzg/qt-videos/renesas-bigideasforeveryspace.mp4;name=video \
 		   file://0003-qt5-launch-demo-work-around-issue-cannot-play-video.patch \
 "
 # Tempory remove due to license issue with Qt webengine
